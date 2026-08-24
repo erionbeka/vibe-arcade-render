@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log in — Vibe Arcade</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <a class="logo" href="/">VIBE ARCADE</a>
+    <div class="nav-spacer"></div>
+    <div id="nav-auth" style="display:flex;gap:14px;align-items:center"></div>
+  </div>
+</nav>
+
+<div class="form-page">
+  <div class="form-card">
+    <h2>Welcome back</h2>
+    <p class="sub">Log in to upload games, like, rate and comment.</p>
+
+    <div class="form-error" id="error"></div>
+
+    <form id="login-form">
+      <div class="field">
+        <label for="username">Username</label>
+        <input type="text" id="username" maxlength="24" required autocomplete="username">
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%">Log in</button>
+    </form>
+
+    <p class="form-footer">No account yet? <a href="/register.html">Sign up free</a></p>
+  </div>
+</div>
+
+<script src="/js/app.js"></script>
+<script src="/js/authpage.js"></script>
+<script>document.getElementById('login-form').addEventListener('submit', e => handleAuthSubmit(e, '/auth/login', 'Welcome back!'));</script>
+</body>
+</html>

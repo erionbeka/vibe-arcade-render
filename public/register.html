@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign up — Vibe Arcade</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <a class="logo" href="/">VIBE ARCADE</a>
+    <div class="nav-spacer"></div>
+    <div id="nav-auth" style="display:flex;gap:14px;align-items:center"></div>
+  </div>
+</nav>
+
+<div class="form-page">
+  <div class="form-card">
+    <h2>Join the arcade</h2>
+    <p class="sub">Create a free account to publish your vibe-coded games.</p>
+
+    <div class="form-error" id="error"></div>
+
+    <form id="register-form">
+      <div class="field">
+        <label for="username">Username</label>
+        <input type="text" id="username" maxlength="24" required autocomplete="username">
+        <div class="hint">3-24 characters. Letters, numbers, underscore.</div>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" required autocomplete="new-password">
+        <div class="hint">At least 6 characters.</div>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%">Create account</button>
+    </form>
+
+    <p class="form-footer">Already have an account? <a href="/login.html">Log in</a></p>
+  </div>
+</div>
+
+<script src="/js/app.js"></script>
+<script src="/js/authpage.js"></script>
+<script>document.getElementById('register-form').addEventListener('submit', e => handleAuthSubmit(e, '/auth/register', 'Account created!'));</script>
+</body>
+</html>

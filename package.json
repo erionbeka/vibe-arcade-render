@@ -1,0 +1,19 @@
+{
+  "name": "vibe-arcade",
+  "version": "1.0.0",
+  "description": "A community arcade where vibe coders upload and share their games",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.16",
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^13.0.3",
+    "express": "^4.21.2",
+    "express-rate-limit": "^8.6.2",
+    "express-session": "^1.18.1",
+    "multer": "^1.4.5-lts.2"
+  }
+}

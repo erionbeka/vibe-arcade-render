@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vibe Arcade — play games made by vibe coders</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta name="description" content="Vibe Arcade is a community site where vibe coders upload their games. Play in your browser, rate, comment and download the source to remix.">
+<meta property="og:title" content="Vibe Arcade">
+<meta property="og:description" content="Play games made by vibe coders — or upload your own.">
+<meta property="og:image" content="/og.png">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <a class="logo" href="/">VIBE ARCADE</a>
+    <div class="nav-spacer"></div>
+    <div id="nav-auth" style="display:flex;gap:14px;align-items:center"></div>
+  </div>
+</nav>
+
+<div class="container">
+  <section class="hero">
+    <h1>GAMES MADE BY <span class="grad">VIBE CODERS</span></h1>
+    <p>Upload your AI-assisted creations, play other people's games right in the browser,
+       rate them, and remix their source code.</p>
+    <div class="coin-hint">- INSERT COIN TO CONTINUE -</div>
+  </section>
+
+  <div class="toolbar">
+    <div class="search-wrap">
+      <input type="text" id="search" placeholder="Search games..." autocomplete="off">
+    </div>
+    <select id="sort" aria-label="Sort games">
+      <option value="new">Newest first</option>
+      <option value="likes">Most liked</option>
+      <option value="views">Most played</option>
+      <option value="rating">Top rated</option>
+    </select>
+  </div>
+
+  <div class="tag-chips" id="tags"></div>
+  <div class="grid" id="games"></div>
+</div>
+
+<script src="/js/app.js"></script>
+<script src="/js/main.js"></script>
+</body>
+</html>

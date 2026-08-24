@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Play — Vibe Arcade</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta name="description" content="Play this game on Vibe Arcade — the arcade for vibe-coded games.">
+<meta property="og:title" content="Play — Vibe Arcade">
+<meta property="og:description" content="Play this game on Vibe Arcade, the arcade for vibe-coded games.">
+<meta property="og:image" content="/og.png">
+<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <a class="logo" href="/">VIBE ARCADE</a>
+    <div class="nav-spacer"></div>
+    <div id="nav-auth" style="display:flex;gap:14px;align-items:center"></div>
+  </div>
+</nav>
+
+<div class="container play-shell">
+  <div class="game-head">
+    <div>
+      <h1 id="g-title">Loading...</h1>
+      <div class="byline" id="g-byline"></div>
+    </div>
+    <div class="actions" id="g-actions"></div>
+  </div>
+
+  <div class="iframe-frame" id="frame-area">
+    <iframe id="playframe" sandbox="allow-scripts allow-pointer-lock" allowfullscreen
+            allow="fullscreen; autoplay; gamepad" title="game"></iframe>
+  </div>
+
+  <div class="detail-cols">
+    <div>
+      <div class="panel">
+        <h3>About this game</h3>
+        <div class="desc-text" id="g-desc">No description.</div>
+      </div>
+      <div class="panel">
+        <h3>Comments</h3>
+        <div id="comments-list"></div>
+        <form class="comment-form" id="comment-form" style="display:none">
+          <textarea id="comment-body" placeholder="Say something nice (or helpful)..." maxlength="2000"></textarea>
+          <div class="row"><button type="submit" class="btn btn-primary btn-sm">Post comment</button></div>
+        </form>
+        <p class="muted" id="login-nudge" style="display:none"><a href="/login.html">Log in</a> to join the conversation.</p>
+      </div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Rate this game</h3>
+        <div class="rating-line">
+          <span class="stars" id="stars-widget"></span>
+          <span><span class="rating-num" id="rating-num">&ndash;</span> <span class="muted" id="rating-count"></span></span>
+        </div>
+        <p class="muted" id="rate-hint" style="margin-bottom:0"></p>
+      </div>
+      <div class="panel">
+        <h3>Details</h3>
+        <ul class="meta-list" id="g-meta"></ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/js/app.js"></script>
+<script type="module" src="/js/game.js"></script>
+</body>
+</html>
