@@ -86,6 +86,36 @@ const CATALOG = [
     title: 'BUDGET AIRLINES: PEANUT EDITION',
     description: 'Pilot the world\'s cheapest aircraft. Hold to throttle up, collect peanuts (worth 10 meters each), dodge birds and colleagues.\n\nFeatures a captain who announces things like "we saved on fuel by removing the fuel" and a crash screen with sincere corporate apologies.',
     tags: 'flying arcade food comedy'
+  },
+  {
+    file: 'yelling-simulator.html',
+    title: 'YELLING SIMULATOR',
+    description: 'Hold the button. Yell (internally). The decibel meter rises, the screen shakes, and your neighbors leave increasingly formal complaints.\n\nYell too briefly and you produce a mere squeak, disappointing a goldfish somewhere. 8 complaint milestones including involvement of the city.',
+    tags: 'comedy clicker noise'
+  },
+  {
+    file: 'wack-strike.html',
+    title: 'WACK-A-MOLE (LABOR DISPUTE)',
+    description: 'The moles are on strike and hold tiny picket signs. Whacking strikers earns you -1 karma and a formal grievance; the occasional non-union scab mole is fair game.\n\n30-second shifts end with an ethical assessment of your career choices.',
+    tags: 'whack-a-mole animals comedy labor'
+  },
+  {
+    file: 'goldfish-memory.html',
+    title: 'GOLDFISH MEMORY TEST',
+    description: 'Memorize words for 2 seconds, then pick them from decoys like "REGRET" and "CAR ALARM".\n\nYour opponent is a goldfish that claims it never forgets. The goldfish always scores. Always. Verify this injustice yourself across 6 rounds.',
+    tags: 'quiz animals comedy unfair'
+  },
+  {
+    file: 'dial-up-1997.html',
+    title: 'DIAL-UP SIMULATOR 1997',
+    description: 'Connect to the internet the way nature intended: a 25-second ritual of modem throat-clearing, handshakes, and genuine synthesized screeching.\n\nReward: one (1) email from mom with a 47-minute attachment. Disconnecting makes mom never know.',
+    tags: 'retro simulation comedy slow'
+  },
+  {
+    file: 'fridge.html',
+    title: 'FRIDGE SIMULATOR',
+    description: 'Open the fridge. Close the fridge. Discover what the leftovers have become.\n\n12 mysteries to find, including opinion-having yogurt, unexplained additional ham, and a cat that declines to leave. Day counter included because time passes inside fridges too.',
+    tags: 'simulation food mystery cozy'
   }
 ];
 
@@ -95,14 +125,16 @@ const insertGame = db.prepare(
 const insertTag = db.prepare('INSERT OR IGNORE INTO tags (game_id, tag) VALUES (?, ?)');
 
 for (const g of CATALOG) {
-  const exists = db.prepare('SELECT id FROM games WHERE title = ? AND user_id = ?').get(g.title, bot.id);
-  if (exists) {
-    console.log(`skip (already published): ${g.title}`);
-    continue;
-  }
   const srcPath = path.join(__dirname, '..', 'games-to-upload', g.file);
   if (!fs.existsSync(srcPath)) {
     console.error(`missing file: ${g.file}`);
+    continue;
+  }
+  const existing = db.prepare('SELECT id FROM games WHERE title = ? AND user_id = ?').get(g.title, bot.id);
+  if (existing) {
+    // refresh the playable copy so source fixes reach published games
+    fs.copyFileSync(srcPath, path.join(GAMES_DIR, String(existing.id), 'index.html'));
+    console.log(`refreshed: ${g.title} (#${existing.id})`);
     continue;
   }
   const gameId = db.transaction(() => {

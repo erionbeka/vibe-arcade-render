@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>YELLING SIMULATOR</title>
+<style>
+  html,body{margin:0;height:100%;background:#1c0512;color:#ffe3f1;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+  h1{font-size:.95rem;color:#ff6ec7;margin:0}
+  #meterWrap{width:min(440px,88vw);height:34px;border:4px solid #7a2456;background:#2b0a1e}
+  #fill{height:100%;width:0%;background:linear-gradient(90deg,#ff6ec7,#ffe600);transition:none}
+  #btn{width:220px;height:110px;font-family:'Consolas';font-size:1.3rem;font-weight:bold;border:5px solid #ff2bd6;background:#4a0f36;color:#ffd9f2;border-radius:14px;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:none}
+  #btn:active{transform:scale(.96)}
+  body.quake #wrapall{animation:q .12s infinite}
+  @keyframes q{25%{transform:translate(4px,-3px)}50%{transform:translate(-4px,3px)}75%{transform:translate(3px,2px)}}
+  #notes{min-height:120px;display:flex;flex-direction:column-reverse;gap:8px;width:min(440px,88vw)}
+  .note{background:#fff8e0;color:#4a3a20;padding:8px 12px;font-size:.95rem;transform:rotate(-1deg);border-radius:4px;box-shadow:3px 3px 0 rgba(0,0,0,.4)}
+  .note:nth-child(even){transform:rotate(1.4deg)}
+  #stats{color:#c98bb0}
+</style>
+</head>
+<body>
+<div id="wrapall" style="display:flex;flex-direction:column;align-items:center;gap:16px">
+<h1>YELLING SIMULATOR</h1>
+<div id="meterWrap"><div id="fill"></div></div>
+<button id="btn">HOLD TO YELL</button>
+<div id="stats">loudest: <span id="loud">0</span>dB &nbsp;&middot;&nbsp; total yelled: <span id="tot">0</span>dB &nbsp;&middot;&nbsp; notes: <span id="notes-n">0</span></div>
+<div id="notes"><div class="note">welcome! neighbors are currently calm.</div></div>
+</div>
+<script>
+const fill=document.getElementById('fill'),btn=document.getElementById('btn'),notes=document.getElementById('notes');
+let holding=false,power=0,loudest=0,total=0,nCount=0,yelling=false;
+const COMPLAINTS=[
+  [15,'keep it down!! - neighbor (left)'],
+  [35,'i can HEAR your feelings - upstairs'],
+  [60,'the dog next door is now concerned - dog'],
+  [90,'this is a LIBRARY (it is not a library) - someone'],
+  [130,'my plants are stressed. i blame you. - 3B'],
+  [180,'the building has voted. you are the noise. - management'],
+  [240,'we have forwarded your yell to the city. - city'],
+  [310,'legend. teach me. - a different neighbor']
+];
+function drone(on){
+  if(on&&!window.__osc){
+    try{
+      const a=new (window.AudioContext||window.webkitAudioContext)();
+      const o=a.createOscillator(),g=a.createGain();
+      o.type='sawtooth';o.frequency.value=90;o.connect(g);g.connect(a.destination);
+      g.gain.value=.03;o.start();window.__osc={o,g,a};
+    }catch(e){}
+    yelling=true;
+  }else if(!on&&window.__osc){
+    try{const {o,a}=window.__osc;o.stop();a.close();}catch(e){}
+    window.__osc=null;yelling=false;
+  }
+}
+function loop(){
+  if(holding){
+    power+=holding?2.2:0;
+    if(power>=100){power=100;}
+    const db=Math.round(power);
+    if(db>loudest){loudest=db;}
+    if(window.__osc)window.__osc.o.frequency.value=70+power*1.6;
+    document.body.classList.toggle('quake',power>55);
+    if(power>=100&&!document.getElementById('btn').dataset.max){
+      document.getElementById('btn').dataset.max='1';
+      note('ACHIEVEMENT: FULL LUNG. medical science is intrigued.');
+    }
+  } else if(power>0){
+    if(power>8){
+      total+=Math.round(power);document.getElementById('tot').textContent=total;
+      checkComplaints(Math.round(total));
+    } else if(window.__osc&&total===0){}
+    power=0;
+    delete document.getElementById('btn').dataset.max;
+    document.body.classList.remove('quake');
+  }
+  if(power<=8&&power>0){/* squeak zone */}
+  fill.style.width=power+'%';
+  document.getElementById('loud').textContent=loudest;
+  requestAnimationFrame(loop);
+}
+function checkComplaints(t){
+  while(nCount<COMPLAINTS.length&&t>=COMPLAINTS[nCount][0]){
+    note(COMPLAINTS[nCount][1]);nCount++;
+    document.getElementById('notes-n').textContent=nCount;
+  }
+}
+function note(text){
+  const n=document.createElement('div');n.className='note';n.textContent=text;
+  notes.appendChild(n);
+  while(notes.children.length>5)notes.firstChild.remove();
+}
+btn.addEventListener('pointerdown',e=>{e.preventDefault();holding=true;drone(true);});
+addEventListener('pointerup',()=>{if(holding&&power<=8&&power>0)note('that was a squeak. the goldfish next door is unimpressed.');holding=false;drone(false);});
+addEventListener('pointercancel',()=>{holding=false;drone(false);});
+loop();
+</script>
+</body>
+</html>

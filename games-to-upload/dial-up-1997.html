@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DIAL-UP SIMULATOR 1997</title>
+<style>
+  html,body{margin:0;height:100%;background:#000;color:#3cff5e;font-family:'Courier New',monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+  h1{font-size:.95rem;margin:0;color:#b6ffb9;text-align:center}
+  #screen{width:min(560px,92vw);height:280px;background:#0a0a0a;border:6px solid #333;border-radius:12px;padding:16px;overflow:hidden;font-size:.95rem;line-height:1.5;position:relative}
+  #bar{width:100%;height:18px;border:2px solid #3cff5e;margin-top:10px}
+  #fill{height:100%;width:0%;background:#3cff5e}
+  button{padding:12px 26px;font-family:inherit;font-size:1.05rem;background:#003a00;color:#7dff85;border:2px solid #3cff5e;cursor:pointer}
+  button:disabled{opacity:.4}
+  .mail{color:#ffe600}
+</style>
+</head>
+<body>
+<h1>DIAL-UP SIMULATOR 1997</h1>
+<div id="screen"><div id="log">READY.<br></div><div id="bar" style="display:none"><div id="fill"></div></div></div>
+<button id="connect">CONNECT</button>
+<script>
+const log=document.getElementById('log'),fill=document.getElementById('fill'),bar=document.getElementById('bar'),btn=document.getElementById('connect');
+let busy=false;
+const say=t=>{log.innerHTML+=t+'<br>';};
+function noise(dur,freqs){
+  try{
+    const a=new (window.AudioContext||window.webkitAudioContext)();
+    const o=a.createOscillator(),g=a.createGain();
+    o.type='sawtooth';o.frequency.setValueAtTime(freqs[0],a.currentTime);
+    freqs.forEach((f,i)=>o.frequency.linearRampToValueAtTime(f,a.currentTime+dur*(i+1)/freqs.length));
+    g.gain.value=.04;o.connect(g);g.connect(a.destination);
+    o.start();o.stop(a.currentTime+dur);
+  }catch(e){}
+}
+const PHASES=[
+  ['initializing modem... it clears its throat',8,[[400],[600]]],
+  ['dialing 1-800-555-0199...',20,[[440,660],[440,660]]],
+  ['handshake in progress (they are shaking)',38,[[1200,900,1500,700]]],
+  ['screeching. this is the internet singing.',62,[[2000,1500,2400,1800,2200]]],
+  ['negotiating with the phone line spirits',80,[[300,500,300,500]]],
+  ['compressing pixels individually',93,[[1000]]],
+  ['CONNECTED at 56,000 bps (allegedly)',100,null]
+];
+btn.addEventListener('click',async()=>{
+  if(busy)return;busy=true;btn.disabled=true;
+  bar.style.display='block';fill.style.width='0%';log.innerHTML='';
+  for(const [text,pct,freq] of PHASES){
+    say('> '+text);
+    if(freq)noise(1.6,freq.flat?freq.flat():freq);
+    let p=0;const start=parseInt(fill.style.width)||0;
+    await new Promise(res=>{
+      const iv=setInterval(()=>{
+        p+=1.4;
+        if(p>=pct-start){p=pct-start;clearInterval(iv);res();}
+        fill.style.width=(start+p)+'%';
+      },30);
+    });
+    await new Promise(r=>setTimeout(r,420));
+  }
+  say('');
+  say('<span class="mail">YOU\'VE GOT MAIL! (1 new message)</span>');
+  await new Promise(r=>setTimeout(r,700));
+  say('from: mom &nbsp;&nbsp; subject: fwd:FWD:fwd:funny cats.txt');
+  await new Promise(r=>setTimeout(r,900));
+  say('estimated download time of attachment: 47 minutes');
+  btn.textContent='DISCONNECT (why would you)';
+  btn.disabled=false;
+  btn.onclick=()=>{
+    say('<br>connection lost. mom never knew.');
+    btn.textContent='CONNECT';busy=false;
+    btn.onclick=()=>location.reload();
+  };
+});
+</script>
+</body>
+</html>

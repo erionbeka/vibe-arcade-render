@@ -15,7 +15,9 @@
 <script>
 const cv=document.getElementById('c'),x=cv.getContext('2d');
 const W=480,H=600,GY=H-60;
-let y=250,vy=0,pipes=[],score=0,best=+(localStorage.getItem('sausage_best')||0),alive=true,started=false,owT=0;
+let y=250,vy=0,pipes=[],score=0;
+const store={g(k){try{return localStorage.getItem(k)}catch(e){return null}},s(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+let best=+(store.g('sausage_best')||0),alive=true,started=false,owT=0;
 const TAUNTS={1:'lucky.',3:'beginner\'s luck',5:'ok sausage jesus',8:'we get it, you flap',12:'the sausage ascends',17:'physics called. it quits.',25:'certified sausage pilot'};
 function reset(){y=250;vy=0;pipes=[];score=0;alive=true;spawn();pipes[0].x=W+120;}
 function spawn(){const gap=195,top=60+Math.random()*(GY-gap-160);pipes.push({x:W+40,top,gap,passed:false});if(pipes.length>3)pipes.shift();}
@@ -43,7 +45,7 @@ function loop(ts){
 function die(){
   if(!alive)return;
   alive=false;ow();owT=90;
-  best=Math.max(best,score);localStorage.setItem('sausage_best',best);
+  best=Math.max(best,score);store.s('sausage_best',best);
 }
 function draw(){
   x.fillStyle='#7ec8ff';x.fillRect(0,0,W,H);

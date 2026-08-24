@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>GOLDFISH MEMORY TEST</title>
+<style>
+  html,body{margin:0;height:100%;background:#031c33;color:#dff2ff;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+  h1{font-size:.95rem;color:#7dd3fc;margin:0;text-align:center}
+  #stage{min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+  #word{font-size:2.6rem;color:#ffe600;letter-spacing:4px}
+  #fish{font-size:3.4rem}
+  #opts{display:flex;gap:12px}
+  button{padding:12px 20px;font-family:inherit;font-size:1.05rem;border:3px solid #4a9fd8;background:#082a47;color:#bfe6ff;cursor:pointer}
+  button:hover:not(:disabled){background:#0d3d69}
+  button:disabled{opacity:.5}
+  #say{min-height:30px;text-align:center;font-size:1.1rem;color:#ffd9a0;padding:0 12px}
+  #score{color:#9281bd}
+</style>
+</head>
+<body>
+<h1>GOLDFISH MEMORY TEST<br>(you vs a goldfish)</h1>
+<div id="stage"><div id="fish"></div><div id="word">press START</div><div id="opts" style="display:none"></div></div>
+<div id="say">the goldfish claims it never forgets. verify this.</div>
+<div id="score">you: <span id="me">0</span> &nbsp; goldfish: <span id="fishn">0</span></div>
+<button id="go">START</button>
+<script>
+const WORDS=['CUCUMBER','LADDER','WHISPER','PONTIFF','GRUMBLE','TURQUOISE','MEATLOAF','SPARKLE','BUREAU','WAFFLE','KETCHUP','DRIZZLE'];
+const DECOYS=[['SOUP','LADDER','DESTINY'],['WHISPER','SCREAM','MOP'],['GRAVITY','NOODLE','TUESDAY'],['BANANA','PONTIFF','CAR ALARM'],['GRUMBLE','GLITTER','PHILOSOPHY'],['TURQUOISE','PLUMBER','BEIGE'],['MEATLOAF','HAYSTACK','REGRET'],['SPARKLE','GRAVEL','INVOICE'],['BUREAU','FERRIS','OINTMENT'],['WAFFLE','GAVEL','CRUST'],['KETCHUP','LEDGER','MOON'],['DRIZZLE','TRUMPET','STARCH']];
+const FACES=['\u{1F41F}','\u{1F420}','\u{1F421}'];
+let round=0,me=0,fish=0,cur=0;
+const wordEl=document.getElementById('word'),opts=document.getElementById('opts'),say=document.getElementById('say'),fishEl=document.getElementById('fish'),go=document.getElementById('go');
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+go.addEventListener('click',()=>{round=0;me=0;fish=0;upd();next();});
+function upd(){document.getElementById('me').textContent=me;document.getElementById('fishn').textContent=fish;}
+function next(){
+  if(round>=6){
+    let end='FINAL: you '+me+' - '+fish+' goldfish. ';
+    end+=me>fish?'IMPOSSIBLE. the fish demands a recount.':me===fish?'a tie. the tiebreaker is swimming ability. you lost that in overtime.':'the goldfish wins, as prophesied.';
+    wordEl.textContent='';opts.style.display='none';go.style.display='block';
+    say.textContent=end;
+    go.textContent='PLAY AGAIN';
+    return;
+  }
+  go.style.display='none';
+  cur=Math.floor(Math.random()*WORDS.length);
+  const w=WORDS[cur];
+  fishEl.textContent=FACES[Math.floor(Math.random()*3)];
+  say.textContent='memorize the word... (the goldfish is watching too)';
+  wordEl.textContent=w;wordEl.style.color='#fff';
+  opts.innerHTML='';
+  setTimeout(()=>{
+    wordEl.textContent='';
+    const choices=shuffle([w,...DECOYS[cur]]);
+    choices.forEach(c=>{
+      const b=document.createElement('button');b.textContent=c;
+      b.addEventListener('click',()=>answer(c,w));opts.appendChild(b);
+    });
+    opts.style.display='flex';
+    say.textContent='what was the word?';
+  },2200);
+}
+function answer(pick,w){
+  opts.style.display='none';
+  const meRight=pick===w,fishRight=true;
+  if(meRight)me++;if(fishRight)fish++;
+  upd();
+  say.textContent=meRight?'correct! but the goldfish also claims it remembered. suspicious.'
+    :'wrong! it was "'+w+'". the goldfish nods smugly.';
+  setTimeout(next,1600);
+}
+</script>
+</body>
+</html>

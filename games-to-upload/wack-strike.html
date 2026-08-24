@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>WACK-A-MOLE (LABOR DISPUTE)</title>
+<style>
+  html,body{margin:0;height:100%;background:#12240f;color:#eaffe0;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+  h1{font-size:.9rem;color:#9dff70;margin:0;text-align:center}
+  #grid{display:grid;grid-template-columns:repeat(3,110px);gap:12px}
+  .hole{height:110px;background:#241a10;border:4px solid #4d3820;border-radius:10px;position:relative;overflow:hidden;cursor:pointer}
+  .mole{position:absolute;left:50%;bottom:-80px;transform:translateX(-50%);transition:bottom .15s;width:74px;text-align:center}
+  .mole.up{bottom:-6px}
+  .face{font-size:2.6rem;line-height:1}
+  .sign{font-size:.62rem;background:#ffe600;color:#333;padding:2px 5px;border:2px solid #333;margin-top:2px;white-space:nowrap}
+  #hud{display:flex;gap:26px;font-size:1.05rem}
+  b{color:#ffe600}#karma{color:#ff6b6b}
+  #msg{min-height:30px;color:#cfe8bf}
+  button{padding:12px 24px;font-family:inherit;font-size:1rem;border:3px solid #9dff70;background:#1d3315;color:#cfffb0;cursor:pointer}
+  button:disabled{opacity:.4}
+</style>
+</head>
+<body>
+<h1>WACK-A-MOLE<br>(the moles are on strike)</h1>
+<div id="hud"><span>SCORE <b id="sc">0</b></span><span>KARMA <span id="karma">0</span></span><span>TIME <b id="tm">30</b></span></div>
+<div id="grid"></div>
+<div id="msg">the moles demand dental. whacking strikers is frowned upon.</div>
+<button id="go">START SHIFT</button>
+<script>
+const grid=document.getElementById('grid'),msg=document.getElementById('msg');
+const SIGNS=['ON STRIKE','NO.','DENTAL NOW','5 MORE MIN'];
+let score=0,karma=0,time=30,timer=null,spawner=null;
+for(let i=0;i<9;i++){
+  const h=document.createElement('div');h.className='hole';
+  h.innerHTML='<div class="mole"><div class="face"></div><div class="sign"></div></div>';
+  h.addEventListener('pointerdown',()=>whack(h));
+  grid.appendChild(h);
+}
+function pop(){
+  const hole=grid.children[Math.floor(Math.random()*9)];
+  if(hole.querySelector('.up'))return;
+  const mole=hole.querySelector('.mole'),face=mole.querySelector('.face'),sign=mole.querySelector('.sign');
+  const union=Math.random()<.78;
+  face.textContent=union?'\u{1F43F}':'\u{1F43F}';
+  sign.textContent=union?SIGNS[Math.floor(Math.random()*SIGNS.length)]:'non-union scab';
+  mole.dataset.union=union;
+  mole.classList.add('up');
+  setTimeout(()=>mole.classList.remove('up'),union?900:650);
+}
+function whack(hole){
+  const mole=hole.querySelector('.mole');
+  if(!mole.classList.contains('up')||time<=0)return;
+  mole.classList.remove('up');
+  if(mole.dataset.union==='true'){
+    karma-=1;msg.textContent='you whacked a PICKETING mole. it has filed a grievance.';
+    mole.querySelector('.sign').textContent='filed complaint';
+  }else{
+    score+=10;karma+=1;msg.textContent='+10! the non-union mole thanks you for the opportunity.';
+  }
+  document.getElementById('sc').textContent=score;
+  document.getElementById('karma').textContent=karma;
+}
+document.getElementById('go').addEventListener('click',()=>{
+  time=30;score=0;karma=0;
+  document.getElementById('sc').textContent=0;document.getElementById('karma').textContent=0;
+  document.getElementById('go').disabled=true;msg.textContent='shift started. choose your ethics.';
+  timer=setInterval(()=>{
+    time--;document.getElementById('tm').textContent=time;
+    if(time<=0){
+      clearInterval(timer);clearInterval(spawner);
+      document.querySelectorAll('.up').forEach(m=>m.classList.remove('up'));
+      let end='Shift over. Score: '+score+'. ';
+      end+=karma<-3?'The union has banned you from this meadow.':karma>3?'The moles respect you. Unions are complicated.':'A morally neutral performance.';
+      msg.textContent=end;
+      document.getElementById('go').disabled=false;document.getElementById('go').textContent='WORK AGAIN';
+    }
+  },1000);
+  spawner=setInterval(pop,520);
+});
+</script>
+</body>
+</html>

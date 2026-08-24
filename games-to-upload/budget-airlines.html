@@ -18,7 +18,9 @@
 <div id="hint">hold click / space = throttle up. collect peanuts. avoid wildlife and colleagues.</div>
 <script>
 const cv=document.getElementById('c'),x=cv.getContext('2d'),W=680,H=420,capEl=document.getElementById('cap');
-let y=200,vy=0,thrust=false,dist=0,peanuts=0,best=+(localStorage.getItem('budget_best')||0);
+let y=200,vy=0,thrust=false,dist=0,peanuts=0;
+const store={g(k){try{return localStorage.getItem(k)}catch(e){return null}},s(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+let best=+(store.g('budget_best')||0);
 let obs=[],snacks=[],frame=0,alive=true,started=false;
 const CAPTAIN=['This is your captain speaking. We are cruising at an altitude of yes.','Good news: we saved on fuel by removing the fuel.','Our in-flight movie is this window.','Please remain seated. The seatbelt sign broke in 2011.','We have upgraded everyone to slightly warmer seats.','This aircraft features cutting-edge wing technology. Both of them.','If you look left you will see sky. If you look right, also sky. Great value.','Cabin crew, prepare for emotional turbulence.'];
 const DEATHS=['You died doing what you loved: flying budget.','The airline apologizes. Refund issued: 1 peanut.','Your flight has been rebranded as a ground experience.','Captain\'s final words: "that is normal".','You have been downgraded to passenger (deceased).'];
@@ -32,7 +34,7 @@ function beep(f1,f2,d,type){try{const a=new (window.AudioContext||window.webkitA
 function die(why){
   if(!alive)return;
   alive=false;beep(300,50,.5,'sawtooth');
-  best=Math.max(best,total());localStorage.setItem('budget_best',best);
+  best=Math.max(best,total());store.s('budget_best',best);
   capEl.textContent=DEATHS[Math.floor(Math.random()*DEATHS.length)]+' ('+why+')';
 }
 function total(){return Math.floor(dist/10)+peanuts*10;}
