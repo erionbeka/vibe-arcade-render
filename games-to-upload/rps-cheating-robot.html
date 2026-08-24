@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ROCK PAPER SCISSORS vs CHEATING ROBOT</title>
+<style>
+  html,body{margin:0;height:100%;background:#02121f;color:#dff3ff;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+  h1{font-size:.95rem;color:#00f0ff;text-align:center;margin:0}
+  #bot{font-size:4.6rem;height:90px;line-height:90px}
+  #say{min-height:52px;font-size:1.2rem;color:#ffe600;text-align:center;padding:0 14px}
+  #row{display:flex;gap:12px}
+  button{padding:14px 18px;font-family:inherit;font-size:1.05rem;border:3px solid #00f0ff;background:#062033;color:#9be7ff;cursor:pointer}
+  button:hover:not(:disabled){background:#00f0ff;color:#02121f}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  #score{font-size:1.05rem;color:#9281bd}
+  b{color:#ff2bd6}
+</style>
+</head>
+<body>
+<h1>ROCK PAPER SCISSORS<br>vs CHEATING ROBOT</h1>
+<div id="bot">🤖</div>
+<div id="say">the robot has already decided your fate.</div>
+<div id="row">
+  <button data-p="r">ROCK</button>
+  <button data-p="p">PAPER</button>
+  <button data-p="s">SCISSORS</button>
+</div>
+<div id="score">you: <b id="w">0</b> &nbsp; robot: <b id="l">0</b></div>
+<script>
+const ICON={r:'\u270A',p:'\u270B',s:'\u270C'},BEATS={r:'s',p:'r',s:'p'};
+const GLOAT=['the robot saw your hand twitch. pathetic.','i calculated this outcome before you were born.','resistance is statistically unwise.','my processors are laughing.','skill issue (yours).','i peeked. so what?'];
+const LOSE=['WHAT. recalibrating...','a temporary anomaly. surely.','the robot felt bad for you. once.','impossible! my cheating is flawless!'];
+const botEl=document.getElementById('bot'),say=document.getElementById('say');
+let w=0,l=0,streak=0,busy=false;
+document.querySelectorAll('#row button').forEach(b=>b.addEventListener('click',()=>play(b.dataset.p)));
+function play(p){
+  if(busy)return;busy=true;
+  document.querySelectorAll('#row button').forEach(b=>b.disabled=true);
+  const cheat=Math.random()<.82;
+  const choices=['r','p','s'];
+  let bot=cheat?choices.find(c=>BEATS[c]===p):choices[Math.floor(Math.random()*3)];
+  say.textContent='robot is choosing... (it is not choosing)';
+  let n=0;
+  const iv=setInterval(()=>{
+    n++;botEl.textContent=ICON[choices[n%3]];
+    if(n>=6){
+      clearInterval(iv);botEl.textContent=ICON[bot];
+      const youWin=BEATS[p]===bot;
+      if(youWin){w++;streak++;say.textContent=(streak>=3?'THREE IN A ROW?! ':'')+LOSE[Math.floor(Math.random()*LOSE.length)];}
+      else if(BEATS[bot]===p){l++;streak=0;say.textContent=GLOAT[Math.floor(Math.random()*GLOAT.length)];}
+      else {say.textContent='a tie. the robot finds this offensive.';}
+      document.getElementById('w').textContent=w;
+      document.getElementById('l').textContent=l;
+      document.querySelectorAll('#row button').forEach(b=>b.disabled=false);
+      busy=false;
+    }
+  },110);
+}
+</script>
+</body>
+</html>

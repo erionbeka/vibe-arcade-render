@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SNAIL RACING LEAGUE</title>
+<style>
+  html,body{margin:0;height:100%;background:#101828;color:#e6f0ff;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;gap:10px}
+  h1{font-size:1rem;color:#7dd3fc;margin:14px 0 0}
+  canvas{border:3px solid #27406b;background:#1b2b47}
+  #pick,#race-ui{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+  button{padding:10px 14px;font-family:inherit;font-size:.95rem;border:3px solid #4a6fa5;background:#16233c;color:#cfe3ff;cursor:pointer}
+  button:hover:not(:disabled){background:#22355a}
+  button:disabled{opacity:.4;cursor:not-allowed}
+  #ann{min-height:54px;text-align:center;font-size:1.15rem;color:#ffe600;padding:0 16px}
+  #coins{color:#39ff88}
+</style>
+</head>
+<body>
+<h1>SNAIL RACING LEAGUE (OFFICIAL)</h1>
+<canvas id="c" width="680" height="240"></canvas>
+<div id="pick"></div>
+<div id="race-ui" style="display:none"><button id="again">RACE AGAIN</button></div>
+<div id="ann">place your bet. choose your champion. believe.</div>
+<div id="coins">coins: 50</div>
+<script>
+const c=document.getElementById('c'),x=c.getContext('2d'),ann=document.getElementById('ann'),coinsEl=document.getElementById('coins');
+const NAMES=['Shelly','Turbo (not fast)','Sir Slimesworth','Dave'];
+const COLORS=['#ff2bd6','#00f0ff','#ffe600','#9dff5a'];
+let picks=[],snails=[],running=false,coins=50,bet=null,winner=null,t=0;
+function drawTrack(){
+  x.fillStyle='#1b2b47';x.fillRect(0,0,680,240);
+  for(let i=0;i<4;i++){
+    x.fillStyle=i%2?'#20345a':'#1d2f52';x.fillRect(0,i*60+20,680,60);
+    x.fillStyle='#0e1830';x.font='bold 13px Consolas';
+    x.fillText((i+1)+'. '+NAMES[i],12,i*60+38);
+    if(bet===i){x.fillStyle='#ffe600';x.fillText('<- YOUR PICK',150,i*60+38);}
+  }
+  x.strokeStyle='#eaf2ff';x.lineWidth=4;x.setLineDash([12,10]);
+  x.beginPath();x.moveTo(640,16);x.lineTo(640,256);x.stroke();x.setLineDash([]);
+  snails.forEach(drawSnail);
+}
+function drawSnail(s,i){
+  const py=s.lane*60+62;
+  x.fillStyle='#a7f3d0';
+  x.beginPath();x.ellipse(s.x,py+18,26,11,0,0,6.29);x.fill();
+  x.strokeStyle='#a7f3d0';x.lineWidth=4;x.lineCap='round';
+  x.beginPath();x.moveTo(s.x+18,py+16);x.lineTo(s.x+30,py-2);x.stroke();
+  x.fillStyle='#eaf2ff';x.fillRect(s.x+26,py-10,3,3);
+  x.fillStyle=COLORS[i];
+  x.beginPath();x.arc(s.x-4,py+2,15,0,6.29);x.fill();
+  x.strokeStyle='rgba(0,0,0,.35)';x.lineWidth=2.5;
+  x.beginPath();
+  for(let a=0;a<6;a+=.25){const r=1+a*2.05;x.lineTo(s.x-4+Math.cos(a)*r,py+2+Math.sin(a)*r);}
+  x.stroke();
+}
+function renderPick(){
+  const p=document.getElementById('pick');p.innerHTML='';
+  NAMES.forEach((n,i)=>{
+    const b=document.createElement('button');
+    b.textContent=n;b.style.borderColor=COLORS[i];b.style.color=COLORS[i];
+    b.addEventListener('click',()=>start(i));
+    p.appendChild(b);
+  });
+}
+const LINES=[[1,'AND THEY\'RE OFF... technically'],[3,'shelly shows incredible courage by existing'],[5,'TURBO IS MOVING. this is not a drill. (it is very slow)'],[8,'sir slimesworth leaves a trail of dignity'],[11,'DAVE IS DOING SOMETHING'],[14,'photo finish pending (no photos available)'],[17,'my grandmother could have crawled faster. no offense to the snails.']];
+function start(i){
+  if(running)return;
+  if(coins<10){ann.textContent='you are broke. the league sponsors you out of pity. (+10 coins)';coins+=10;coinsEl.textContent='coins: '+coins;return;}
+  bet=i;coins-=10;
+  running=true;t=0;winner=null;
+  snails=NAMES.map((n,l)=>({lane:l,x:40,prog:0}));
+  document.getElementById('pick').style.display='none';
+  ann.textContent='bet placed: 10 coins on '+NAMES[i]+'. godspeed.';
+  coinsEl.textContent='coins: '+coins;
+  drawTrack();
+  const iv=setInterval(()=>{
+    t++;
+    snails.forEach(s=>{s.prog+=Math.random()*0.55;s.x=Math.min(618,40+s.prog);});
+    const line=LINES.find(l=>l[0]===t);
+    if(line)ann.textContent=line[1];
+    drawTrack();
+    const lead=snails.reduce((a,b)=>b.prog>a.prog?b:a);
+    if(lead.x>=618){
+      clearInterval(iv);running=false;winner=lead.lane;
+      ann.textContent=NAMES[winner].toUpperCase()+' WINS!! ';
+      if(winner===bet){coins+=30;ann.textContent+='YOU WON 30 COINS. the crowd goes mild.';}
+      else ann.textContent+='your '+NAMES[bet]+' finished with honor and last place. -10 coins.';
+      coinsEl.textContent='coins: '+coins;
+      document.getElementById('pick').style.display='flex';
+      document.getElementById('race-ui').style.display='flex';
+    }
+  },700);
+}
+document.getElementById('again').addEventListener('click',()=>{document.getElementById('race-ui').style.display='none';renderPick();});
+snails=[{lane:0,x:40},{lane:1,x:40},{lane:2,x:40},{lane:3,x:40}];
+drawTrack();renderPick();
+</script>
+</body>
+</html>

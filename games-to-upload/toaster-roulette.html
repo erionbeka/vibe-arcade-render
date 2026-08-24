@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TOASTER ROULETTE</title>
+<style>
+  html,body{margin:0;height:100%;background:#1c1026;color:#f3efff;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+  h1{font-size:1rem;color:#ffe600;margin:0}
+  #machine{position:relative;width:300px;height:190px;background:linear-gradient(#e04fb0,#8a2a72);border-radius:22px;border:5px solid #ff9ae4;box-shadow:0 14px 0 #3d0f30}
+  #slot{position:absolute;top:-18px;left:50%;transform:translateX(-50%);width:180px;height:26px;background:#12041a;border:4px solid #ff9ae4}
+  #bread{position:absolute;top:-70px;left:50%;transform:translateX(-50%);width:110px;height:64px;background:#e8b06a;border:4px solid #b07a34;border-radius:12px 12px 6px 6px;transition:top .35s cubic-bezier(.6,-.4,.7,1.6)}
+  #lever{position:absolute;right:-52px;top:44px;width:20px;height:74px;background:#333;border:4px solid #111;border-radius:10px}
+  #lever:after{content:'';position:absolute;top:-24px;left:-13px;width:38px;height:38px;border-radius:50%;background:#ff2bd6;border:4px solid #fff}
+  #stats{display:flex;gap:22px;font-size:.95rem;color:#cfc4e8}
+  #result{min-height:60px;text-align:center;font-size:1.3rem;color:#ffe600;padding:0 14px}
+  button{padding:14px 26px;font-family:'Consolas';font-size:1.05rem;border:none;background:#ff2bd6;color:#16002e;font-weight:bold;cursor:pointer;border-radius:8px}
+  button:hover{filter:brightness(1.15)}
+  button:disabled{opacity:.5}
+  .shake{animation:sh .4s}
+  @keyframes sh{20%{transform:translate(8px,-6px)}40%{transform:translate(-8px,6px)}60%{transform:translate(6px,3px)}80%{transform:translate(-5px,-3px)}}
+</style>
+</head>
+<body>
+<h1>TOASTER ROULETTE</h1>
+<div id="machine">
+  <div id="bread" style="display:none"></div>
+  <div id="slot"></div>
+  <div id="lever"></div>
+</div>
+<button id="pull">PULL THE LEVER</button>
+<div id="result">the toaster awaits. it knows things.</div>
+<div id="stats"><span>toast: <b id="sToast">0</b></span><span>coal: <b id="sCoal">0</b></span><span>in orbit: <b id="sOrbit">0</b></span><span>golden: <b id="sGold">0</b></span></div>
+<script>
+let pulls=0,busy=false;
+const S={t:document.getElementById('sToast'),c:document.getElementById('sCoal'),o:document.getElementById('sOrbit'),g:document.getElementById('sGold')};
+const bread=document.getElementById('bread'),res=document.getElementById('result'),btn=document.getElementById('pull'),m=document.getElementById('machine');
+function roll(){
+  const r=Math.random();
+  if(r<.45)return{k:'t',msg:'PERFECT TOAST. golden brown. the machine whispers "you\'re welcome."'};
+  if(r<.65)return{k:'c',msg:'BURNT. you have acquired charcoal. charcoal is basically toast that tried its best.'};
+  if(r<.80)return{k:'o',msg:'THE TOAST LAUNCHED INTO ORBIT. it is with the satellites now. godspeed.'};
+  if(r<.90)return{k:'',msg:'the toaster is empty. where did it go? nobody knows. the toaster refuses to comment.'};
+  if(r<.97)return{k:'t',msg:'TOAST JUDGES YOU. verdict: "found adequate." devastating.'};
+  return{k:'g',msg:'*** GOLDEN TOAST JACKPOT *** +10 legendary bread points'};
+}
+btn.addEventListener('click',()=>{
+  if(busy)return;busy=true;btn.disabled=true;
+  res.textContent='bread loading...';bread.style.display='block';
+  bread.style.transition='none';bread.style.top='-70px';
+  void bread.offsetWidth;
+  bread.style.transition='top .35s cubic-bezier(.6,-.4,.7,1.6)';bread.style.top='40px';
+  setTimeout(()=>{
+    const out=roll();pulls++;
+    m.classList.remove('shake');void m.offsetWidth;m.classList.add('shake');
+    bread.style.top='-260px';
+    if(out.k==='t')S.t.textContent++;else if(out.k==='c')S.c.textContent++;
+    else if(out.k==='o')S.o.textContent++;else if(out.k==='g'){S.g.textContent+=10;}
+    res.textContent=out.msg;
+    if(pulls%10===0)setTimeout(()=>res.textContent+=' ACHIEVEMENT UNLOCKED: why',1400);
+    btn.disabled=false;busy=false;
+    setTimeout(()=>bread.style.display='none',500);
+  },900);
+});
+</script>
+</body>
+</html>

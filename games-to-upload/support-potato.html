@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>EMOTIONAL SUPPORT POTATO</title>
+<style>
+  html,body{margin:0;height:100%;background:#241a10;color:#f5e9d0;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+  h1{font-size:1.05rem;color:#ffd98a;margin:0}
+  #stage{position:relative}
+  #bubble{position:absolute;top:-8px;left:50%;transform:translate(-50%,-100%);background:#fff8e6;color:#3a2a10;padding:10px 16px;border-radius:14px;font-size:1.05rem;max-width:300px;text-align:center;opacity:0;transition:opacity .25s}
+  #bubble:after{content:'';position:absolute;top:100%;left:50%;margin-left:-8px;border:8px solid transparent;border-top-color:#fff8e6}
+  #mood{width:min(420px,86vw);height:22px;border:3px solid #6b4d2a;background:#171009}
+  #fill{height:100%;width:50%;background:#ffb347;transition:width .3s}
+  #row{display:flex;gap:12px}
+  button{padding:12px 18px;font-family:inherit;font-size:1rem;border:3px solid #b8863f;background:#332413;color:#ffe9c2;cursor:pointer}
+  button:hover{background:#4a3520}
+  #insult{border-color:#c94f4f;color:#ffc2c2}
+</style>
+</head>
+<body>
+<h1>EMOTIONAL SUPPORT POTATO</h1>
+<div id="stage">
+  <div id="bubble"></div>
+  <canvas id="c" width="320" height="240"></canvas>
+</div>
+<div id="mood"><div id="fill"></div></div>
+<div id="row">
+  <button id="pet">PET</button>
+  <button id="feed">FEED</button>
+  <button id="insult">INSULT</button>
+</div>
+<script>
+const c=document.getElementById('c'),x=c.getContext('2d'),bubble=document.getElementById('bubble'),fill=document.getElementById('fill');
+let mood=50,feedCd=0,said=null;
+const PET_HI=['bliss.','the potato purrs. potatoes should not do that.','*gentle potato rumbling*','this is the best day of the potato\'s life.'];
+const PET_MID=['acceptable.','the potato tolerates this.','*slight potato happiness detected*','petting acknowledged.'];
+const FEEDS=['you fed the potato... vibes. it counted.','the potato absorbs nutrients from the air and your kindness.','delicious. probably.'];
+const INSULT_LOW=['potato remembers.','harsh. harsh but fair?','the potato questions your childhood.','emotional damage (to you).'];
+const MAXED=['POTATO HAS ACHIEVED ENLIGHTENMENT. YOU DID THIS.','the potato loves you unconditionally now. this is legally binding.','maximum potato.'];
+const MINNED=['the potato has left (emotionally). (it is still physically here.)','the potato no longer trusts you.','rock bottom. potato bottom.'];
+function say(t){bubble.textContent=t;bubble.style.opacity=1;clearTimeout(said);said=setTimeout(()=>bubble.style.opacity=0,2300);}
+function draw(){
+  x.clearRect(0,0,320,240);
+  const blink=Math.floor(Date.now()/900)%7===0;
+  x.fillStyle='#c9a15f';x.strokeStyle='#8a6a33';x.lineWidth=5;
+  x.beginPath();x.ellipse(160,140,95,70,.18,0,6.29);x.fill();x.stroke();
+  x.fillStyle='rgba(122,90,40,.5)';
+  x.beginPath();x.ellipse(110,110,7,5,.4,0,6.29);x.fill();
+  x.beginPath();x.ellipse(215,165,9,6,-.3,0,6.29);x.fill();
+  x.fillStyle='#2b1c0a';
+  if(blink){x.fillRect(128,116,20,3);x.fillRect(176,112,20,3);}
+  else{x.fillRect(132,108,12,14);x.fillRect(180,104,12,14);}
+  x.strokeStyle='#2b1c0a';x.lineWidth=4;x.beginPath();
+  if(mood>=80){x.arc(158,152,17,3.4,6);x.moveTo(141,150);x.arc(158,146,17,.2,2.9);}
+  else if(mood>=45){x.moveTo(146,158);x.quadraticCurveTo(158,164,172,158);}
+  else{x.moveTo(144,166);x.quadraticCurveTo(158,154,174,164);}
+  x.stroke();
+  if(mood>=95){x.strokeStyle='#ffe600';x.lineWidth=3;x.beginPath();x.arc(158,60,14,0,6.29);x.moveTo(158,44);x.lineTo(158,76);x.moveTo(142,60);x.lineTo(174,60);x.stroke();}
+}
+setInterval(draw,120);
+function setMood(v){mood=Math.max(0,Math.min(100,v));fill.style.width=mood+'%';
+  fill.style.background=mood>=70?'#7dff6a':mood>=35?'#ffb347':'#ff5c5c';
+  if(mood>=100)say(MAXED[Math.floor(Math.random()*MAXED.length)]);
+  else if(mood===0)say(MINNED[Math.floor(Math.random()*MINNED.length)]);}
+document.getElementById('pet').addEventListener('click',()=>{setMood(mood+6);const arr=mood>=65?PET_HI:PET_MID;say(arr[Math.floor(Math.random()*arr.length)]);});
+document.getElementById('feed').addEventListener('click',()=>{
+  if(feedCd>0){say('the potato is full. slow down.');return;}
+  feedCd=3;setMood(mood+11);say(FEEDS[Math.floor(Math.random()*FEEDS.length)]);
+});
+document.getElementById('insult').addEventListener('click',()=>{setMood(mood-24);say(INSULT_LOW[Math.floor(Math.random()*INSULT_LOW.length)]);});
+setInterval(()=>{if(feedCd>0)feedCd--;},1000);
+draw();setMood(50);
+</script>
+</body>
+</html>

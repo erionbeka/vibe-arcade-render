@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>WATCH GRASS GROW</title>
+<style>
+  html,body{margin:0;height:100%;background:#071a0d;color:#d8ffd8;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;gap:10px}
+  h1{font-size:1rem;margin:14px 0 0;color:#39ff88}
+  #pct{font-size:2.2rem;color:#b6ff7a;text-shadow:0 0 14px rgba(120,255,80,.5)}
+  canvas{background:linear-gradient(#0a2a3a,#123); border:3px solid #1e4d2b}
+  #log{height:110px;width:min(640px,92vw);overflow:hidden;font-size:.95rem;color:#8fd99a;text-align:center}
+  button{padding:10px 22px;background:#123316;color:#b6ff7a;border:3px solid #39ff88;font-family:inherit;font-size:1rem;cursor:pointer;margin-bottom:12px}
+  button:hover{background:#1c4d22}
+</style>
+</head>
+<body>
+<h1>WATCH GRASS GROW</h1>
+<div id="pct">0.0000000%</div>
+<canvas id="c" width="640" height="300"></canvas>
+<button id="fert">FERTILIZE (does almost nothing)</button>
+<div id="log"></div>
+<script>
+const cv=document.getElementById('c'),x=cv.getContext('2d'),logEl=document.getElementById('log'),pctEl=document.getElementById('pct');
+let growth=0,done=false;
+const blades=[];
+for(let i=0;i<130;i++)blades.push({x:10+Math.random()*620,h:4+Math.random()*4,max:34+Math.random()*46,sway:Math.random()*6.28,hue:95+Math.random()*40});
+const EVENTS=['a bird flew overhead. it did not care.','photosynthesis is happening. probably.','the neighbor mowed their lawn. yours remains morally superior.','an ant walked past. said nothing.','wind: yes.','somewhere, a gardener weeps with pride.','the sun contributes. minimal effort.','root activity detected (unconfirmed).','this is exactly what grass does. nothing more.','a ladybug considered landing. decided against it.'];
+function log(t){const d=document.createElement('div');d.textContent='> '+t;logEl.prepend(d);while(logEl.children.length>4)logEl.lastChild.remove();}
+setInterval(()=>{if(!done&&Math.random()<.65)log(EVENTS[Math.floor(Math.random()*EVENTS.length)])},4200);
+document.getElementById('fert').addEventListener('click',()=>{const b=blades[Math.floor(Math.random()*blades.length)];b.max+=1;log('one blade grew slightly. you are welcome.');});
+function draw(){
+  x.clearRect(0,0,640,300);
+  x.fillStyle='#2e1d12';x.fillRect(0,240,640,60);
+  const t=Date.now()/900;
+  for(const b of blades){
+    const h=Math.min(b.h,b.max);
+    x.strokeStyle='hsl('+b.hue+',70%,45%)';x.lineWidth=3;
+    x.beginPath();x.moveTo(b.x,242);
+    x.quadraticCurveTo(b.x+Math.sin(t+b.sway)*3,242-h*.6,b.x+Math.sin(t+b.sway)*6+(h/b.max)*2,242-h);
+    x.stroke();
+  }
+}
+setInterval(()=>{
+  draw();
+  if(done)return;
+  growth+=0.013;
+  pctEl.textContent=growth.toFixed(7)+'%';
+  blades.forEach(b=>{if(b.h<b.max)b.h+=0.02;});
+  if(growth>=100){
+    done=true;pctEl.textContent='100.0000000%!';log('YOUR GRASS IS FULLY GROWN.');log('life complete. there is nothing more.');
+    setTimeout(()=>log('(you may leave now. the grass will remember you.)'),1500);
+  }
+},33);
+draw();
+</script>
+</body>
+</html>

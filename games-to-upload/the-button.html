@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>THE BUTTON</title>
+<style>
+  html,body{margin:0;height:100%;background:#0d0221;color:#f3efff;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;overflow:hidden}
+  #count{font-size:1rem;color:#9281bd}
+  #btn{width:220px;height:220px;border-radius:50%;border:10px solid #7a0020;background:radial-gradient(circle at 35% 30%,#ff4d6d,#c4003a);cursor:pointer;box-shadow:0 12px 0 #4d0014,inset 0 -14px 24px rgba(0,0,0,.35);transition:transform .05s}
+  #btn:active{transform:translateY(10px);box-shadow:0 2px 0 #4d0014,inset 0 -14px 24px rgba(0,0,0,.35)}
+  #msg{min-height:56px;font-size:1.4rem;text-align:center;padding:0 20px;color:#ffe600;text-shadow:0 0 12px rgba(255,230,0,.5)}
+  #sub{color:#00f0ff;font-size:.85rem;opacity:.8}
+  .shake{animation:sh .3s}
+  @keyframes sh{25%{transform:translate(6px,-4px)}50%{transform:translate(-6px,4px)}75%{transform:translate(4px,2px)}}
+</style>
+</head>
+<body>
+<div id="count">clicks: 0</div>
+<button id="btn" aria-label="the button"></button>
+<div id="msg">press the button. or don't.</div>
+<div id="sub">(there is nothing else to do)</div>
+<script>
+const btn=document.getElementById('btn'),msg=document.getElementById('msg'),cnt=document.getElementById('count');
+let n=0;
+const M=[[1,'nothing happened.'],[5,'still nothing.'],[10,'you can stop now.'],[15,'seriously.'],[20,'ACHIEVEMENT UNLOCKED: persistence'],[25,'the button is starting to like you'],[30,'ok we get it'],[40,'there is no prize. there was never a prize.'],[50,'FINE. YOU WIN. the prize is this sentence.'],[60,'imagine if this were your job'],[75,'your index finger deserves hazard pay'],[100,'100 clicks. seek help. (jk. or do.)'],[150,'at this point this is a relationship'],[200,'the button now considers you family'],[250,'LEGEND STATUS'],[333,'the button saw that coming'],[500,'go touch grass (this establishment is grass-free)'],[666,'the button fears you now'],[999,'WHY']];
+const R=['click registered. universe unmoved.','the void acknowledges your input.','button status: pressed.','nothing continues to happen.','scientists are baffled.','your confidence is inspiring.','logged. ignored. respected.','the button felt that one.'];
+function beep(f,d){try{const c=new (window.AudioContext||window.webkitAudioContext)();const o=c.createOscillator(),g=c.createGain();o.frequency.value=f;o.connect(g);g.connect(c.destination);g.gain.setValueAtTime(.06,c.currentTime);g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+d);o.start();o.stop(c.currentTime+d);}catch(e){}}
+btn.addEventListener('click',()=>{
+  n++;cnt.textContent='clicks: '+n;
+  const mile=M.filter(m=>m[0]===n)[0];
+  msg.textContent=mile?mile[1]:R[Math.floor(Math.random()*R.length)];
+  beep(600-n*0.4,.07);
+  if([20,50,100,250,500,999].includes(n)){document.body.classList.remove('shake');void document.body.offsetWidth;document.body.classList.add('shake');beep(120,.25);}
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FLAPPY SAUSAGE</title>
+<style>
+  html,body{margin:0;height:100%;background:#1a0b0b;color:#ffe9d6;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+  canvas{border:4px solid #5e2f18;background:linear-gradient(#7ec8ff,#cdefff)}
+  #hint{color:#ffb46e}
+</style>
+</head>
+<body>
+<canvas id="c" width="480" height="600"></canvas>
+<div id="hint">click / tap / space = flap. you are a sausage.</div>
+<script>
+const cv=document.getElementById('c'),x=cv.getContext('2d');
+const W=480,H=600,GY=H-60;
+let y=250,vy=0,pipes=[],score=0,best=+(localStorage.getItem('sausage_best')||0),alive=true,started=false,owT=0;
+const TAUNTS={1:'lucky.',3:'beginner\'s luck',5:'ok sausage jesus',8:'we get it, you flap',12:'the sausage ascends',17:'physics called. it quits.',25:'certified sausage pilot'};
+function reset(){y=250;vy=0;pipes=[];score=0;alive=true;spawn();pipes[0].x=W+120;}
+function spawn(){const gap=195,top=60+Math.random()*(GY-gap-160);pipes.push({x:W+40,top,gap,passed:false});if(pipes.length>3)pipes.shift();}
+addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();flap();}});
+cv.addEventListener('pointerdown',flap);
+function flap(){if(!alive){reset();return;}started=true;vy=-8.2;boing();}
+function boing(){try{const a=new (window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),g=a.createGain();o.type='triangle';o.frequency.setValueAtTime(300,a.currentTime);o.frequency.exponentialRampToValueAtTime(700,a.currentTime+.09);o.connect(g);g.connect(a.destination);g.gain.value=.05;o.start();o.stop(a.currentTime+.1);}catch(e){}}
+function ow(){try{const a=new (window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),g=a.createGain();o.type='sawtooth';o.frequency.setValueAtTime(220,a.currentTime);o.frequency.exponentialRampToValueAtTime(60,a.currentTime+.3);o.connect(g);g.connect(a.destination);g.gain.value=.07;o.start();o.stop(a.currentTime+.3);}catch(e){}}
+let last=0;
+function loop(ts){
+  const dt=Math.min((ts-last)/16.7,3)||1;last=ts;
+  if(alive&&started){
+    vy+=.45*dt;y+=vy*dt;
+    pipes.forEach(p=>p.x-=2.6*dt);
+    if(pipes.length===0||pipes[pipes.length-1].x<W-230)spawn();
+    for(const p of pipes){
+      if(!p.passed&&p.x+70<110){p.passed=true;score++;boing();}
+      if(110+34>p.x&&110-34<p.x+70&&(y-24<p.top||y+24>p.top+p.gap))die();
+    }
+    if(y>GY-22){y=GY-22;die();}
+  }
+  draw();
+  requestAnimationFrame(loop);
+}
+function die(){
+  if(!alive)return;
+  alive=false;ow();owT=90;
+  best=Math.max(best,score);localStorage.setItem('sausage_best',best);
+}
+function draw(){
+  x.fillStyle='#7ec8ff';x.fillRect(0,0,W,H);
+  x.fillStyle='#5aa53c';x.fillRect(0,GY,W,H-GY);
+  x.fillStyle='#3d7526';
+  for(let i=0;i<W;i+=26)x.fillRect(i,GY+14+((i*13)%9),14,8);
+  for(const p of pipes){
+    x.fillStyle='#e8b06a';x.fillRect(p.x,0,70,p.top);
+    x.fillRect(p.x,p.top+p.gap,70,GY-p.top-p.gap);
+    x.fillStyle='#c98a3f';
+    x.fillRect(p.x,p.top-14,70,14);x.fillRect(p.x,p.top+p.gap,70,14);
+    x.fillStyle='#8a5a20';
+    x.fillRect(p.x+30,0,6,p.top-14);x.fillRect(p.x+30,p.top+p.gap+14,6,GY-p.top-p.gap-14);
+  }
+  const a=Math.max(-.5,Math.min(.9,vy/10));
+  x.save();x.translate(110,y);x.rotate(a);
+  x.fillStyle='#b4552d';x.strokeStyle='#7a3010';x.lineWidth=3;
+  roundRect(-40,-24,80,48,24);x.fill();x.stroke();
+  x.strokeStyle='#8a3d1a';x.lineWidth=4;
+  [-14,0,14].forEach(o=>{x.beginPath();x.moveTo(o,-16);x.lineTo(o,16);x.stroke();});
+  x.fillStyle='#fff';x.fillRect(8,-12,14,12);
+  x.fillStyle='#000';x.fillRect(15,-9,5,7);
+  x.restore();
+  if(owT>0){x.fillStyle='#ff2bd6';x.font='bold 42px Consolas';x.fillText('OW',130,y-44);owT--;}
+  x.fillStyle='#1a0b0b';x.font='bold 28px Consolas';
+  x.fillText('SCORE '+score,20,44);
+  x.font='16px Consolas';x.fillText('best: '+best,20,68);
+  if(!alive){
+    x.fillStyle='rgba(10,2,2,.72)';x.fillRect(0,180,W,240);
+    x.fillStyle='#ffe9d6';x.textAlign='center';
+    x.font='bold 34px Consolas';x.fillText('SAUSAGE DOWN',W/2,260);
+    x.font='20px Consolas';
+    x.fillText(TAUNTS[Math.min(score,25)]||'the grill claims another',W/2,300);
+    x.fillText('score: '+score+'   best: '+best,W/2,340);
+    x.fillStyle='#ffe600';x.fillText('click to be reborn as sausage',W/2,385);
+    x.textAlign='left';
+  }
+  if(!started&&alive){
+    x.fillStyle='rgba(10,2,2,.6)';x.fillRect(0,240,W,110);
+    x.fillStyle='#ffe9d6';x.textAlign='center';x.font='bold 24px Consolas';
+    x.fillText('FLAP TO BEGIN YOUR JOURNEY',W/2,290);
+    x.font='15px Consolas';x.fillText('(as a sausage)',W/2,320);x.textAlign='left';
+  }
+}
+function roundRect(px,py,w,h,r){x.beginPath();x.moveTo(px+r,py);x.arcTo(px+w,py,px+w,py+h,r);x.arcTo(px+w,py+h,px,py+h,r);x.arcTo(px,py+h,px,py,r);x.arcTo(px,py,px+w,py,r);x.closePath();}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
