@@ -80,6 +80,12 @@ const CATALOG = [
     title: 'RPS vs CHEATING ROBOT',
     description: 'Rock Paper Scissors against a robot that openly cheats 82% of the time and gloats about it.\n\nWin three in a row to witness a genuine robot crisis. It has already decided your fate. Probably.',
     tags: 'casual robots comedy unfair'
+  },
+  {
+    file: 'budget-airlines.html',
+    title: 'BUDGET AIRLINES: PEANUT EDITION',
+    description: 'Pilot the world\'s cheapest aircraft. Hold to throttle up, collect peanuts (worth 10 meters each), dodge birds and colleagues.\n\nFeatures a captain who announces things like "we saved on fuel by removing the fuel" and a crash screen with sincere corporate apologies.',
+    tags: 'flying arcade food comedy'
   }
 ];
 

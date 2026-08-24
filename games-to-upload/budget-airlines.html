@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BUDGET AIRLINES</title>
+<style>
+  html,body{margin:0;height:100%;background:#04182b;color:#eaf6ff;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+  h1{font-size:.95rem;color:#ffd23e;margin:12px 0 0;text-align:center}
+  canvas{border:4px solid #144a75;background:linear-gradient(#4aa7e8,#bfe6ff)}
+  #cap{min-height:30px;font-size:1rem;color:#9fe0ff;padding:0 14px;text-align:center}
+  #hint{color:#7fa8c9;font-size:.85rem}
+</style>
+</head>
+<body>
+<h1>BUDGET AIRLINES: PEANUT EDITION</h1>
+<canvas id="c" width="680" height="420"></canvas>
+<div id="cap">boarding...</div>
+<div id="hint">hold click / space = throttle up. collect peanuts. avoid wildlife and colleagues.</div>
+<script>
+const cv=document.getElementById('c'),x=cv.getContext('2d'),W=680,H=420,capEl=document.getElementById('cap');
+let y=200,vy=0,thrust=false,dist=0,peanuts=0,best=+(localStorage.getItem('budget_best')||0);
+let obs=[],snacks=[],frame=0,alive=true,started=false;
+const CAPTAIN=['This is your captain speaking. We are cruising at an altitude of yes.','Good news: we saved on fuel by removing the fuel.','Our in-flight movie is this window.','Please remain seated. The seatbelt sign broke in 2011.','We have upgraded everyone to slightly warmer seats.','This aircraft features cutting-edge wing technology. Both of them.','If you look left you will see sky. If you look right, also sky. Great value.','Cabin crew, prepare for emotional turbulence.'];
+const DEATHS=['You died doing what you loved: flying budget.','The airline apologizes. Refund issued: 1 peanut.','Your flight has been rebranded as a ground experience.','Captain\'s final words: "that is normal".','You have been downgraded to passenger (deceased).'];
+const BIRDTAUNT='you have collided with nature',PLANETAUNT='mid-air merger rejected';
+addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();thrust=true;if(!alive)restart();started=true;}});
+addEventListener('keyup',e=>{if(e.code==='Space')thrust=false;});
+cv.addEventListener('pointerdown',()=>{thrust=true;if(!alive){restart();return;}started=true;});
+addEventListener('pointerup',()=>thrust=false);
+function restart(){y=200;vy=0;obs=[];snacks=[];dist=0;peanuts=0;frame=0;alive=true;started=false;capEl.textContent='now boarding: you';}
+function beep(f1,f2,d,type){try{const a=new (window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),g=a.createGain();o.type=type||'square';o.frequency.setValueAtTime(f1,a.currentTime);if(f2)o.frequency.exponentialRampToValueAtTime(f2,a.currentTime+d);g.gain.value=.05;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}}
+function die(why){
+  if(!alive)return;
+  alive=false;beep(300,50,.5,'sawtooth');
+  best=Math.max(best,total());localStorage.setItem('budget_best',best);
+  capEl.textContent=DEATHS[Math.floor(Math.random()*DEATHS.length)]+' ('+why+')';
+}
+function total(){return Math.floor(dist/10)+peanuts*10;}
+function loop(){
+  frame++;
+  if(alive&&started){
+    dist+=2.2;
+    vy+=thrust?-0.52:0.34;
+    vy=Math.max(-6,Math.min(6.5,vy));
+    y+=vy;
+    if(y<16){y=16;vy=0;}
+    if(y>H-26){y=H-26;die('terrain (the classic one)');}
+    if(frame%72===0){
+      const kind=Math.random()<.5?'bird':'plane';
+      obs.push({kind,x:W+60,y:40+Math.random()*(H-120),vy:(Math.random()-.5)*1.4});
+    }
+    if(frame%110===0)snacks.push({x:W+40,y:60+Math.random()*(H-140)});
+    const pb={x:90,y:y,w:44,h:20};
+    for(const o of obs){
+      o.x-=o.kind==='bird'?3.4:4.6;o.y+=o.vy;
+      if(o.y<20||o.y>H-40)o.vy*=-1;
+      if(Math.abs(o.x-(pb.x+pb.w/2))<(o.kind==='bird'?24:32)&&Math.abs(o.y-y)<20)
+        die(o.kind==='bird'?BIRTAUNT:PLANETAUNT);
+    }
+    obs=obs.filter(o=>o.x>-80);
+    for(const s of snacks){
+      s.x-=3;
+      if(!s.hit&&Math.abs(s.x-(pb.x+pb.w/2))<26&&Math.abs(s.y-y)<22){s.hit=true;peanuts++;beep(700,1100,.08);}
+    }
+    snacks=snacks.filter(s=>s.x>-30&&!s.hit);
+    if(frame%560===0){capEl.textContent='CAPTAIN: '+CAPTAIN[Math.floor(Math.random()*CAPTAIN.length)];beep(500,400,.12);}
+  }
+  draw();
+  requestAnimationFrame(loop);
+}
+function draw(){
+  x.fillStyle='#4aa7e8';x.fillRect(0,0,W,H);
+  x.fillStyle='rgba(255,255,255,.85)';
+  if(alive)for(let i=0;i<5;i++){const cx=(W-((frame*.4+i*173)%(W+140)))+70,cy=50+i*74;x.beginPath();x.arc(cx,cy,17,0,7);x.arc(cx+18,cy+4,13,0,7);x.arc(cx-17,cy+5,12,0,7);x.fill();}
+  x.fillStyle='#2f7d3f';x.fillRect(0,H-18,W,18);
+  for(const o of obs){
+    if(o.kind==='bird'){
+      x.strokeStyle='#26221c';x.lineWidth=4;x.lineCap='round';
+      const f=Math.sin(frame*.25)*8;
+      x.beginPath();x.moveTo(o.x-16,o.y-f);x.lineTo(o.x,o.y);x.lineTo(o.x+16,o.y-f);x.stroke();
+    }else{
+      x.fillStyle='#d33f49';
+      x.fillRect(o.x-30,o.y-8,60,16);
+      x.fillRect(o.x-6,o.y-22,16,16);
+      x.fillStyle='#8fd3ff';x.fillRect(o.x-3,o.y-19,10,6);
+      x.strokeStyle='#7a1f27';x.lineWidth=3;
+      x.beginPath();x.moveTo(o.x-28,o.y);x.lineTo(o.x-6,o.y);x.moveTo(o.x-2,o.y+8);x.lineTo(o.x-14,o.y+20);x.stroke();
+    }
+  }
+  for(const s of snacks){
+    x.fillStyle='#d9a05b';
+    x.beginPath();x.arc(s.x-4,s.y-4,6,0,7);x.arc(s.x+4,s.y+4,6,0,7);x.fill();
+    x.strokeStyle='#8a5a20';x.lineWidth=2;
+    x.beginPath();x.moveTo(s.x-6,s.y+2);x.quadraticCurveTo(s.x,s.y-2,s.x+6,s.y-6);x.stroke();
+  }
+  const tilt=Math.max(-.4,Math.min(.5,(thrust?-.3:vy*.06)));
+  x.save();x.translate(90,y);x.rotate(tilt);
+  x.fillStyle='#ffd23e';x.strokeStyle='#8a6a00';x.lineWidth=3;
+  x.beginPath();x.moveTo(-30,0);x.lineTo(22,0);x.lineTo(30,-6);x.lineTo(30,6);x.closePath();x.fill();x.stroke();
+  x.fillStyle='#e86a1f';x.fillRect(-12,-4,20,8);
+  x.fillStyle='#c94f2a';x.fillRect(-34,-3,12,6);
+  x.fillStyle='#fff';x.fillRect(14,-3,8,6);
+  x.restore();
+  x.fillStyle='#04203c';x.font='bold 18px Consolas';
+  x.fillText('DIST '+Math.floor(dist/10)+'m   PEANUTS '+peanuts+'   SCORE '+total(),14,28);
+  x.font='13px Consolas';x.fillStyle='#123a5e';
+  x.fillText('best: '+best+'   (a peanut is worth 10 meters)',14,48);
+  if(!alive){
+    x.fillStyle='rgba(2,10,20,.78)';x.fillRect(0,130,W,170);
+    x.textAlign='center';x.fillStyle='#ff5c5c';x.font='bold 30px Consolas';
+    x.fillText('TECHNICAL DIFFICULTIES',W/2,190);
+    x.fillStyle='#eaf6ff';x.font='17px Consolas';
+    x.fillText('score: '+total()+'   best: '+best,W/2,225);
+    x.fillText('(the airline thanks you for choosing budget)',W/2,255);
+    x.fillStyle='#ffd23e';x.fillText('click to board another doomed flight',W/2,285);
+    x.textAlign='left';
+  } else if(!started){
+    x.fillStyle='rgba(2,10,20,.6)';x.fillRect(0,160,W,90);
+    x.textAlign='center';x.fillStyle='#ffd23e';x.font='bold 22px Consolas';
+    x.fillText('HOLD TO TAKE OFF',W/2,205);x.textAlign='left';
+  }
+}
+loop();
+</script>
+</body>
+</html>
