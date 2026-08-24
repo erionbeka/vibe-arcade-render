@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DECISION COIN</title>
+<style>
+  html,body{margin:0;height:100%;background:#101c14;color:#e6f4ea;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+  h1{font-size:.95rem;color:#7dff8a;margin:0;text-align:center}
+  input{width:min(380px,86vw);padding:12px;background:#0a130d;border:3px solid #2e5c3a;color:#fff;font-family:inherit;font-size:1rem;outline:none;text-align:center}
+  input:focus{border-color:#7dff8a}
+  #coin{width:130px;height:130px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe98a,#c9a227);display:flex;align-items:center;justify-content:center;color:#5c470a;font-weight:bold;font-size:1rem;box-shadow:0 8px 0 #6b5510, inset 0 -6px 12px rgba(0,0,0,.25);transition:transform .12s}
+  .flip{animation:fl .18s 8 alternate}
+  @keyframes fl{to{transform:translateY(-46px) rotateX(720deg)}}
+  button{padding:12px 26px;font-family:inherit;font-size:1.02rem;border:3px solid #7dff8a;background:#14331c;color:#c9ffd2;cursor:pointer}
+  button:disabled{opacity:.5}
+  #verdict{min-height:56px;font-size:1.4rem;color:#ffe600;text-align:center;padding:0 10px}
+</style>
+</head>
+<body>
+<h1>DECISION COIN</h1>
+<input id="q" placeholder="ask a life question... (optional, ignored)" maxlength="80">
+<div id="coin">$</div>
+<button id="flip">FLIP THE COIN</button>
+<div id="verdict">the coin has seen your future. it says nothing yet.</div>
+<script>
+const coin=document.getElementById('coin'),btn=document.getElementById('flip'),v=document.getElementById('verdict');
+let busy=false;
+const OUTCOMES=[
+  ['YES',22],['NO',22],['YES BUT ALSO NO',16],['ASK AGAIN AFTER A SNACK',14],
+  ['THE COIN REFUSES',10],['BOTH. SIMULTANEOUSLY. GOOD LUCK.',8],
+  ['HAVE YOU CONSIDERED A NAP',5],['THE ANSWER IS SOUP',3]
+];
+function roll(){
+  let r=Math.random()*100;
+  for(const [t,w] of OUTCOMES){if((r-=w)<0)return t;}
+  return 'YES';
+}
+btn.addEventListener('click',()=>{
+  if(busy)return;busy=true;btn.disabled=true;
+  v.textContent='the coin deliberates...';
+  coin.classList.add('flip');
+  try{const a=new (window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),g=a.createGain();o.frequency.value=1800;o.connect(g);g.connect(a.destination);g.gain.value=.03;o.start();o.stop(a.currentTime+.09);}catch(e){}
+  setTimeout(()=>{
+    coin.classList.remove('flip');
+    v.textContent='"'+roll()+'"';
+    btn.disabled=false;busy=false;
+  },1500);
+});
+</script>
+</body>
+</html>

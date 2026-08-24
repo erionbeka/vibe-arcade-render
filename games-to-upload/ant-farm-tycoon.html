@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ANT FARM TYCOON</title>
+<style>
+  html,body{margin:0;height:100%;background:#1a130b;color:#f2e8d5;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;gap:10px}
+  h1{font-size:.95rem;color:#e0b25c;margin:10px 0 0}
+  canvas{border:4px solid #4d3820;background:#2b1d10}
+  #row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center}
+  button{padding:10px 16px;font-family:inherit;font-size:.92rem;border:3px solid #a97b3f;background:#2e2113;color:#ffe1ad;cursor:pointer}
+  button:disabled{opacity:.45}
+  #stats{font-size:.9rem;color:#c9b48c;text-align:center;padding:0 10px}
+</style>
+</head>
+<body>
+<h1>ANT FARM TYCOON</h1>
+<canvas id="c" width="600" height="240"></canvas>
+<div id="row"><button id="leaf">GATHER LEAF (manual)</button><button id="buy">BUY ANT (costs <span id="cost">10</span>)</button><button id="name">RENAME COLONY</button></div>
+<div id="stats"></div>
+<script>
+const c=document.getElementById('c'),x=c.getContext('2d');
+let leaves=0,ants=1,cost=10,colony='The Guys';
+const antDots=[{x:300,y:120,a:Math.random()*7}];
+const GDP=['vibes','crumbs','leaves (allegedly)','ambition','unpaid ant hours'];
+document.getElementById('leaf').addEventListener('click',()=>{leaves++;});
+document.getElementById('buy').addEventListener('click',()=>{
+  if(leaves<cost)return;
+  leaves-=cost;cost=Math.ceil(cost*1.7);ants++;
+  const a={x:Math.random()*560+20,y:Math.random()*200+20,a:Math.random()*7};
+  antDots.push(a);
+});
+document.getElementById('name').addEventListener('click',()=>{
+  colony=prompt('colony name:')||colony;
+});
+setInterval(()=>{document.getElementById('cost').textContent=cost;
+  document.getElementById('stats').innerHTML=
+    'leaves: '+leaves+' &middot; ants: '+ants+'<br>colony "'+colony+'" &middot; GDP: '+(GDP[Math.min(GDP.length-1,Math.floor(ants/3))])+
+    '<br>ant satisfaction: '+(ants>18?'concerning':'acceptable')+' &middot; escape attempts: '+(ants>8?ants-8:0);
+},250);
+function tick(){
+  x.fillStyle='#2b1d10';x.fillRect(0,0,600,240);
+  x.strokeStyle='#3d2c17';x.lineWidth=6;x.lineCap='round';
+  for(let i=0;i<5;i++){x.beginPath();x.moveTo(60+i*110,40);x.quadraticCurveTo(80+i*110,140,50+i*110,210);x.stroke();}
+  while(antDots.length<ants)antDots.push({x:300,y:120,a:Math.random()*7});
+  for(const a of antDots){
+    a.a+=(Math.random()-.5)*.6;
+    a.x+=Math.cos(a.a)*.9;a.y+=Math.sin(a.a)*.9;
+    if(a.x<10||a.x>590||a.y<10||a.y<10||a.y>230)a.a+=Math.PI;
+    a.x=Math.max(8,Math.min(592,a.x));a.y=Math.max(8,Math.min(232,a.y));
+    x.fillStyle='#111';x.beginPath();x.ellipse(a.x,a.y,5,3,a.a,0,7);x.fill();
+    x.beginPath();x.arc(a.x-Math.cos(a.a)*6,a.y-Math.sin(a.a)*6,2.6,0,7);x.fill();
+  }
+  requestAnimationFrame(tick);
+}
+tick();
+setInterval(()=>{leaves+=ants;},1000);
+</script>
+</body>
+</html>

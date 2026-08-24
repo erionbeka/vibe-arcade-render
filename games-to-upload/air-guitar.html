@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AIR GUITAR CHAMPIONSHIPS</title>
+<style>
+  html,body{margin:0;height:100%;background:#12071f;color:#f5ecff;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+  h1{font-size:.95rem;color:#ff6ec7;margin:0;text-align:center}
+  #stage{font-size:4rem;height:90px;line-height:90px}
+  #keys{display:flex;gap:8px}
+  .k{width:52px;height:52px;border:3px solid #7a3fd0;background:#241242;color:#e6d5ff;display:flex;align-items:center;justify-content:center;font-size:1.1rem;border-radius:6px}
+  .k.hit{background:#ff2bd6;color:#fff;transform:translateY(3px)}
+  #judges{display:flex;gap:18px;font-size:1.3rem;color:#ffe600;min-height:36px}
+  #say{min-height:28px;color:#c9b3ee;text-align:center;padding:0 10px}
+  #timer{color:#8d76b8}
+</style>
+</head>
+<body>
+<h1>AIR GUITAR CHAMPIONSHIPS<br>(regional qualifiers)</h1>
+<div id="stage"></div>
+  <div id="keys"></div>
+<button id="start">BEGIN 30-SECOND SET</button>
+<div id="judges"></div>
+<div id="say">strum A S D F L H. SPACE = windmill. the guitar is imaginary. the glory is real.</div>
+<div id="timer"></div>
+<script>
+const keysEl=document.getElementById('keys');keysEl.innerHTML='ASDFLH'.split('').map(k=>'<div class="k" data-k="'+k+'">'+k+'</div>').join('');
+const stage=document.getElementById('stage'),judges=document.getElementById('judges'),say=document.getElementById('say'),timer=document.getElementById('timer');
+let playing=false,strums=0,iv=null;
+const POSES=['\u{1F941}','\u{1F918}','\u{1F919}','\u{1F91F}','\u{1F3B8}'];
+const JUDGENAMES=['judge karen','the russian judge','a guy named dennis','your mom'];
+function strum(){
+  if(!playing)return;
+  strums++;
+  stage.textContent=POSES[Math.floor(Math.random()*POSES.length)];
+  document.querySelector('.k:nth-child('+(Math.floor(Math.random()*6)+1)+')')?.classList.add('hit');
+  setTimeout(()=>document.querySelectorAll('.k').forEach(k=>k.classList.remove('hit')),90);
+  try{
+    const a=new (window.AudioContext||window.webkitAudioContext)();
+    const o=a.createOscillator(),g=a.createGain();o.type='sawtooth';
+    o.frequency.value=110+Math.random()*700;
+    g.gain.value=.06;g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.22);
+    o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+.25);
+  }catch(e){}
+  if(strums===20)say.textContent='crowd is on their feet (nobody is here)';
+}
+addEventListener('keydown',e=>{
+  const k=e.key.toUpperCase();
+  if('ASDFLH'.includes(k)&&!e.repeat)strum();
+  if(e.code==='Space'){e.preventDefault();if(playing)strum(),say.textContent='WINDMILL!! +style';}
+});
+document.querySelectorAll('.k').forEach(k=>k.addEventListener('pointerdown',strum));
+document.getElementById('start').addEventListener('click',()=>{
+  playing=true;strums=0;judges.textContent='';say.textContent='SHRED.';
+  let t=30;timer.textContent=t+'s remaining';
+  iv=setInterval(()=>{
+    t--;timer.textContent=t+'s remaining';
+    if(t<=0){
+      clearInterval(iv);playing=false;stage.textContent='\u{1F3C6}';
+      judges.innerHTML=JUDGENAMES.map(n=>{
+        const s=n==='the russian judge'?(2+Math.random()):Math.random()*4+5;
+        return n+': <b>'+s.toFixed(1)+'</b>';
+      }).join(' &nbsp; ');
+      say.textContent='set complete with '+strums+' strums. rank: '+(strums>60?'AIR GOD':strums>30?'moderately electric':strums>10?'acoustic at best':'audience member');
+    }
+  },1000);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>STARE CONTEST vs GOAT</title>
+<style>
+  html,body{margin:0;height:100%;background:#0e1a12;color:#e8ffe8;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+  h1{font-size:.95rem;color:#9dff70;margin:0;text-align:center}
+  #goat{font-size:7rem;height:130px;line-height:130px}
+  #goat.blink{opacity:.15}
+  #say{min-height:30px;text-align:center;color:#ffd23e;font-size:1.15rem;padding:0 10px}
+  #rec{color:#8fa98f}
+</style>
+</head>
+<body>
+<h1>STARE CONTEST<br>vs GOAT</h1>
+  <div id="goat">&#128016;</div>
+<div id="say">the goat stares. do not click. clicking is blinking.</div>
+<div id="rec">your record survival: 0s &middot; goat wins: 0</div>
+<script>
+const goat=document.getElementById('goat'),say=document.getElementById('say'),rec=document.getElementById('rec');
+let playing=false,startT=0,bestW=0,losses=0,blinkIv=null;
+function upd(){rec.textContent='your record survival: '+bestW+'s \u00B7 goat wins: '+losses;}
+addEventListener('click',()=>{
+  if(!playing){begin();return;}
+  end(false,'you blinked at '+((Date.now()-startT)/1000).toFixed(1)+'s. the goat did not even try.');
+});
+function begin(){
+  playing=true;startT=Date.now();
+  say.textContent='staring commenced. do NOT click.';
+  const winAt=5000+Math.random()*10000;
+  blinkIv=setTimeout(()=>{
+    if(!playing)return;
+    goat.classList.add('blink');setTimeout(()=>goat.classList.remove('blink'),160);
+    say.textContent='the goat blinked!! keep going...';
+  },winAt*0.55);
+  setTimeout(()=>{
+    if(!playing)return;
+    end(true,'the goat has fallen asleep standing up. YOU WIN.');
+  },winAt);
+}
+function end(win,msg){
+  playing=false;clearTimeout(blinkIv);
+  const s=(Date.now()-startT)/1000;
+  if(!win){losses++;}else{bestW=Math.max(bestW,s);}
+  say.textContent=msg+' '+(!win?'GOAT WINS (goat cheated).':'');
+  upd();
+}
+upd();
+</script>
+</body>
+</html>

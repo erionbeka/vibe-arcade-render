@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>STACK OF PLATES</title>
+<style>
+
+  html,body{margin:0;height:100%;background:#161019;color:#eef;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+  h1{font-size:.95rem;margin:0;text-align:center;color:#39ff88}
+  button{padding:11px 20px;font-family:inherit;font-size:.98rem;border:3px solid #39ff88;background:#151530;color:#dfe8ff;cursor:pointer}
+  button:disabled{opacity:.45}
+  #say{min-height:28px;text-align:center;padding:0 10px}
+
+</style>
+</head>
+<body>
+<h1>STACK OF PLATES</h1>
+<div style="color:#9281bd">wedding china. no pressure.</div>
+<div style="position:relative;width:min(440px,88vw);height:30px;border:3px solid #39446b;background:#0d1120">
+  <div id="fill" style="position:absolute;top:0;height:100%;width:0%;left:50%;background:#39ff88"></div>
+</div>
+<div style="display:flex;gap:40px"><button id="l">← STEADY LEFT</button><button id="r">STEADY RIGHT →</button></div>
+<div id="say"></div>
+<script>
+const GUSTS=["door slammed","tiny personal earthquake","dishwasher jealousy","a plate sighed"];
+(function(){window.__beep=function(f,d,t){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.05;g.gain.exponentialRampToValueAtTime(.001,a.currentTime+(d||.08));o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+(d||.08));}catch(e){}};})();
+let pos=0,vel=0,alive=true,t0=Date.now(),best=0;
+const bar=document.getElementById('fill');
+function loop(){
+  if(!alive)return;
+  vel+=(Math.random()-.5)*.95;
+  vel*=.985;
+  pos+=vel;
+  if(pos>100||pos<-100)return die();
+  bar.style.width=Math.abs(pos)+'%';
+  bar.style.left=pos<0?(50+pos/2)+'%':'50%';
+  bar.style.background=Math.abs(pos)>70?'#ff5c5c':'#39ff88';
+  requestAnimationFrame(loop);
+}
+function push(d){if(alive)vel+=d;}
+document.getElementById('l').addEventListener('pointerdown',()=>push(-1.7));
+document.getElementById('r').addEventListener('pointerdown',()=>push(1.7));
+addEventListener('keydown',e=>{if(e.key==='ArrowLeft')push(-1.7);if(e.key==='ArrowRight')push(1.7);});
+setInterval(()=>{
+  if(alive&&Math.random()<.45){
+    const g=GUSTS[Math.floor(Math.random()*GUSTS.length)];
+    document.getElementById('say').textContent=g+'!';
+  }
+},1800);
+function die(){
+  alive=false;
+  const sec=((Date.now()-t0)/1000).toFixed(1);
+  best=Math.max(best,+sec);
+  document.getElementById('say').innerHTML='lasted '+sec+'s (record '+best+'s). it hit the floor.<br><br><button onclick="location.reload()">REBALANCE</button>';
+  __beep(120,.25,'sawtooth');
+}
+document.getElementById('say').textContent='wedding china. no pressure.';
+loop();
+</script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SNAIL COMMUTE</title>
+<style>
+
+  html,body{margin:0;height:100%;background:#0f1220;color:#eef;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+  h1{font-size:.95rem;margin:0;text-align:center;color:#a7f3d0}
+  button{padding:11px 20px;font-family:inherit;font-size:.98rem;border:3px solid #a7f3d0;background:#151530;color:#dfe8ff;cursor:pointer}
+  button:disabled{opacity:.45}
+  #say{min-height:28px;text-align:center;padding:0 10px}
+
+  #over{display:none;position:absolute;inset:0;background:rgba(5,5,15,.88);align-items:center;justify-content:center;text-align:center}
+  body{position:relative}
+</style>
+</head>
+<body>
+<h1>SNAIL COMMUTE</h1>
+<canvas id="c" width="600" height="260" style="border:4px solid #a7f3d0;touch-action:none"></canvas>
+<div id="say">space / tap to jump. the world is hostile.</div>
+<div id="over"><div id="res"></div></div>
+<script>
+const TAUNTS=["nice hops. said nobody.","is that all the altitude you have?","my grandmother clears those. she is a rock.","jump timing: creative.","you call that a jump?"];(function(){window.__beep=function(f,d,t){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.05;g.gain.exponentialRampToValueAtTime(.001,a.currentTime+(d||.08));o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+(d||.08));}catch(e){}};})();
+const c=document.getElementById('c'),x=c.getContext('2d');
+let y=210,vy=0,jump=false,dist=0,obs=[],dead=false,tick=0,lastTaunt=0;
+function press(e){if(e)e.preventDefault();if(dead){location.reload();return;}if(!jump){vy=-8.4;jump=true;__beep(500,.06);}}
+addEventListener('keydown',e=>{if(e.code==='Space')press(e);});
+c.addEventListener('pointerdown',press);
+setInterval(()=>{
+  tick++;if(dead)return;
+  vy+=.5;y=Math.min(212,y+vy);if(y>=212){y=212;jump=false;}
+  dist+=.22;
+  if(tick%Math.max(38,70-Math.floor(dist/60))===0)obs.push({x:620,w:16+Math.random()*22,h:22+Math.random()*26});
+  obs.forEach(o=>o.x-=3.2+dist/240);
+  obs=obs.filter(o=>o.x>-50);
+  for(const o of obs)if(86>o.x&&60<o.x+o.w&&y>232-o.h)return die();
+  if(tick-lastTaunt>480){lastTaunt=tick;if(Math.random()<.6)say(TAUNTS[Math.floor(Math.random()*TAUNTS.length)]);}
+},16);
+function say(t){document.getElementById('say').textContent=t;}
+function die(){
+  dead=true;say('');
+  const d=Math.floor(dist);
+  document.getElementById('over').style.display='flex';
+  document.getElementById('res').innerHTML='distance: '+d+'m<br><span class="mut">slow and steady still got splashed.</span><br><br><button onclick="location.reload()">RUN IT BACK</button>';
+}
+(function draw(){
+  x.clearRect(0,0,600,260);
+  x.fillStyle='#2b2b40';x.fillRect(0,236,600,24);
+  x.fillStyle='#a7f3d0';x.fillRect(60,y,26,26);
+  x.fillStyle='#ef5350';
+  for(const o of obs)x.fillRect(o.x,236-o.h,o.w,o.h);
+  x.fillStyle='#fff';x.font='bold 15px Consolas';
+  x.fillText(Math.floor(dist)+'m',14,24);
+  requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>

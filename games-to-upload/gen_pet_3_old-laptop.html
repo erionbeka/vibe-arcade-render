@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>OLD LAPTOP</title>
+<style>
+
+  html,body{margin:0;height:100%;background:#131124;color:#eef;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+  h1{font-size:.95rem;margin:0;text-align:center;color:#c792ea}
+  button{padding:11px 20px;font-family:inherit;font-size:.98rem;border:3px solid #c792ea;background:#151530;color:#dfe8ff;cursor:pointer}
+  button:disabled{opacity:.45}
+  #say{min-height:28px;text-align:center;padding:0 10px}
+
+</style>
+</head>
+<body>
+<h1>OLD LAPTOP</h1>
+<div style="font-size:5rem;height:96px;line-height:96px">💻</div>
+<div style="position:relative;width:min(300px,80vw);height:16px;border:3px solid #7a5cc7">
+<div id="fill" style="height:100%;width:50%;background:#c792ea"></div></div>
+<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center"><button id="b1">open the lid</button><button id="b2">plug in charger</button><button id="b3">install update</button></div>
+<div id="say">it awaits your attention. reluctantly.</div>
+<script>
+(function(){window.__beep=function(f,d,t){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.05;g.gain.exponentialRampToValueAtTime(.001,a.currentTime+(d||.08));o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+(d||.08));}catch(e){}};})();
+let mood=50;
+const upd=()=>{const f=document.getElementById('fill');f.style.width=mood+'%';f.style.background=mood>=65?'#69f0ae':mood>=30?'#c792ea':'#ff5c5c';};
+const say=t=>{document.getElementById('say').textContent=t;};
+document.getElementById('b1').addEventListener('click',()=>{
+  mood=Math.min(100,mood+7);upd();
+  const p=["fan roars like a jet preparing.","battery: 4% forever.","updates configured: 37 of 3."][Math.floor(Math.random()*3)];
+  say(p);
+  if(mood>=100)say("runs surprisingly fast. suspicious. what did you do.");
+});
+document.getElementById('b2').addEventListener('click',()=>{
+  mood=Math.min(100,mood+12);upd();
+  say(["consumed greedily.","refueled with attitude.","accepts offering silently."][Math.floor(Math.random()*3)]);
+  if(mood>=100)say("runs surprisingly fast. suspicious. what did you do.");
+});
+document.getElementById('b3').addEventListener('click',()=>{
+  mood=Math.max(0,mood-20);upd();__beep(140,.1);
+  say(["hey. watch it.","poked. seething.","how dare."][Math.floor(Math.random()*3)]);
+  if(mood<=0)say("blue screen. it rests now.");
+});
+upd();
+</script>
+</body>
+</html>

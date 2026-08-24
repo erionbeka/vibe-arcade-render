@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>THE FLOOR IS LAVA (it is not)</title>
+<style>
+  html,body{margin:0;height:100%;background:#171225;color:#eaeaf5;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+  canvas{border:4px solid #34205e;background:#241c3f}
+  #say{min-height:30px;color:#ffe600;text-align:center;padding:0 12px}
+</style>
+</head>
+<body>
+<canvas id="c" width="600" height="380"></canvas>
+<div id="say">use arrows / WASD. survive the floor.</div>
+<script>
+const c=document.getElementById('c'),x=c.getContext('2d'),say=document.getElementById('say');
+let px=280,py=170,lastMove=Date.now(),still=false;
+const keys={};
+addEventListener('keydown',e=>keys[e.key.toLowerCase()]=1);
+addEventListener('keyup',e=>keys[e.key.toLowerCase()]=0);
+setInterval(()=>{
+  const lines=['THE FLOOR IS LAVA.','do not look down.','i heard the rug is magma.','stay vigilant.'];
+  say.textContent=lines[Math.floor(Math.random()*lines.length)];
+  lavaClaims++;
+  setTimeout(()=>{say.textContent='...it is not lava. it never was.';},1900);
+},8000);
+function draw(){
+  x.fillStyle='#241c3f';x.fillRect(0,0,600,380);
+  x.strokeStyle='#332854';for(let i=0;i<600;i+=48){x.beginPath();x.moveTo(i,0);x.lineTo(i,380);x.stroke();}
+  for(let j=0;j<380;j+=48){x.beginPath();x.moveTo(0,j);x.lineTo(600,j);x.stroke();}
+  x.fillStyle='#ff8c42';x.fillRect(px,py,36,36);
+  x.strokeStyle='#ffd23e';x.lineWidth=2;x.strokeRect(px,py,36,36);
+  requestAnimationFrame(draw);
+}
+draw();
+setInterval(()=>{
+  const dx=(keys.arrowright||keys.d?3:0)-(keys.arrowleft||keys.a?3:0);
+  const dy=(keys.arrowdown||keys.s?3:0)-(keys.arrowup||keys.w?3:0);
+  if(dx||dy){px=Math.max(0,Math.min(564,px+dx));py=Math.max(0,Math.min(344,py+dy));lastMove=Date.now();still=false;}
+},16);
+setInterval(()=>{
+  if(!still&&Date.now()-lastMove>6000){still=true;say.textContent='ACHIEVEMENT: STILLNESS. the lava respects you now.';}
+},1000);
+</script>
+</body>
+</html>

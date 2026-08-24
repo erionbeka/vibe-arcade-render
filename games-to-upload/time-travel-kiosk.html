@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TIME TRAVEL KIOSK</title>
+<style>
+  html,body{margin:0;height:100%;background:#071426;color:#d9ecff;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+  h1{font-size:.95rem;color:#6fd3ff;margin:0;text-align:center}
+  #kiosk{width:min(520px,92vw);background:#0c2038;border:5px solid #1e4a75;border-radius:12px;padding:20px;text-align:center}
+  input{width:130px;padding:10px;background:#04101f;border:3px solid #1e4a75;color:#fff;font-family:inherit;font-size:1.3rem;text-align:center;outline:none}
+  button{padding:12px 24px;font-family:inherit;font-size:1rem;border:3px solid #6fd3ff;background:#082a47;color:#bfe9ff;cursor:pointer;margin-left:10px}
+  button:disabled{opacity:.45}
+  #out{min-height:120px;margin-top:14px;font-size:.98rem;line-height:1.6;color:#a9cdf0;text-align:left}
+  #para{color:#ff9de2}
+</style>
+</head>
+<body>
+<h1>TIME TRAVEL KIOSK<br>(self-service, no refunds across timelines)</h1>
+<div id="kiosk">
+  <div>DESTINATION YEAR: <input id="year" value="3024" maxlength="6"></div>
+  <div style="margin-top:12px"><button id="go">TRAVEL</button></div>
+  <div id="out">insert year. press travel. become disappointed.</div>
+  <div id="para">paradox accumulation: 0%</div>
+</div>
+<script>
+const out=document.getElementById('out'),btn=document.getElementById('go'),para=document.getElementById('para');
+let trips=0,paradox=0,busy=false;
+const BULLETS=['still no flying cars','the wifi password is now longer','coffee costs more. somehow.','your descendants do not return your calls','gravity: unchanged (lazy)','everything smells faintly of ozone'];
+const SPECIALS={1997:'you are at a computer. the internet is a baby and it is screaming.',1885:'everyone is wearing 40 pounds of clothing and nobody will say why.',1969:'the moon looks freshly visited.',3000:'the pigeons have learned to read. they are not happy.',1066:'it is extremely medieval. someone takes your kiosk as a relic.'};
+btn.addEventListener('click',()=>{
+  if(busy)return;
+  const y=parseInt(document.getElementById('year').value)||2026;
+  busy=true;btn.disabled=true;
+  out.textContent='warping...';
+  try{const a=new (window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),g=a.createGain();o.frequency.setValueAtTime(90,a.currentTime);o.frequency.exponentialRampToValueAtTime(900,a.currentTime+1.4);g.gain.value=.05;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+1.5);}catch(e){}
+  setTimeout(()=>{
+    trips++;
+    paradox=Math.min(100,paradox+12);
+    let html='<b style="color:#7ddcff">ARRIVED: '+y+'</b><br>';
+    html+=SPECIALS[y]?('<i>'+SPECIALS[y]+'</i><br>'):('');
+    const picks=[...BULLETS].sort(()=>Math.random()-.5).slice(0,3);
+    html+=picks.map(b=>'\u2022 '+b).join('<br>');
+    out.innerHTML=html;
+    para.textContent='paradox accumulation: '+paradox+'%'+(paradox>=60?' (a second you has arrived to complain about the mess)':'');
+    btn.disabled=false;busy=false;
+  },1600);
+});
+</script>
+</body>
+</html>

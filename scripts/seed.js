@@ -38,7 +38,7 @@ if (promoteArg.startsWith('admin:')) {
   }
 }
 
-const CATALOG = [
+const CATALOG_HANDMADE = [
   {
     file: 'the-button.html',
     title: 'THE BUTTON',
@@ -72,7 +72,7 @@ const CATALOG = [
   {
     file: 'toaster-roulette.html',
     title: 'TOASTER ROULETTE',
-    description: 'Pull the lever. Receive toast. Or charcoal. Or the toast leaves for orbit. The toaster knows things it will not share.\n\nCollect stats across six possible outcomes including the rare GOLDEN TOAST JACKPOT (+10 legendary bread points).',
+    description: 'Pull the lever. Receive toast. Or charcoal. Or toast leaves for orbit. The toaster knows things it will not share.\n\nCollect stats across six possible outcomes including the rare GOLDEN TOAST JACKPOT (+10 legendary bread points).',
     tags: 'casino bread comedy random'
   },
   {
@@ -116,6 +116,72 @@ const CATALOG = [
     title: 'FRIDGE SIMULATOR',
     description: 'Open the fridge. Close the fridge. Discover what the leftovers have become.\n\n12 mysteries to find, including opinion-having yogurt, unexplained additional ham, and a cat that declines to leave. Day counter included because time passes inside fridges too.',
     tags: 'simulation food mystery cozy'
+  },
+  {
+    file: 'floor-is-not-lava.html',
+    title: 'THE FLOOR IS LAVA (it is not)',
+    description: 'The floor is lava. Except it is not. It is regular floor. But what if?\n\nWalk around a room while an unseen voice issues lava alerts it immediately walks back. Includes ACHIEVEMENT: STILLNESS for standing motionless for six seconds like a brave little rectangle.',
+    tags: 'walking paranoia comedy'
+  },
+  {
+    file: 'elevator.html',
+    title: 'ELEVATOR SIMULATOR',
+    description: 'Nine floors. Nine buttons. One elevator car with dramatic doors.\n\nEach floor has a full description (spoiler: they are all offices). Random passengers board silently and leave awkwardness behind. Floor 9 is stairs.',
+    tags: 'simulation awkward comedy'
+  },
+  {
+    file: 'conspiracy-board.html',
+    title: 'CONSPIRACY BOARD',
+    description: 'PIGEONS. THE MOON. TOAST. YOUR CAT. Connect the photos with red string and the board stamps EXACTLY after every link.\n\nAfter 8 connections the truth is revealed, and it is laundry. It is always laundry.',
+    tags: 'puzzle comedy birds'
+  },
+  {
+    file: 'mood-ring.html',
+    title: 'MOOD RING',
+    description: 'A high-precision mood analysis instrument. Consult the ring and receive readings like "soup", "legally tired", or "one bad day from raccoon".\n\nColor changes included. Accuracy not. Recent moods logged for your permanent emotional record.',
+    tags: 'toy comedy mood'
+  },
+  {
+    file: 'decision-coin.html',
+    title: 'DECISION COIN',
+    description: 'Outsource your life choices to a coin with eight possible outcomes, including "YES BUT ALSO NO", "ASK AGAIN AFTER A SNACK" and "THE ANSWER IS SOUP".\n\nYour question is accepted and completely ignored. The coin flips dramatically anyway.',
+    tags: 'casual comedy decisions'
+  },
+  {
+    file: 'ant-farm-tycoon.html',
+    title: 'ANT FARM TYCOON',
+    description: 'Build a colony. Gather leaves. Buy ants that wander around accomplishing nothing visible.\n\nFeatures a stats panel measuring Colony GDP (in vibes) and escape attempts. Rename your colony anything; the ants will not remember.',
+    tags: 'idle tycoon ants comedy'
+  },
+  {
+    file: 'air-guitar.html',
+    title: 'AIR GUITAR CHAMPIONSHIPS',
+    description: 'Strum ASDFLH for power chords, SPACE for windmills. A panel including "the russian judge" and "a guy named dennis" scores your 30-second set.\n\nThe guitar is imaginary. The glory is real. Crowd attendance: nobody.',
+    tags: 'music rhythm comedy keyboard'
+  },
+  {
+    file: 'stare-contest.html',
+    title: 'STARE CONTEST vs GOAT',
+    description: 'A goat stares at you. Do not click. Clicking is blinking, and blinking is losing.\n\nThe goat blinks strategically then claims victory regardless ("goat cheated"). Survive long enough and it falls asleep standing up. Records tracked.',
+    tags: 'animals casual comedy goat'
+  },
+  {
+    file: 'bubble-wrap.html',
+    title: 'BUBBLE WRAP: ETERNAL',
+    description: '84 bubbles of satisfying popping with rising-pitch sounds. But the LAST BUBBLE is sentient, and it has seen its siblings fall.\n\nChoose: SPARE THE BUBBLE (it follows you spiritually) or POP IT ANYWAY ("i forgive you," it whispers). Both endings haunt.',
+    tags: 'clicker comedy wholesome'
+  },
+  {
+    file: 'time-travel-kiosk.html',
+    title: 'TIME TRAVEL KIOSK',
+    description: 'Self-service time travel. Enter a year, endure the warping sound, receive a disappointing arrival report ("still no flying cars", "gravity: unchanged (lazy)").\n\nSpecial years unlock special disappointments. Paradox accumulation rises 12% per trip; above 60% a second you arrives to complain about the mess.',
+    tags: 'sci-fi casual comedy paradox'
+  },
+  {
+    file: 'ghost-roommate.html',
+    title: 'GHOST ROOMMATE AGREEMENT',
+    description: 'Negotiate six house rules with a ghost named Reginald (or Gary, or Chad (dead)). Agreeing means nothing; refusing changes nothing.\n\nFinal Coexistence Score: exactly 50%. The lease is signed in cold breath. This is now legally your problem.',
+    tags: 'casual ghosts comedy negotiation'
   }
 ];
 
@@ -123,6 +189,12 @@ const insertGame = db.prepare(
   'INSERT INTO games (user_id, title, description, type) VALUES (?, ?, ?, ?)'
 );
 const insertTag = db.prepare('INSERT OR IGNORE INTO tags (game_id, tag) VALUES (?, ?)');
+
+const GEN_CATALOG = path.join(__dirname, '..', 'games-to-upload', 'gen-catalog.json');
+const GENERATED = fs.existsSync(GEN_CATALOG)
+  ? JSON.parse(fs.readFileSync(GEN_CATALOG, 'utf8'))
+  : [];
+const CATALOG = [...CATALOG_HANDMADE, ...GENERATED];
 
 for (const g of CATALOG) {
   const srcPath = path.join(__dirname, '..', 'games-to-upload', g.file);

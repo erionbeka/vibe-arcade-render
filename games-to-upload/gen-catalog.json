@@ -1,0 +1,458 @@
+[
+ {
+  "file": "gen_dodge_0_sandwich-vs-pigeons.html",
+  "title": "SANDWICH VS PIGEONS",
+  "description": "SANDWICH has ONE job: exist. Everything else wants otherwise.\n\nMove with arrows/mouse, collect olives (+50), dodge falling pigeons, and receive a personalized obituary.",
+  "tags": "dodge arcade olives"
+ },
+ {
+  "file": "gen_dodge_1_lost-sock-vs-dryer-lint.html",
+  "title": "LOST SOCK VS DRYER LINT",
+  "description": "LOST SOCK has ONE job: exist. Everything else wants otherwise.\n\nMove with arrows/mouse, collect matching socks (+50), dodge falling lint balls, and receive a personalized obituary.",
+  "tags": "dodge arcade matching"
+ },
+ {
+  "file": "gen_dodge_2_snowman-vs-sunbeams.html",
+  "title": "SNOWMAN VS SUNBEAMS",
+  "description": "SNOWMAN has ONE job: exist. Everything else wants otherwise.\n\nMove with arrows/mouse, collect snowflakes (+50), dodge falling sunbeams, and receive a personalized obituary.",
+  "tags": "dodge arcade snowflakes"
+ },
+ {
+  "file": "gen_dodge_3_meatball-vs-forks.html",
+  "title": "MEATBALL VS FORKS",
+  "description": "MEATBALL has ONE job: exist. Everything else wants otherwise.\n\nMove with arrows/mouse, collect parmesan (+50), dodge falling forks, and receive a personalized obituary.",
+  "tags": "dodge arcade parmesan"
+ },
+ {
+  "file": "gen_dodge_4_toast-vs-butter-knives.html",
+  "title": "TOAST VS BUTTER KNIVES",
+  "description": "TOAST has ONE job: exist. Everything else wants otherwise.\n\nMove with arrows/mouse, collect jam jars (+50), dodge falling butter knives, and receive a personalized obituary.",
+  "tags": "dodge arcade jam"
+ },
+ {
+  "file": "gen_dodge_5_balloon-vs-cacti.html",
+  "title": "BALLOON VS CACTI",
+  "description": "BALLOON has ONE job: exist. Everything else wants otherwise.\n\nMove with arrows/mouse, collect helium puffs (+50), dodge falling cacti, and receive a personalized obituary.",
+  "tags": "dodge arcade helium"
+ },
+ {
+  "file": "gen_dodge_6_turtle-vs-skateboards.html",
+  "title": "TURTLE VS SKATEBOARDS",
+  "description": "TURTLE has ONE job: exist. Everything else wants otherwise.\n\nMove with arrows/mouse, collect lettuce (+50), dodge falling skateboards, and receive a personalized obituary.",
+  "tags": "dodge arcade lettuce"
+ },
+ {
+  "file": "gen_dodge_7_cloud-vs-rain.html",
+  "title": "CLOUD VS RAIN",
+  "description": "CLOUD has ONE job: exist. Everything else wants otherwise.\n\nMove with arrows/mouse, collect sunbeams (+50), dodge falling raindrops, and receive a personalized obituary.",
+  "tags": "dodge arcade sunbeams"
+ },
+ {
+  "file": "gen_dodge_8_worm-vs-birds.html",
+  "title": "WORM VS BIRDS",
+  "description": "WORM has ONE job: exist. Everything else wants otherwise.\n\nMove with arrows/mouse, collect dirt snacks (+50), dodge falling birds, and receive a personalized obituary.",
+  "tags": "dodge arcade dirt"
+ },
+ {
+  "file": "gen_dodge_9_banana-vs-monkeys.html",
+  "title": "BANANA VS MONKEYS",
+  "description": "BANANA has ONE job: exist. Everything else wants otherwise.\n\nMove with arrows/mouse, collect smoothies (+50), dodge falling monkeys, and receive a personalized obituary.",
+  "tags": "dodge arcade smoothies"
+ },
+ {
+  "file": "gen_dodge_10_robot-vs-rust.html",
+  "title": "ROBOT VS RUST",
+  "description": "ROBOT has ONE job: exist. Everything else wants otherwise.\n\nMove with arrows/mouse, collect oil cans (+50), dodge falling rust flakes, and receive a personalized obituary.",
+  "tags": "dodge arcade oil"
+ },
+ {
+  "file": "gen_dodge_11_ghost-vs-vacuums.html",
+  "title": "GHOST VS VACUUMS",
+  "description": "GHOST has ONE job: exist. Everything else wants otherwise.\n\nMove with arrows/mouse, collect ectoplasm (+50), dodge falling vacuum cleaners, and receive a personalized obituary.",
+  "tags": "dodge arcade ectoplasm"
+ },
+ {
+  "file": "gen_dodge_12_ice-cube-vs-hairdryers.html",
+  "title": "ICE CUBE VS HAIRDRYERS",
+  "description": "ICE CUBE has ONE job: exist. Everything else wants otherwise.\n\nMove with arrows/mouse, collect mint leaves (+50), dodge falling hairdryers, and receive a personalized obituary.",
+  "tags": "dodge arcade mint"
+ },
+ {
+  "file": "gen_dodge_13_cactus-vs-hugs.html",
+  "title": "CACTUS VS HUGS",
+  "description": "CACTUS has ONE job: exist. Everything else wants otherwise.\n\nMove with arrows/mouse, collect water drops (+50), dodge falling hugs, and receive a personalized obituary.",
+  "tags": "dodge arcade water"
+ },
+ {
+  "file": "gen_dodge_14_pancake-vs-syrup-bottles.html",
+  "title": "PANCAKE VS SYRUP BOTTLES",
+  "description": "PANCAKE has ONE job: exist. Everything else wants otherwise.\n\nMove with arrows/mouse, collect butter pads (+50), dodge falling syrup bottles, and receive a personalized obituary.",
+  "tags": "dodge arcade butter"
+ },
+ {
+  "file": "gen_dodge_15_ufo-vs-conspiracy-nuts.html",
+  "title": "UFO VS CONSPIRACY NUTS",
+  "description": "UFO has ONE job: exist. Everything else wants otherwise.\n\nMove with arrows/mouse, collect cows (+50), dodge falling believers, and receive a personalized obituary.",
+  "tags": "dodge arcade cows"
+ },
+ {
+  "file": "gen_clicker_0_rock-clicker.html",
+  "title": "ROCK CLICKER",
+  "description": "A rock. You click it. Rocks accumulate, the upgrade shop sells pure placebo (+0.2/sec of self-respect), and milestone messages judge you softly.\n\n\"sedimentary, my dear clicker.\"",
+  "tags": "clicker idle rock"
+ },
+ {
+  "file": "gen_clicker_1_cloud-clicker.html",
+  "title": "CLOUD CLICKER",
+  "description": "A cloud. You click it. Raindrops accumulate, the upgrade shop sells pure placebo (+0.2/sec of self-respect), and milestone messages judge you softly.\n\n\"silver linings sold separately.\"",
+  "tags": "clicker idle cloud"
+ },
+ {
+  "file": "gen_clicker_2_duck-clicker.html",
+  "title": "DUCK CLICKER",
+  "description": "A duck. You click it. Breadcrumbs accumulate, the upgrade shop sells pure placebo (+0.2/sec of self-respect), and milestone messages judge you softly.\n\n\"bread: the original currency.\"",
+  "tags": "clicker idle duck"
+ },
+ {
+  "file": "gen_clicker_3_kettle-clicker.html",
+  "title": "KETTLE CLICKER",
+  "description": "A kettle. You click it. Steam wisps accumulate, the upgrade shop sells pure placebo (+0.2/sec of self-respect), and milestone messages judge you softly.\n\n\"whistle when ready.\"",
+  "tags": "clicker idle kettle"
+ },
+ {
+  "file": "gen_clicker_4_cactus-clicker.html",
+  "title": "CACTUS CLICKER",
+  "description": "A cactus. You click it. Spines accumulate, the upgrade shop sells pure placebo (+0.2/sec of self-respect), and milestone messages judge you softly.\n\n\"desert approved.\"",
+  "tags": "clicker idle cactus"
+ },
+ {
+  "file": "gen_clicker_5_cheese-wheel-clicker.html",
+  "title": "CHEESE WHEEL CLICKER",
+  "description": "A cheese wheel. You click it. Wedges accumulate, the upgrade shop sells pure placebo (+0.2/sec of self-respect), and milestone messages judge you softly.\n\n\"the holes add character.\"",
+  "tags": "clicker idle cheese"
+ },
+ {
+  "file": "gen_clicker_6_fax-machine-clicker.html",
+  "title": "FAX MACHINE CLICKER",
+  "description": "A fax machine. You click it. Documents accumulate, the upgrade shop sells pure placebo (+0.2/sec of self-respect), and milestone messages judge you softly.\n\n\"screeching intensifies.\"",
+  "tags": "clicker idle fax"
+ },
+ {
+  "file": "gen_clicker_7_lighthouse-clicker.html",
+  "title": "LIGHTHOUSE CLICKER",
+  "description": "A lighthouse. You click it. Light beams accumulate, the upgrade shop sells pure placebo (+0.2/sec of self-respect), and milestone messages judge you softly.\n\n\"seagulls respect you now.\"",
+  "tags": "clicker idle lighthouse"
+ },
+ {
+  "file": "gen_clicker_8_mushroom-clicker.html",
+  "title": "MUSHROOM CLICKER",
+  "description": "A mushroom. You click it. Spores accumulate, the upgrade shop sells pure placebo (+0.2/sec of self-respect), and milestone messages judge you softly.\n\n\"dark and damp, like your humor.\"",
+  "tags": "clicker idle mushroom"
+ },
+ {
+  "file": "gen_clicker_9_traffic-cone-clicker.html",
+  "title": "TRAFFIC CONE CLICKER",
+  "description": "A traffic cone. You click it. Apologies accumulate, the upgrade shop sells pure placebo (+0.2/sec of self-respect), and milestone messages judge you softly.\n\n\"safety third.\"",
+  "tags": "clicker idle traffic"
+ },
+ {
+  "file": "gen_clicker_10_washing-machine-clicker.html",
+  "title": "WASHING MACHINE CLICKER",
+  "description": "A washing machine. You click it. Lost socks accumulate, the upgrade shop sells pure placebo (+0.2/sec of self-respect), and milestone messages judge you softly.\n\n\"spin cycle enlightenment.\"",
+  "tags": "clicker idle washing"
+ },
+ {
+  "file": "gen_clicker_11_grandma-s-armchair-clicker.html",
+  "title": "GRANDMA'S ARMCHAIR CLICKER",
+  "description": "A grandma's armchair. You click it. Stories accumulate, the upgrade shop sells pure placebo (+0.2/sec of self-respect), and milestone messages judge you softly.\n\n\"comfort level: archival.\"",
+  "tags": "clicker idle grandma's"
+ },
+ {
+  "file": "gen_runner_0_potato-fleeing-the-masher.html",
+  "title": "POTATO FLEEING THE MASHER",
+  "description": "An endless runner with strong opinions. Jump over masher heads, endure unsolicited coaching from the commentary track.\n\nEnding: \"you were almost thanksgiving.\"",
+  "tags": "runner jumping arcade"
+ },
+ {
+  "file": "gen_runner_1_snail-commute.html",
+  "title": "SNAIL COMMUTE",
+  "description": "An endless runner with strong opinions. Jump over coffee spills, endure unsolicited coaching from the commentary track.\n\nEnding: \"slow and steady still got splashed.\"",
+  "tags": "runner jumping arcade"
+ },
+ {
+  "file": "gen_runner_2_businessman-fleeing-meetings.html",
+  "title": "BUSINESSMAN FLEEING MEETINGS",
+  "description": "An endless runner with strong opinions. Jump over calendar invites, endure unsolicited coaching from the commentary track.\n\nEnding: \"this could have been an email (your death).\"",
+  "tags": "runner jumping arcade"
+ },
+ {
+  "file": "gen_runner_3_roomba-vs-the-stairs.html",
+  "title": "ROOMBA VS THE STAIRS",
+  "description": "An endless runner with strong opinions. Jump over stair edges, endure unsolicited coaching from the commentary track.\n\nEnding: \"cliff. it was a cliff all along.\"",
+  "tags": "runner jumping arcade"
+ },
+ {
+  "file": "gen_runner_4_penguin-escaping-summer.html",
+  "title": "PENGUIN ESCAPING SUMMER",
+  "description": "An endless runner with strong opinions. Jump over heatwaves, endure unsolicited coaching from the commentary track.\n\nEnding: \"tuxedo made of ice. bad combo.\"",
+  "tags": "runner jumping arcade"
+ },
+ {
+  "file": "gen_runner_5_t-rex-avoiding-leg-day.html",
+  "title": "T-REX AVOIDING LEG DAY",
+  "description": "An endless runner with strong opinions. Jump over dumbbells, endure unsolicited coaching from the commentary track.\n\nEnding: \"skipping legs caught up with you.\"",
+  "tags": "runner jumping arcade"
+ },
+ {
+  "file": "gen_runner_6_wizard-late-for-wizard-school.html",
+  "title": "WIZARD LATE FOR WIZARD SCHOOL",
+  "description": "An endless runner with strong opinions. Jump over enchanted briefcases, endure unsolicited coaching from the commentary track.\n\nEnding: \"detention (magical).\"",
+  "tags": "runner jumping arcade"
+ },
+ {
+  "file": "gen_runner_7_mop-chasing-cleanliness.html",
+  "title": "MOP CHASING CLEANLINESS",
+  "description": "An endless runner with strong opinions. Jump over grime piles, endure unsolicited coaching from the commentary track.\n\nEnding: \"the grime fights back.\"",
+  "tags": "runner jumping arcade"
+ },
+ {
+  "file": "gen_runner_8_cow-en-route-to-moon.html",
+  "title": "COW EN ROUTE TO MOON",
+  "description": "An endless runner with strong opinions. Jump over gravity anomalies, endure unsolicited coaching from the commentary track.\n\nEnding: \"the moon was never real (it is).\"",
+  "tags": "runner jumping arcade"
+ },
+ {
+  "file": "gen_runner_9_skateboard-vs-every-pebble.html",
+  "title": "SKATEBOARD VS EVERY PEBBLE",
+  "description": "An endless runner with strong opinions. Jump over pebbles, endure unsolicited coaching from the commentary track.\n\nEnding: \"the smallest enemy won.\"",
+  "tags": "runner jumping arcade"
+ },
+ {
+  "file": "gen_runner_10_mailman-vs-dogs.html",
+  "title": "MAILMAN VS DOGS",
+  "description": "An endless runner with strong opinions. Jump over dogs, endure unsolicited coaching from the commentary track.\n\nEnding: \"special delivery: regret.\"",
+  "tags": "runner jumping arcade"
+ },
+ {
+  "file": "gen_runner_11_knight-buried-in-paperwork.html",
+  "title": "KNIGHT BURIED IN PAPERWORK",
+  "description": "An endless runner with strong opinions. Jump over scroll piles, endure unsolicited coaching from the commentary track.\n\nEnding: \"death by bureaucracy.\"",
+  "tags": "runner jumping arcade"
+ },
+ {
+  "file": "gen_react_0_red-light-green-light.html",
+  "title": "RED LIGHT GREEN LIGHT",
+  "description": "Three-round reaction trial: wait for the signal, then click with everything you have. Early clickers receive personalized disappointment (\"you moved, doll.\")",
+  "tags": "reaction reflex quick"
+ },
+ {
+  "file": "gen_react_1_popcorn-watch.html",
+  "title": "POPCORN WATCH",
+  "description": "Three-round reaction trial: wait for the signal, then click with everything you have. Early clickers receive personalized disappointment (\"that was just the microwave humming.\")",
+  "tags": "reaction reflex quick"
+ },
+ {
+  "file": "gen_react_2_cat-pounce-training.html",
+  "title": "CAT POUNCE TRAINING",
+  "description": "Three-round reaction trial: wait for the signal, then click with everything you have. Early clickers receive personalized disappointment (\"the cat saw you hesitate.\")",
+  "tags": "reaction reflex quick"
+ },
+ {
+  "file": "gen_react_3_microwave-ding.html",
+  "title": "MICROWAVE DING",
+  "description": "Three-round reaction trial: wait for the signal, then click with everything you have. Early clickers receive personalized disappointment (\"you opened it 0.4s early. shame.\")",
+  "tags": "reaction reflex quick"
+ },
+ {
+  "file": "gen_react_4_volcano-watch.html",
+  "title": "VOLCANO WATCH",
+  "description": "Three-round reaction trial: wait for the signal, then click with everything you have. Early clickers receive personalized disappointment (\"ash in your mouth. should have waited.\")",
+  "tags": "reaction reflex quick"
+ },
+ {
+  "file": "gen_react_5_teacher-turning-around.html",
+  "title": "TEACHER TURNING AROUND",
+  "description": "Three-round reaction trial: wait for the signal, then click with everything you have. Early clickers receive personalized disappointment (\"caught passing notes to yourself.\")",
+  "tags": "reaction reflex quick"
+ },
+ {
+  "file": "gen_react_6_the-sneeze.html",
+  "title": "THE SNEEZE",
+  "description": "Three-round reaction trial: wait for the signal, then click with everything you have. Early clickers receive personalized disappointment (\"false alarm. everyone stared anyway.\")",
+  "tags": "reaction reflex quick"
+ },
+ {
+  "file": "gen_react_7_snail-race-start.html",
+  "title": "SNAIL RACE START",
+  "description": "Three-round reaction trial: wait for the signal, then click with everything you have. Early clickers receive personalized disappointment (\"you left before the gun. disgrace.\")",
+  "tags": "reaction reflex quick"
+ },
+ {
+  "file": "gen_react_8_coffee-ready.html",
+  "title": "COFFEE READY",
+  "description": "Three-round reaction trial: wait for the signal, then click with everything you have. Early clickers receive personalized disappointment (\"burnt tongue speedrun any%.\")",
+  "tags": "reaction reflex quick"
+ },
+ {
+  "file": "gen_react_9_dragon-eye.html",
+  "title": "DRAGON EYE",
+  "description": "Three-round reaction trial: wait for the signal, then click with everything you have. Early clickers receive personalized disappointment (\"it heard your heart. it always does.\")",
+  "tags": "reaction reflex quick"
+ },
+ {
+  "file": "gen_sim_0_dishwashing-simulator.html",
+  "title": "DISHWASHING SIMULATOR",
+  "description": "The most realistic simulator on the site. Press run cycle repeatedly; discover all 8 true-to-life events hiding in the mundane.\n\nContains at least one emotionally accurate disaster.",
+  "tags": "simulation idle mundane"
+ },
+ {
+  "file": "gen_sim_1_laundry-day-simulator.html",
+  "title": "LAUNDRY DAY SIMULATOR",
+  "description": "The most realistic simulator on the site. Press start load repeatedly; discover all 8 true-to-life events hiding in the mundane.\n\nContains at least one emotionally accurate disaster.",
+  "tags": "simulation idle mundane"
+ },
+ {
+  "file": "gen_sim_2_office-printer-3000.html",
+  "title": "OFFICE PRINTER 3000",
+  "description": "The most realistic simulator on the site. Press send job repeatedly; discover all 8 true-to-life events hiding in the mundane.\n\nContains at least one emotionally accurate disaster.",
+  "tags": "simulation idle mundane"
+ },
+ {
+  "file": "gen_sim_3_weather-forecaster.html",
+  "title": "WEATHER FORECASTER",
+  "description": "The most realistic simulator on the site. Press publish forecast repeatedly; discover all 8 true-to-life events hiding in the mundane.\n\nContains at least one emotionally accurate disaster.",
+  "tags": "simulation idle mundane"
+ },
+ {
+  "file": "gen_sim_4_bus-stop-philosopher.html",
+  "title": "BUS STOP PHILOSOPHER",
+  "description": "The most realistic simulator on the site. Press check schedule repeatedly; discover all 8 true-to-life events hiding in the mundane.\n\nContains at least one emotionally accurate disaster.",
+  "tags": "simulation idle mundane"
+ },
+ {
+  "file": "gen_sim_5_dmv-queue-survivor.html",
+  "title": "DMV QUEUE SURVIVOR",
+  "description": "The most realistic simulator on the site. Press take number repeatedly; discover all 8 true-to-life events hiding in the mundane.\n\nContains at least one emotionally accurate disaster.",
+  "tags": "simulation idle mundane"
+ },
+ {
+  "file": "gen_sim_6_houseplant-parent.html",
+  "title": "HOUSEPLANT PARENT",
+  "description": "The most realistic simulator on the site. Press water plant repeatedly; discover all 8 true-to-life events hiding in the mundane.\n\nContains at least one emotionally accurate disaster.",
+  "tags": "simulation idle mundane"
+ },
+ {
+  "file": "gen_sim_7_wifi-router-technician.html",
+  "title": "WIFI ROUTER TECHNICIAN",
+  "description": "The most realistic simulator on the site. Press reboot router repeatedly; discover all 8 true-to-life events hiding in the mundane.\n\nContains at least one emotionally accurate disaster.",
+  "tags": "simulation idle mundane"
+ },
+ {
+  "file": "gen_sim_8_family-group-chat-scroller.html",
+  "title": "FAMILY GROUP CHAT SCROLLER",
+  "description": "The most realistic simulator on the site. Press scroll chat repeatedly; discover all 8 true-to-life events hiding in the mundane.\n\nContains at least one emotionally accurate disaster.",
+  "tags": "simulation idle mundane"
+ },
+ {
+  "file": "gen_sim_9_garage-sale-baron.html",
+  "title": "GARAGE SALE BARON",
+  "description": "The most realistic simulator on the site. Press open sale repeatedly; discover all 8 true-to-life events hiding in the mundane.\n\nContains at least one emotionally accurate disaster.",
+  "tags": "simulation idle mundane"
+ },
+ {
+  "file": "gen_pet_0_grumpy-storm-cloud.html",
+  "title": "GRUMPY STORM CLOUD",
+  "description": "Care for a grumpy storm cloud using three questionable caregiving techniques. Mood meter included; consequences emotional.\n\nBest outcome: \"the cloud rains exclusively on YOU. that is honor.\"",
+  "tags": "pet wholesome comedy"
+ },
+ {
+  "file": "gen_pet_1_office-fern.html",
+  "title": "OFFICE FERN",
+  "description": "Care for a office fern using three questionable caregiving techniques. Mood meter included; consequences emotional.\n\nBest outcome: \"fern achieves unmatched lushness. coworkers notice.\"",
+  "tags": "pet wholesome comedy"
+ },
+ {
+  "file": "gen_pet_2_vending-machine.html",
+  "title": "VENDING MACHINE",
+  "description": "Care for a vending machine using three questionable caregiving techniques. Mood meter included; consequences emotional.\n\nBest outcome: \"dispenses TWO snacks. a miracle. tell no one.\"",
+  "tags": "pet wholesome comedy"
+ },
+ {
+  "file": "gen_pet_3_old-laptop.html",
+  "title": "OLD LAPTOP",
+  "description": "Care for a old laptop using three questionable caregiving techniques. Mood meter included; consequences emotional.\n\nBest outcome: \"runs surprisingly fast. suspicious. what did you do.\"",
+  "tags": "pet wholesome comedy"
+ },
+ {
+  "file": "gen_pet_4_parking-meter.html",
+  "title": "PARKING METER",
+  "description": "Care for a parking meter using three questionable caregiving techniques. Mood meter included; consequences emotional.\n\nBest outcome: \"grace period granted. rare kindness from the meter gods.\"",
+  "tags": "pet wholesome comedy"
+ },
+ {
+  "file": "gen_pet_5_garden-gnome.html",
+  "title": "GARDEN GNOME",
+  "description": "Care for a garden gnome using three questionable caregiving techniques. Mood meter included; consequences emotional.\n\nBest outcome: \"the gnome nods. you have been acknowledged.\"",
+  "tags": "pet wholesome comedy"
+ },
+ {
+  "file": "gen_quiz_0_are-you-the-drama.html",
+  "title": "ARE YOU THE DRAMA?",
+  "description": "Five deeply official questions. Every answer is wrong; some are wronger. Gentle narration, merciless verdict.\n\nFinal verdict: \"CERTIFIED MAIN CHARACTER\"",
+  "tags": "quiz personality comedy"
+ },
+ {
+  "file": "gen_quiz_1_which-kitchen-appliance-are-you.html",
+  "title": "WHICH KITCHEN APPLIANCE ARE YOU?",
+  "description": "Five deeply official questions. Every answer is wrong; some are wronger. Gentle narration, merciless verdict.\n\nFinal verdict: \"YOU ARE THE TOASTER OVEN (nobody expected it)\"",
+  "tags": "quiz personality comedy"
+ },
+ {
+  "file": "gen_quiz_2_what-does-your-wallet-fear.html",
+  "title": "WHAT DOES YOUR WALLET FEAR?",
+  "description": "Five deeply official questions. Every answer is wrong; some are wronger. Gentle narration, merciless verdict.\n\nFinal verdict: \"YOUR WALLET FEARS TUESDAYS SPECIFICALLY\"",
+  "tags": "quiz personality comedy"
+ },
+ {
+  "file": "gen_quiz_3_history-exam-made-up.html",
+  "title": "HISTORY EXAM (MADE UP)",
+  "description": "Five deeply official questions. Every answer is wrong; some are wronger. Gentle narration, merciless verdict.\n\nFinal verdict: \"GRADE: F+ (THE PLUS IS PITY)\"",
+  "tags": "quiz personality comedy"
+ },
+ {
+  "file": "gen_quiz_4_space-law-bar-exam.html",
+  "title": "SPACE LAW BAR EXAM",
+  "description": "Five deeply official questions. Every answer is wrong; some are wronger. Gentle narration, merciless verdict.\n\nFinal verdict: \"BAR PASSED. SPACE DISBARRED.\"",
+  "tags": "quiz personality comedy"
+ },
+ {
+  "file": "gen_bal_0_soup-on-your-head.html",
+  "title": "SOUP ON YOUR HEAD",
+  "description": "Keep the meter centered while reality interferes. Gusts include \"a bird looked at you\" and \"thought about soup\". Controls: left hand / right hand buttons or arrow keys.\n\nPhysics rating: emotionally accurate.",
+  "tags": "balance skill reflex"
+ },
+ {
+  "file": "gen_bal_1_seesaw-with-an-elephant.html",
+  "title": "SEESAW WITH AN ELEPHANT",
+  "description": "Keep the meter centered while reality interferes. Gusts include \"elephant had an idea\" and \"gravity took sides\". Controls: lean back / lean forward buttons or arrow keys.\n\nPhysics rating: emotionally accurate.",
+  "tags": "balance skill reflex"
+ },
+ {
+  "file": "gen_bal_2_tightrope-raccoon.html",
+  "title": "TIGHTROPE RACCOON",
+  "description": "Keep the meter centered while reality interferes. Gusts include \"supportive raccoon arrived\" and \"existential thought\". Controls: dip left / dip right buttons or arrow keys.\n\nPhysics rating: emotionally accurate.",
+  "tags": "balance skill reflex"
+ },
+ {
+  "file": "gen_bal_3_stack-of-plates.html",
+  "title": "STACK OF PLATES",
+  "description": "Keep the meter centered while reality interferes. Gusts include \"dishwasher jealousy\" and \"a plate sighed\". Controls: steady left / steady right buttons or arrow keys.\n\nPhysics rating: emotionally accurate.",
+  "tags": "balance skill reflex"
+ },
+ {
+  "file": "gen_bal_4_ping-pong-paddle-ball.html",
+  "title": "PING-PONG PADDLE BALL",
+  "description": "Keep the meter centered while reality interferes. Gusts include \"opponent psychically taunted\" and \"ball considered options\". Controls: angle up / angle down buttons or arrow keys.\n\nPhysics rating: emotionally accurate.",
+  "tags": "balance skill reflex"
+ }
+]

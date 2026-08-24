@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BUBBLE WRAP: ETERNAL</title>
+<style>
+  html,body{margin:0;height:100%;background:#101820;color:#dfeaf2;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+  h1{font-size:.95rem;color:#7fd1ff;margin:0}
+  #wrap{display:grid;grid-template-columns:repeat(14,34px);gap:5px}
+  .bub{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 32% 30%,#9adcff,#2e7cab);cursor:pointer;border:0}
+  .bub.popped{background:#15222c;cursor:default;box-shadow:inset 0 3px 6px rgba(0,0,0,.6)}
+  #say{min-height:30px;color:#ffd23e;text-align:center;padding:0 10px}
+  #left{color:#8fa8b8}
+</style>
+</head>
+<body>
+<h1>BUBBLE WRAP: ETERNAL</h1>
+<div id="wrap"></div>
+<div id="say">pop responsibly.</div>
+<div id="left">remaining: 84</div>
+<script>
+const wrap=document.getElementById('wrap'),say=document.getElementById('say'),left=document.getElementById('left');
+let popped=0,total=84,pitches=0;
+for(let i=0;i<total;i++){
+  const b=document.createElement('button');b.className='bub';
+  b.addEventListener('click',()=>pop(b));
+  wrap.appendChild(b);
+}
+function pop(b){
+  if(b.classList.contains('popped'))return;
+  if(popped>=total-1){finalBoss(b);return;}
+  b.classList.add('popped');popped++;
+  try{
+    const a=new (window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),g=a.createGain();
+    o.type='triangle';o.frequency.value=300+pitches*9;
+    g.gain.value=.08;g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.09);
+    o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+.1);
+  }catch(e){}
+  pitches++;
+  left.textContent='remaining: '+(total-popped);
+  say.textContent=popped===40?'halfway. your hands understand peace now.'
+    :popped===70?'do you ever think about how this is someone\'s job?':'';
+}
+function finalBoss(b){
+  say.textContent='the LAST BUBBLE trembles. it speaks: "i have seen my siblings fall. spare me."';
+  b.style.background='radial-gradient(circle at 32% 30%,#ffe98a,#c98527)';
+  const opts=document.createElement('div');
+  opts.innerHTML='<button id="spare" style="margin:6px;padding:8px 14px;font-family:inherit;background:#14331c;color:#c9ffd2;border:2px solid #7dff8a">SPARE THE BUBBLE</button>'+
+   '<button id="popit" style="margin:6px;padding:8px 14px;font-family:inherit;background:#33141c;color:#ffc9d2;border:2px solid #ff7d8a">POP IT ANYWAY</button>';
+  say.appendChild(opts);
+  document.getElementById('spare').addEventListener('click',()=>{
+    say.textContent='you spared the last bubble. it follows you now, spiritually. true ending.';
+  });
+  document.getElementById('popit').addEventListener('click',()=>{
+    b.classList.add('popped');
+    say.textContent='"i forgive you," it whispers as it pops. you feel nothing forever.';
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>WEATHER FORECASTER</title>
+<style>
+
+  html,body{margin:0;height:100%;background:#111318;color:#eef;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+  h1{font-size:.95rem;margin:0;text-align:center;color:#7fd1ff}
+  button{padding:11px 20px;font-family:inherit;font-size:.98rem;border:3px solid #7fd1ff;background:#151530;color:#dfe8ff;cursor:pointer}
+  button:disabled{opacity:.45}
+  #say{min-height:28px;text-align:center;padding:0 10px}
+
+</style>
+</head>
+<body>
+<h1>WEATHER FORECASTER</h1>
+<button id="act" style="font-size:1.1rem">PUBLISH FORECAST</button>
+<div id="inv" style="min-height:56px;width:min(460px,90vw);text-align:center;color:#cfd8e3">predict the sky. apologize later.</div>
+<div id="cnt">cycles: 0 · discoveries: 0/8</div>
+<script>
+(function(){window.__beep=function(f,d,t){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.05;g.gain.exponentialRampToValueAtTime(.001,a.currentTime+(d||.08));o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+(d||.08));}catch(e){}};})();
+let opens=0;const seen=new Set();
+const EVENTS=[["predicted clear. hail happened","hail"],["umbrella sales spiked thanks to you","sales"],["the wind did something unlisted","wind"],["70% chance of vibes","vibes"],["cold front named after you (insultingly)","front"],["radar shows a blob. explain the blob.","blob"],["perfect forecast. nobody believed it.","perfect"],["you jinxed the sunshine","jinx"]];
+document.getElementById('act').addEventListener('click',()=>{
+  opens++;
+  const inv=document.getElementById('inv');
+  if(opens===1){inv.textContent='sunny with a chance of being wrong.';__beep(600,.07);}
+  else if(seen.size<EVENTS.length&&Math.random()<.62){
+    let e;do{e=EVENTS[Math.floor(Math.random()*EVENTS.length)];}while(seen.has(e[1]));
+    seen.add(e[1]);inv.textContent=e[0];__beep(800,.06);
+  }else inv.textContent='predict the sky. apologize later.';
+  document.getElementById('cnt').textContent='cycles: '+opens+' \u00B7 discoveries: '+seen.size+'/8';
+  if(seen.size===EVENTS.length)inv.textContent+=' \u2014 YOU HAVE SEEN IT ALL.';
+});
+</script>
+</body>
+</html>

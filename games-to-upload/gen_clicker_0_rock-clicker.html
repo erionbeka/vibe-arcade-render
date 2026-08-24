@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ROCK CLICKER</title>
+<style>
+
+  html,body{margin:0;height:100%;background:#12101c;color:#eef;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+  h1{font-size:.95rem;margin:0;text-align:center;color:#8d8d8d}
+  button{padding:11px 20px;font-family:inherit;font-size:.98rem;border:3px solid #8d8d8d;background:#151530;color:#dfe8ff;cursor:pointer}
+  button:disabled{opacity:.45}
+  #say{min-height:28px;text-align:center;padding:0 10px}
+
+</style>
+</head>
+<body>
+<h1>ROCK CLICKER</h1>
+<button id="big" style="width:190px;height:190px;border-radius:50%;border:8px double #8d8d8d;background:#1c1830;font-size:2rem;color:#8d8d8d;text-transform:uppercase">rock</button>
+<div id="count" style="font-size:1.2rem">0 rocks</div>
+<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center"><button class="up" data-cost="10" data-joke="now you can see the rock better">loupe (<span class="cs">10</span>)</button><button class="up" data-cost="40" data-joke="this is how rocks are made">hammer (<span class="cs">40</span>)</button><button class="up" data-cost="120" data-joke="professionally unprofessional">geologist hat (<span class="cs">120</span>)</button></div>
+<div id="say">click the rock. that is the entire economy.</div>
+<script>
+(function(){window.__beep=function(f,d,t){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.05;g.gain.exponentialRampToValueAtTime(.001,a.currentTime+(d||.08));o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+(d||.08));}catch(e){}};})();
+let n=0,passive=0;
+const MILE=[[5,"the rock does not care."],[15,"geology is just slow clicking."],[30,"sedimentary, my dear clicker."]];
+document.getElementById('big').addEventListener('click',()=>{
+  n++;__beep(200+n*2,.06);
+  const m=MILE.find(m=>m[0]===n);
+  if(m)say(m[1]);
+  upd();
+});
+document.querySelectorAll('.up').forEach(b=>b.addEventListener('click',()=>{
+  const c=+b.dataset.cost;
+  if(n<c)return;
+  n-=c;passive+=.2;
+  b.dataset.cost=Math.ceil(c*3);
+  b.querySelector('.cs').textContent=b.dataset.cost;
+  say(b.dataset.joke);
+  upd();
+}));
+setInterval(()=>{if(passive){n+=passive;upd();}},1000);
+function say(t){document.getElementById('say').textContent=t;}
+function upd(){
+  document.getElementById('count').textContent=Math.floor(n)+' rocks';
+  document.querySelectorAll('.up').forEach(b=>b.disabled=n<+b.dataset.cost);
+}
+upd();
+</script>
+</body>
+</html>

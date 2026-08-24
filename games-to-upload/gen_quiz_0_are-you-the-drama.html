@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ARE YOU THE DRAMA?</title>
+<style>
+
+  html,body{margin:0;height:100%;background:#171225;color:#eef;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+  h1{font-size:.95rem;margin:0;text-align:center;color:#ff6ec7}
+  button{padding:11px 20px;font-family:inherit;font-size:.98rem;border:3px solid #ff6ec7;background:#151530;color:#dfe8ff;cursor:pointer}
+  button:disabled{opacity:.45}
+  #say{min-height:28px;text-align:center;padding:0 10px}
+
+</style>
+</head>
+<body>
+<h1>ARE YOU THE DRAMA?</h1>
+<div id="quiz" style="width:min(460px,92vw)">
+  <div id="qq" style="min-height:44px;font-size:1.08rem;text-align:center"></div>
+  <div id="opts" style="display:flex;flex-direction:column;gap:8px;margin-top:10px"></div>
+  <div id="roast" style="min-height:24px;text-align:center;color:#9281bd;font-size:.9rem"></div>
+</div>
+<script>
+const ROASTS=["interesting choice. wrong, but interesting.","bold. incorrect. bold.","the committee wrote that down. laughed.","science has notes.","your therapist will hear about this."];
+const FINAL="CERTIFIED MAIN CHARACTER";
+(function(){window.__beep=function(f,d,t){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.05;g.gain.exponentialRampToValueAtTime(.001,a.currentTime+(d||.08));o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+(d||.08));}catch(e){}};})();
+let q=0;
+const QS=[["Your friend cancels plans. You:","understand, life is hard","start a podcast about it","thank the universe"],["Group chat quiet for 2 hours. You:","enjoy the silence","post a screenshot of the silence","assume they discuss you"],["Someone got a haircut. You:","compliment sincerely","notice. file it away. wait.","ask if they lost a bet"],["Pizza arrives wrong. You:","eat it, it is pizza","write a review novel","start a support group"],["Your birthday approaches. You:","mention it once, casually","countdown in bio since June","hire a hype squad"]];
+function render(){
+  if(q>=QS.length){
+    document.getElementById('quiz').innerHTML='<div style="text-align:center"><b style="color:#ffe600;font-size:1.15rem">'+FINAL+'</b><br><br><span style="color:#9281bd">accuracy: irrelevant.<br>confidence: measured and alarming.</span><br><br><button onclick="location.reload()">RETAKE (results identical)</button></div>';
+    return;
+  }
+  document.getElementById('qq').textContent=(q+1)+'/'+QS.length+'. '+QS[q][0];
+  const opts=document.getElementById('opts');
+  opts.innerHTML='';
+  QS[q].slice(1).forEach(a=>{
+    const b=document.createElement('button');
+    b.textContent=a;b.style.width='100%';
+    b.addEventListener('click',()=>{
+      document.getElementById('roast').textContent=ROASTS[q%ROASTS.length];
+      q++;
+      setTimeout(render,850);
+      __beep(300,.05);
+    });
+    opts.appendChild(b);
+  });
+  document.getElementById('roast').textContent='';
+}
+render();
+</script>
+</body>
+</html>

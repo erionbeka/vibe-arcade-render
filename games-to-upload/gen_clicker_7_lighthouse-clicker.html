@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>LIGHTHOUSE CLICKER</title>
+<style>
+
+  html,body{margin:0;height:100%;background:#12101c;color:#eef;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+  h1{font-size:.95rem;margin:0;text-align:center;color:#fff176}
+  button{padding:11px 20px;font-family:inherit;font-size:.98rem;border:3px solid #fff176;background:#151530;color:#dfe8ff;cursor:pointer}
+  button:disabled{opacity:.45}
+  #say{min-height:28px;text-align:center;padding:0 10px}
+
+</style>
+</head>
+<body>
+<h1>LIGHTHOUSE CLICKER</h1>
+<button id="big" style="width:190px;height:190px;border-radius:50%;border:8px double #fff176;background:#1c1830;font-size:2rem;color:#fff176;text-transform:uppercase">lighthouse</button>
+<div id="count" style="font-size:1.2rem">0 light beams</div>
+<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center"><button class="up" data-cost="14" data-joke="+2 nautical vibes">polished lens (<span class="cs">14</span>)</button><button class="up" data-cost="50" data-joke="HOOOOONK">foghorn (<span class="cs">50</span>)</button><button class="up" data-cost="170" data-joke="his name is greg">assistant keeper (<span class="cs">170</span>)</button></div>
+<div id="say">click the lighthouse. that is the entire economy.</div>
+<script>
+(function(){window.__beep=function(f,d,t){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.05;g.gain.exponentialRampToValueAtTime(.001,a.currentTime+(d||.08));o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+(d||.08));}catch(e){}};})();
+let n=0,passive=0;
+const MILE=[[5,"warning ships since forever."],[15,"shine on, crazy prism."],[30,"seagulls respect you now."]];
+document.getElementById('big').addEventListener('click',()=>{
+  n++;__beep(200+n*2,.06);
+  const m=MILE.find(m=>m[0]===n);
+  if(m)say(m[1]);
+  upd();
+});
+document.querySelectorAll('.up').forEach(b=>b.addEventListener('click',()=>{
+  const c=+b.dataset.cost;
+  if(n<c)return;
+  n-=c;passive+=.2;
+  b.dataset.cost=Math.ceil(c*3);
+  b.querySelector('.cs').textContent=b.dataset.cost;
+  say(b.dataset.joke);
+  upd();
+}));
+setInterval(()=>{if(passive){n+=passive;upd();}},1000);
+function say(t){document.getElementById('say').textContent=t;}
+function upd(){
+  document.getElementById('count').textContent=Math.floor(n)+' light beams';
+  document.querySelectorAll('.up').forEach(b=>b.disabled=n<+b.dataset.cost);
+}
+upd();
+</script>
+</body>
+</html>

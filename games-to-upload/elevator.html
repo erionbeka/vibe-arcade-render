@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ELEVATOR SIMULATOR</title>
+<style>
+  html,body{margin:0;height:100%;background:#101418;color:#e8f1f5;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+  h1{font-size:.95rem;color:#8fd3ff;margin:0}
+  #shaft{display:flex;gap:18px;align-items:center}
+  #cab{width:150px;height:170px;background:#233240;border:4px solid #48607a;border-radius:8px;position:relative;overflow:hidden}
+  #doors{position:absolute;inset:0;display:flex}
+  .door-half{width:50%;background:#7f97ad;transition:transform .9s ease}
+  .open .l{transform:translateX(-100%)}.open .r{transform:translateX(100%)}
+  #panel{display:grid;grid-template-columns:repeat(3,46px);gap:7px}
+  #panel button{padding:11px 0;font-family:inherit;font-size:.95rem;border:3px solid #48607a;background:#182129;color:#bfe0ff;cursor:pointer}
+  #panel button.lit{background:#ffd23e;color:#333;border-color:#fff}
+  #display{position:absolute;top:6px;left:50%;transform:translateX(-50%);color:#ff5c5c;font-weight:bold;background:#000;padding:2px 10px;z-index:2}
+  #msg{min-height:52px;text-align:center;color:#b8cbd6;padding:0 12px;width:min(480px,90vw)}
+</style>
+</head>
+<body>
+<h1>ELEVATOR SIMULATOR</h1>
+<div id="shaft">
+  <div id="cab"><div id="display">1</div><div id="doors"><div class="door-half l"></div><div class="door-half r"></div></div></div>
+  <div id="panel"></div>
+</div>
+<div id="msg">floor 1: the lobby. someone has microwaved fish recently.</div>
+<script>
+const panel=document.getElementById('panel'),cab=document.getElementById('cab'),disp=document.getElementById('display'),msg=document.getElementById('msg');
+const FLOORS={1:'the lobby. someone has microwaved fish recently.',2:'an office. identical to floor 3.',3:'an office. identical to floor 2.',4:'marketing. they have a foosball table nobody uses.',5:'"the creative floor" (same desks).',6:'storage. the copier goes here to retire.',7:'legal. do not make eye contact.',8:'roof access?? no. also an office.',9:'the mysterious floor 9. it is stairs.'};
+const PASSENGERS=['a man who sighs in morse code','someone eating soup, quietly','a woman with 14 identical boxes','a clown (off duty)','your doppelganger (he noticed too)'];
+let busy=false;
+for(let f=9;f>=1;f--){
+  const b=document.createElement('button');b.textContent=f;b.dataset.f=f;
+  b.addEventListener('click',()=>ride(f,b));
+  panel.appendChild(b);
+}
+async function ride(f,btn){
+  if(busy)return;busy=true;
+  document.querySelectorAll('#panel button').forEach(b=>b.classList.remove('lit'));
+  btn.classList.add('lit');
+  disp.textContent='...';
+  await wait(700);
+  disp.textContent=f;beep();
+  await wait(600);
+  cab.classList.add('open');
+  let line='floor '+f+': '+FLOORS[f];
+  if(f>1&&Math.random()<.5){
+    const p=PASSENGERS[Math.floor(Math.random()*PASSENGERS.length)];
+    line+='<br><br>'+p+' enters. says nothing. leaves one floor later. awkwardness +7.';
+  }
+  msg.innerHTML=line;
+  await wait(1500);
+  cab.classList.remove('open');
+  btn.classList.remove('lit');
+  beep();busy=false;
+}
+function wait(ms){return new Promise(r=>setTimeout(r,ms));}
+function beep(){try{const a=new (window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),g=a.createGain();o.frequency.value=880;g.gain.value=.05;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+.15);}catch(e){}}
+</script>
+</body>
+</html>

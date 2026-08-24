@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CONSPIRACY BOARD</title>
+<style>
+  html,body{margin:0;height:100%;background:#0d0806;color:#f0e6d8;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+  h1{font-size:.95rem;color:#ff5c5c;margin:0}
+  #board{position:relative;width:min(640px,94vw);height:340px;background:#1c130c;border:8px solid #4a3524;border-radius:6px}
+  .photo{position:absolute;width:96px;padding:6px 4px;background:#e8ddc9;color:#2a2018;text-align:center;font-size:.72rem;font-weight:bold;cursor:pointer;border:3px solid #fff;box-shadow:3px 4px 0 rgba(0,0,0,.5);user-select:none}
+  .photo.sel{border-color:#ff5c5c;transform:scale(1.06)}
+  svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  line{stroke:#ff2b2b;stroke-width:2.5;opacity:.85}
+  #stamp{position:absolute;top:10px;right:14px;font-size:1.6rem;color:#ff5c5c;border:4px solid #ff5c5c;padding:4px 12px;transform:rotate(-8deg);display:none;font-weight:bold}
+  #truth{min-height:30px;color:#ffe600;text-align:center;padding:0 10px}
+</style>
+</head>
+<body>
+<h1>CONSPIRACY BOARD</h1>
+<div id="board"><svg></svg><div id="stamp">EXACTLY.</div></div>
+<div id="truth">click two items to connect them. the truth wants out.</div>
+<script>
+const board=document.getElementById('board'),svg=board.querySelector('svg'),stamp=document.getElementById('stamp'),truth=document.getElementById('truth');
+const ITEMS=[['PIGEONS','8%','12'],['THE MOON','22%','18'],['TOAST','40%','10'],['MY CAT','60%','15'],['WIFI','78%','24'],['GOVERNMENT CHEESE','50%','30'],['BIRDS AGAIN','15%','55'],['BIG LADLE','70%','62']];
+let sel=null,lines=0;
+ITEMS.forEach(([name,top,left])=>{
+  const d=document.createElement('div');d.className='photo';d.style.top=top+'%';d.style.left=left+'%';
+  d.innerHTML=name+'<br><span style="font-size:1.5rem">\u{1F4F8}</span>';
+  d.addEventListener('click',()=>pick(d,name));
+  board.appendChild(d);
+});
+function pick(d){
+  if(!sel){sel=d;d.classList.add('sel');return;}
+  if(sel===d){sel.classList.remove('sel');sel=null;return;}
+  const b=board.getBoundingClientRect();
+  const l=document.createElementNS('http://www.w3.org/2000/svg','line');
+  l.setAttribute('x1',sel.offsetLeft+48);l.setAttribute('y1',sel.offsetTop+26);
+  l.setAttribute('x2',d.offsetLeft+48);l.setAttribute('y2',d.offsetTop+26);
+  svg.appendChild(l);
+  sel.classList.remove('sel');sel=null;
+  lines++;
+  stamp.style.display='block';setTimeout(()=>{if(lines<8)stamp.style.display='none';},900);
+  if(lines>=8)truth.innerHTML='you have connected EVERYTHING to EVERYTHING.<br>after all that... the truth was laundry. it is always laundry.';
+  else truth.textContent='connections: '+lines+'/8. patterns emerging.';
+}
+</script>
+</body>
+</html>

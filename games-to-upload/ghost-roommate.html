@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>GHOST ROOMMATE AGREEMENT</title>
+<style>
+  html,body{margin:0;height:100%;background:#0b0b16;color:#e4e0f5;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+  h1{font-size:.95rem;color:#b39ddb;margin:0;text-align:center}
+  #ghost{font-size:4.4rem;height:84px;line-height:84px}
+  #rule{width:min(460px,90vw);text-align:center;font-size:1.15rem;min-height:52px}
+  .btns{display:flex;gap:14px}
+  button{padding:12px 28px;font-family:inherit;font-size:1.05rem;border:3px solid #7a5cc7;background:#191230;color:#dcc9ff;cursor:pointer}
+  button:hover{background:#241a44}
+  #say{min-height:56px;color:#9fe8c9;text-align:center;width:min(460px,90vw)}
+</style>
+</head>
+<body>
+<h1>GHOST ROOMMATE AGREEMENT</h1>
+  <div id="ghost">&#128123;</div>
+<div id="rule"></div>
+<div class="btns"><button id="yes">AGREE</button><button id="no">REFUSE</button></div>
+<div id="say"></div>
+<script>
+const NAMES=['Reginald','Gary','Bartholomew','Chad (dead)','Aunt Sylvia'];
+const ghostName=NAMES[Math.floor(Math.random()*NAMES.length)];
+document.getElementById('say').textContent='"'+ghostName+' here. i died in 1987. i get the window seat."';
+const RULES=[
+  ['no rattling chains after 11pm','chains are load-bearing. deal is void.','rattles once, politely, at 11:01pm'],
+  ['stop hiding my keys','keys were never yours. nothing is yours.','your keys are now in the freezer'],
+  ['we split rent 50/50','i cannot hold currency. i tried. it screamed.','pays in expired coupons'],
+  ['no whispering during my meetings','your meetings ARE whispers. muffled screams of capitalism.','attends meetings, takes notes, haunts the minutes'],
+  ['please stop rearranging furniture','the couch faces the spirit realm. feng shui.','moves couch 2cm left nightly'],
+  ['use headphones for moaning','moaning IS the headphone experience.','moans in lo-fi (kind of a vibe?)']
+];
+let i=0,score=[];
+const rule=document.getElementById('rule'),say=document.getElementById('say');
+function show(){
+  if(i>=RULES.length){
+    rule.textContent='COEXISTENCE SCORE: '+(50+Math.floor(Math.random()*2)-1)+'%';
+    say.textContent='the lease is signed in cold breath. "'+ghostName+'" is now legally your problem.';
+    document.querySelector('.btns').style.display='none';
+    return;
+  }
+  rule.innerHTML='<b>RULE PROPOSAL '+(i+1)+'/6:</b><br>'+RULES[i][0];
+}
+document.getElementById('yes').addEventListener('click',()=>{
+  if(i>=RULES.length)return;
+  say.textContent='"sure," says '+ghostName+'. ('+RULES[i][2]+')';
+  score.push(1);i++;setTimeout(show,1400);
+});
+document.getElementById('no').addEventListener('click',()=>{
+  if(i>=RULES.length)return;
+  say.textContent='"no," agrees '+ghostName+'. ('+RULES[i][1]+')';
+  score.push(0);i++;setTimeout(show,1400);
+});
+show();
+</script>
+</body>
+</html>
