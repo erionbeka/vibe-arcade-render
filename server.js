@@ -6,6 +6,18 @@ const session = require('express-session');
 const rateLimit = require('express-rate-limit');
 
 require('./src/db'); // initialize database
+
+// On platforms with ephemeral disks (e.g. Render free tier), repopulate the
+// demo arcade after every cold start. Safe to leave on: seeding is idempotent.
+if (process.env.AUTO_SEED === '1') {
+  const { execSync } = require('child_process');
+  try {
+    execSync(`node "${path.join(__dirname, 'scripts', 'seed.js')}"`, { stdio: 'inherit' });
+  } catch (err) {
+    console.error('auto-seed failed:', err.message);
+  }
+}
+
 const authRoutes = require('./src/auth');
 const gameRoutes = require('./src/games');
 const adminRoutes = require('./src/admin');

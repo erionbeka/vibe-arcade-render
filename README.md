@@ -49,7 +49,23 @@ data/              sqlite db + session secret - created at runtime
 sample-game/       neon-snake.html you can use as your first upload
 ```
 
-## Deploying with your own domain
+## Deploying FREE (Render)
+
+Fastest path — no credit card, live at `https://<yourname>.onrender.com` in ~10 minutes:
+
+1. Push this repo to GitHub (see below).
+2. Go to **render.com → New → Blueprint**, connect your repo. The included
+   `render.yaml` configures everything (free plan, auto-seed of the 100 demo games,
+   secure cookies, proxy trust).
+3. Add a custom domain in Render's dashboard (Settings → Custom Domains) and point
+   your DNS `CNAME` at the provided target. TLS is automatic.
+
+Free-tier trade-offs: the service sleeps after 15 min idle (~50s wake-up for the next
+visitor) and the disk is ephemeral — accounts/uploads reset on sleep or redeploy.
+The 100 seed games republish automatically on every boot (`AUTO_SEED=1`). When real
+people start using it, move to Option A/B above to keep data permanently.
+
+## Deploying with your own domain (paid options)
 
 The app is stateful (SQLite + uploaded files), so it needs **one server with persistent disk**. Two easy paths:
 

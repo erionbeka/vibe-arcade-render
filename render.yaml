@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: vibe-arcade
+    runtime: node
+    plan: free
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TRUST_PROXY
+        value: "1"
+      - key: SECURE_COOKIES
+        value: "1"
+      - key: AUTO_SEED
+        value: "1"
