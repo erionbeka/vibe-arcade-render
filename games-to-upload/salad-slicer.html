@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SALAD SLICER</title>
+<style>
+  html,body{margin:0;height:100%;background:#12200f;color:#eaffe0;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+  h1{font-size:.95rem;color:#9dff70;margin:0}
+  canvas{border:4px solid #2e5c2e;background:#1a2b12;touch-action:none;cursor:none}
+  #hud{display:flex;gap:24px;font-size:.95rem}b{color:#ffe600}
+  #say{min-height:24px;color:#a8c98f;text-align:center;padding:0 10px}
+</style>
+</head>
+<body>
+<h1>SALAD SLICER<br>(fruit flies in. you slice. soap does not get sliced.)</h1>
+<canvas id="c" width="640" height="400"></canvas>
+<div id="hud"><span>SLICES <b id="sc">0</b></span><span>COMBO <b id="cb">x1</b></span><span>LIVES <b id="lv">\u2665\u2665\u2665</b></span></div>
+<div id="say">drag through fruit to slice. slicing soap = shame. missing fruit = disappointment.</div>
+<script>
+const cv=document.getElementById('c'),x=cv.getContext('2d'),W=640,H=400;
+let items=[],trail=[],score=0,combo=1,lives=3,t=0,shake=0;
+const FRUITS=[
+ {n:'watermelon',col:'#ff5c7a',in:'#ff8fa8',r:26},
+ {n:'orange',col:'#ffa53c',in:'#ffd08a',r:20},
+ {n:'kiwi',col:'#8bc34a',in:'#c5e17a',r:18},
+ {n:'dragonfruit',col:'#e05fd0',in:'#f2a8e8',r:24,rare:1}
+];
+const BADS=[
+ {n:'soap',col:'#dfe8ee',r:20},
+ {n:'rubber duck',col:'#ffd23e',r:22,rare:1}
+];
+function launch(){
+  const bad=Math.random()<.22;
+  const kind=bad?BADS[Math.floor(Math.random()*BADS.length)]:FRUITS[Math.floor(Math.random()*FRUITS.length)];
+  items.push({k:kind,x:60+Math.random()*(W-120),y:H+30,vx:(Math.random()-.5)*2.2,vy:-(7.5+Math.random()*3),bad,r:kind.r||20});
+}
+setInterval(()=>{if(t%Math.max(28,52-Math.floor(score/40))===0)launch();},40);
+
+let dragging=false;
+cv.addEventListener('pointerdown',()=>dragging=true);
+addEventListener('pointerup',()=>{dragging=false;trail=[];});
+cv.addEventListener('pointermove',e=>{
+  const r=cv.getBoundingClientRect();
+  const px=(e.clientX-r.left)*(W/r.width),py=(e.clientY-r.top)*(H/r.height);
+  if(dragging){
+    trail.push([px,py]);if(trail.length>14)trail.shift();
+    // slice check against newest segment
+    if(trail.length>=2){
+      const a=trail[trail.length-2],b=trail[trail.length-1];
+      for(let i=items.length-1;i>=0;i--){
+        const it=items[i];
+        if(segHit(a,b,it.x,it.y,it.r+8)){
+          items.splice(i,1);
+          if(it.bad){
+            combo=1;lives--;shake=12;
+            document.getElementById('lv').textContent='\u2665'.repeat(Math.max(0,lives));
+            __beep(110,.25,'sawtooth');
+            say('THAT WAS '+it.n.toUpperCase()+'. we talked about this.');
+            if(lives<=0){over();return;}
+          }else{
+            score+=10*combo;combo=Math.min(9,combo+1);
+            document.getElementById('sc').textContent=score;
+            document.getElementById('cb').textContent='x'+combo;
+            __beep(500+combo*60,.06);
+            juice(it.x,it.y,it.k.col,it.k.in);
+            say(combo>=5?'SLICE HURRICANE!!':combo>=3?'nice wrist action':'sliced');
+          }
+        }
+      }
+    }
+  } else { trail=[[px,py]]; }
+});
+function segHit(a,b,cx,cy,r){
+  const dx=b[0]-a[0],dy=b[1]-a[1],L=dx*dx+dy*dy||1;
+  let t=((cx-a[0])*dx+(cy-a[1])*dy)/L;t=Math.max(0,Math.min(1,t));
+  return Math.hypot(a[0]+dx*t-cx,a[1]+dy*t-cy)<r;
+}
+let bits=[];
+function juice(jx,jy,col,in2){
+  shake=5;
+  for(let i=0;i<10;i++)bits.push({x:jx,y:jy,vx:(Math.random()-.5)*7,vy:-Math.random()*6,l:26,c:i%2?col:in2});
+  score+=0;
+}
+function over(){
+  say('SALAD TERMINATED. final: '+score+' pts, peak combo x'+combo+'. the soap wins today.');
+  __beep(90,.5,'sawtooth');
+  setTimeout(()=>location.reload(),2600);
+}
+(function draw(){
+  requestAnimationFrame(draw);
+  x.clearRect(0,0,W,H);t++;
+  x.save();
+  if(shake>0){x.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);shake--;}
+  x.fillStyle='#233a18';x.fillRect(0,H-30,W,30);
+  for(let i=items.length-1;i>=0;i--){
+    const it=items[i];
+    it.vy+=.16;it.x+=it.vx;it.y+=it.vy;
+    x.save();x.translate(it.x,it.y);
+    x.fillStyle=it.k.col;x.beginPath();x.arc(0,0,it.r,0,7);x.fill();
+    x.fillStyle=it.k.in||it.col;x.beginPath();x.arc(0,0,it.r*.55,0,7);x.fill();
+    if(it.bad){x.fillStyle='#333';x.font='bold 9px Consolas';x.textAlign='center';x.fillText(it.n.toUpperCase().slice(0,7),0,3);x.textAlign='left';}
+    x.restore();
+    if(it.y>H+50){
+      items.splice(i,1);
+      if(!it.bad&&!(it.y<0)){lives--;document.getElementById('lv').textContent='\u2665'.repeat(Math.max(0,lives));combo=1;__beep(180,.15,'sawtooth');say('dropped the '+it.k.n+'. grandma sighs from beyond.');
+        if(lives<=0){over();return;}}
+    }
+  }
+  // trail
+  if(trail.length>1){
+    for(let i=1;i<trail.length;i++){
+      x.strokeStyle='rgba(255,255,255,'+(i/trail.length)+')';x.lineWidth=i/2+1;
+      x.beginPath();x.moveTo(trail[i-1][0],trail[i-1][1]);x.lineTo(trail[i][0],trail[i][1]);x.stroke();
+    }
+  }
+  for(let i=bits.length-1;i>=0;i--){
+    const p=bits[i];p.x+=p.vx;p.y+=p.vy;p.vy+=.3;if(--p.l<0){bits.splice(i,1);continue;}
+    x.fillStyle=p.c;x.fillRect(p.x,p.y,4,4);
+  }
+  x.restore();
+})();
+(function(){window.__beep=function(f,d,t2){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t2||'square';o.frequency.value=f;g.gain.value=.05;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>

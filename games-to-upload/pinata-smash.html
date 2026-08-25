@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PIÑATA PANIC</title>
+<style>
+  html,body{margin:0;height:100%;background:#1c0f1e;color:#fff2fb;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+  h1{font-size:.95rem;color:#ff8ac2;margin:0;text-align:center}
+  canvas{border:4px solid #5e2050;background:#2a1230;touch-action:none}
+  #hud{display:flex;gap:24px;font-size:.95rem}b{color:#ffe600}
+  #say{min-height:24px;color:#e8b8dc;text-align:center;padding:0 10px;width:min(480px,92vw)}
+</style>
+</head>
+<body>
+<h1>PIÑATA PANIC<br>(the candy is earned through VIOLENCE)</h1>
+<canvas id="c" width="640" height="380"></canvas>
+<div id="hud"><span>CANDY <b id="cd">0</b></span><span>PIÑATA <b id="pn">LLAMA</b></span><span>HITS <b id="ht">0/6</b></span></div>
+<div id="say">click when the power bar crosses the pink zone. weak taps amuse the piñata.</div>
+<script>
+const cv=document.getElementById('c'),x=cv.getContext('2d'),W=640,H=380;
+const PINATAS=[
+ {name:'LLAMA',col:'#f4a8d0',mane:'#ffd23e'},
+ {name:'UNICORN',col:'#c9a7ff',mane:'#7dff8a'},
+ {name:'THE INTERN (farewell)',col:'#8ecae6',mane:'#ffb347'},
+ {name:'T-REX',col:'#9dff70',mane:'#ff5c5c'},
+ {name:'YOUR SELF-DOUBT',col:'#9281bd',mane:'#00f0ff'},
+ {name:'GRANDMA (she approves)',col:'#ffb3c1',mane:'#ffe066'}
+];
+let pi=0,hp=6,candy=0,hits=0,swing=0,swingDir=1,parts=[],confetti=[];
+function cur(){return PINATAS[Math.min(pi,PINATAS.length-1)];}
+cv.addEventListener('pointerdown',()=>{
+  const sweet=Math.abs(swing)<.22;
+  const power=sweet?1:(Math.abs(swing)<.45?.5:0);
+  if(power===0){
+    __beep(150,.08,'sawtooth');
+    say(pick(['whiff. the piñata sways mockingly.','air. pure air.','the bat needs a license.']));
+    return;
+  }
+  hp-=power;sweet&&__beep(700,.08);
+  hits++;
+  document.getElementById('ht').textContent=hits+'/6';
+  burst(320,150,power*10,false);
+  if(hp<=0){
+    explode();
+  } else {
+    say(sweet?'SWEET SPOT! tape is peeling off the '+cur().name+'!':'solid contact. structural damage: minor.');
+  }
+});
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+function burst(bx,by,n){
+  for(let i=0;i<n;i++)confetti.push({x:bx,y:by,vx:(Math.random()-.5)*8,vy:-Math.random()*8,l:60,c:'hsl('+Math.random()*360+',90%,65%)'});
+}
+function explode(){
+  const c=cur();
+  candy+=25;burst(320,160,80);shake=14;
+  __beep(900,.15);__beep(1100,.25);
+  document.getElementById('cd').textContent=candy;
+  pi++;hp=6;
+  document.getElementById('pn').textContent=c().name;
+  document.getElementById('ht').textContent='0/6';
+  say(c.name+' ANNIHILATED! +25 candy. next up: '+c().name+'. swing speed increases.');
+  if(pi>=PINATAS.length){
+    setTimeout(()=>{say('ALL PIÑatas DESTROYED. total candy: '+candy+'. dentists have been notified.');},800);
+  }
+}
+let shake=0;
+setInterval(()=>{
+  swing+=swingDir*(.05+pi*.012);
+  if(swing>1){swing=1;swingDir=-1;}if(swing<-1){swing=-1;swingDir=1;}
+},30);
+(function draw(){
+  x.clearRect(0,0,W,H);
+  x.save();
+  if(shake>0){x.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);shake--;}
+  x.strokeStyle='#888';x.lineWidth=2;
+  x.beginPath();x.moveTo(W/2,20);x.lineTo(W/2+Math.sin(Date.now()/500)*30,50);x.stroke();
+  // piñata body
+  const c=cur(),bobX=W/2+Math.sin(Date.now()/700)*24,bobY=120;
+  x.fillStyle=c.col;
+  x.beginPath();x.ellipse(bobX,bobY,64,42,0,0,7);x.fill();
+  x.fillStyle=c.mane;
+  for(let i=-2;i<=2;i++){x.beginPath();x.arc(bobX+i*22,bobY-38,11,0,7);x.fill();}
+  // cracks by hp
+  x.strokeStyle='rgba(0,0,0,.5)';x.lineWidth=2;
+  for(let cr=0;cr<6-hp;cr++){
+    x.beginPath();x.moveTo(bobX-40+cr*16,bobY-20+(cr%2)*18);x.lineTo(bobX-20+cr*16,bobY+14);x.stroke();
+  }
+  x.fillStyle='#333';x.font='bold 11px Consolas';x.textAlign='center';
+  x.fillText(c.name.slice(0,16),bobX,bobY+5);x.textAlign='left';
+  // power meter
+  const mw=300,mx=(W-mw)/2,my=330;
+  x.fillStyle='#111';x.fillRect(mx,my,mw,20);
+  const sweetStart=mx+mw/2-(mw*.22)/2;
+  x.fillStyle='#ff8ac2';x.fillRect(mx+mw*.39,my,mw*.22,20);
+  const px=mx+mw/2+swing*(mw/2-4)-4;
+  x.fillStyle='#fff';x.fillRect(px,my-3,8,26);
+  x.restore();
+  for(let i=confetti.length-1;i>=0;i--){
+    const p=confetti[i];p.x+=p.vx;p.y+=p.vy;p.vy+=.28;if(--p.l<0){confetti.splice(i,1);continue;}
+    x.fillStyle=p.c;x.fillRect(p.x,p.y,6,6);
+  }
+  requestAnimationFrame(draw);
+})();
+(function(){window.__beep=function(f,d,t){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.05;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TONGUE OF JUSTICE</title>
+<style>
+  html,body{margin:0;height:100%;background:#0d1f14;color:#e6ffe6;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+  h1{font-size:.95rem;color:#7dff8a;margin:0}
+  canvas{border:4px solid #1e4d2b;background:linear-gradient(#07220f,#0e3a1c);touch-action:none;cursor:none}
+  #hud{display:flex;gap:24px;font-size:.95rem}b{color:#ffe600}
+  #say{min-height:24px;text-align:center;color:#a8d9a8;padding:0 10px;width:min(480px,92vw)}
+</style>
+</head>
+<body>
+<h1>TONGUE OF JUSTICE</h1>
+<canvas id="c" width="640" height="400"></canvas>
+<div id="hud"><span>FLIES EATEN <b id="sc">0</b></span><span>LIVES <b id="lv">\u2665\u2665\u2665</b></span><span>TIME <b id="tm">45</b></span></div>
+<div id="say">click to launch your tongue at bugs. bees are NOT food. bees are friends with stingers.</div>
+<script>
+const cv=document.getElementById('c'),x=cv.getContext('2d'),W=640,H=400;
+const FROG={x:90,y:H-60};
+let mx=300,my=150,tongue=null,bugs=[],score=0,lives=3,time=45,t=0;
+function say(t2){document.getElementById('say').textContent=t2;}
+cv.addEventListener('pointermove',e=>{const r=cv.getBoundingClientRect();mx=(e.clientX-r.left)*(W/r.width);my=(e.clientY-r.top)*(H/r.height);});
+cv.addEventListener('pointerdown',()=>{
+  if(tongue)return;
+  const dx=mx-FROG.x,dy=my-(FROG.y-30),L=Math.hypot(dx,dy)||1;
+  tongue={dx:dx/L,dy:dy/L,len:0,max:Math.min(L,280),phase:'out',hit:new Set()};
+  __beep(250,.06);
+});
+function spawnBug(){
+  const bee=Math.random()<.25;
+  bugs.push({x:W+20,y:40+Math.random()*(H-140),vx:-(1.4+Math.random()*1.8+t/900),bee,vxw:Math.random()*7});
+}
+spawnBug();spawnBug();spawnBug();
+setInterval(()=>{if(bugs.length<5)spawnBug();},1100);
+setInterval(()=>{
+  time--;document.getElementById('tm').textContent=time;
+  if(time<=0){
+    say(score>=15?'FROG OF THE YEAR. the pond writes songs about you.':score>=7?'well fed. slightly sticky.':'starving but proud.');
+    setTimeout(()=>location.reload(),3000);
+  }
+},1000);
+(function loop(){
+  requestAnimationFrame(loop);t++;
+  for(let i=bugs.length-1;i>=0;i--){
+    const b=bugs[i];
+    b.x+=b.vx;b.y+=Math.sin(t*.05+b.vxw)*1.4;
+    if(b.x<-20)bugs.splice(i,1);
+  }
+  if(tongue){
+    if(tongue.phase==='out'){
+      tongue.len+=16;
+      const tip={x:FROG.x+tongue.dx*tongue.len,y:FROG.y-30+tongue.dy*tongue.len};
+      for(let i=bugs.length-1;i>=0;i--){
+        const b=bugs[i];
+        if(tongue.hit.has(i))continue;
+        if(Math.hypot(b.x-tip.x,b.y-tip.y)<26){
+          if(b.bee){
+            lives--;tongue.phase='back';
+            document.getElementById('lv').textContent='\u2665'.repeat(Math.max(0,lives));
+            __beep(130,.2,'sawtooth');
+            say('YOU LICKED A BEE. it stung your tongue. lessons were learned.');
+            if(lives<=0){setTimeout(()=>{say('the pond falls silent. you are bee-less and life-less. refresh.');},600);}
+          } else {
+            score+=b.vx<-3?3:1;
+            document.getElementById('sc').textContent=score;
+            __beep(650,.08);
+            say(pick(['gulp.','delicious.','protein acquired.',(b.vx<-3?'dragonfly! fancy.':'yum.')]));
+          }
+          bugs.splice(i,1);
+        }
+      }
+      if(tongue.len>=tongue.max)tongue.phase='back';
+      if(lives<=0)tongue=null;
+    } else {
+      tongue.len-=22;
+      if(tongue.len<=0)tongue=null;
+    }
+  }
+  draw();
+})();
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+function draw(){
+  x.clearRect(0,0,W,H);
+  x.fillStyle='#0a3018';x.fillRect(0,H-46,W,46);
+  x.fillStyle='#155c2e';x.fillRect(FROG.x-52,H-52,104,10);
+  // frog
+  x.fillStyle='#39ff88';x.beginPath();x.ellipse(FROG.x,FROG.y-18,42,26,0,0,7);x.fill();
+  // eyes track cursor
+  const ea=Math.atan2(my-(FROG.y-44),mx-FROG.x);
+  for(const ex of [-18,18]){
+    x.fillStyle='#fff';x.beginPath();x.arc(FROG.x+ex,FROG.y-44,11,0,7);x.fill();
+    x.fillStyle='#111';x.beginPath();x.arc(FROG.x+ex+Math.cos(ea)*4,FROG.y-44+Math.sin(ea)*4,5,0,7);x.fill();
+  }
+  // reticle
+  x.strokeStyle='rgba(125,255,138,.6)';x.lineWidth=2;
+  x.beginPath();x.arc(mx,my,12,0,7);x.stroke();
+  // bugs
+  for(const b of bugs){
+    x.save();x.translate(b.x,b.y);
+    const w=Math.sin(Date.now()/15+b.vxw)*5;
+    x.strokeStyle=b.bee?'rgba(255,230,0,.8)':'rgba(255,255,255,.6)';x.lineWidth=2;
+    x.beginPath();x.moveTo(-4,-3-w/2);x.lineTo(4,-3+w/2);x.stroke();
+    x.fillStyle=b.bee?'#ffd23e':'#333';
+    x.beginPath();x.ellipse(0,0,b.bee?9:6,b.bee?5:3.5,0,0,7);x.fill();
+    if(b.bee){x.fillStyle='#111';x.fillRect(-2,-4,2,8);x.fillRect(2,-4,2,8);}
+    x.restore();
+  }
+  // tongue
+  if(tongue){
+    const tx=FROG.x+tongue.dx*tongue.len,ty=FROG.y-30+tongue.dy*tongue.len;
+    x.strokeStyle='#ff5c8a';x.lineWidth=9;x.lineCap='round';
+    x.beginPath();x.moveTo(FROG.x,FROG.y-24);x.lineTo(tx,ty);x.stroke();
+    x.fillStyle='#ff85ad';x.beginPath();x.arc(tx,ty,8,0,7);x.fill();
+  }
+}
+(function(){window.__beep=function(f,d,t){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.05;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>

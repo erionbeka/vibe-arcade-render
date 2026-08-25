@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>POPUP PURGE 98</title>
+<style>
+  html,body{margin:0;height:100%;background:#008080;color:#fff;font-family:'MS Sans Serif',Consolas,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+  h1{font-size:.95rem;color:#ffe;margin:0;text-align:center}
+  #desk{position:relative;width:min(660px,96vw);height:420px;background:#0a9a9a;border:4px outset #c0c0c0;overflow:hidden}
+  .win{position:absolute;width:210px;background:#d4d0c8;border:2px outset #fff;box-shadow:4px 4px 0 rgba(0,0,0,.35);font-size:.72rem}
+  .win h4{margin:0;background:linear-gradient(90deg,#000080,#1084d0);color:#fff;font-size:.7rem;padding:3px 6px;display:flex;justify-content:space-between}
+  .win h4 span.x{cursor:pointer;padding:0 5px;background:#d4d0c8;color:#000;border:1px outset #fff}
+  .win .body{padding:10px;line-height:1.45;text-align:center}
+  #bar{position:absolute;bottom:0;left:0;right:0;height:34px;background:#c0c0c8;border-top:2px outset #fff;display:flex;align-items:center;padding-left:8px;gap:6px}
+  #startb{padding:4px 12px;font-weight:bold;border:2px outset #fff;background:#c0c0c8;cursor:pointer;font-size:.75rem}
+  #stats{color:#cfe;}
+</style>
+</head>
+<body>
+<h1>POPUP PURGE 98<br>close the ads before the desktop drowns. some X buttons lie.</h1>
+<div id="desk"><div id="bar"><button id="startb">Start</button><span style="font-size:.7rem;color:#333">it is 1998 forever here</span></div></div>
+<div id="stats">CLOSED <b id="n">0</b> \u00B7 ON SCREEN <b id="ons">0</b>/14 \u00B7 SURVIVED <b id="tm">90</b>s</div>
+<script>
+var desk = document.getElementById('desk');
+var closed = 0, time = 90, over = false;
+
+var ADS = [
+  ['CONGRATULATIONS!!', 'You are the 1,000,000th visitor! Your prize is this popup.'],
+  ['HOT SINGLES', 'Hot singles in your RAM want to allocate memory with you.'],
+  ['DOWNLOAD MORE', 'Your computer can download more downloads. Click to download the downloader.'],
+  ['SMILEY CENTRAL', 'Add 4,000 smileys to every email you will regret sending.'],
+  ['FREE iPOD MINI', 'Just complete 847 offers. Offer #1: buy the iPod Mini.'],
+  ['YOUR PC IS SLOW', 'Our scan found 3 viruses and one (1) ghost. Remove now?'],
+  ['CASINO ROYALE', 'Gambling is fun when you are 11 and it is 1998.'],
+  ['MONKEY BUTLER', 'A monkey butler for your desktop. He steals your files lovingly.'],
+  ['BONZI BUDDY', 'I am your friend forever. There is no uninstall. There never was.'],
+  ['TIME REMAINING', 'This ad will close in... never mind.']
+];
+var FAKE_TITLES = ['IMPORTANT (not)', 'System Message', 'Do NOT Close', 'Free X Button'];
+
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function beep(f, d) {
+  try {
+    var a = new (window.AudioContext || window.webkitAudioContext)();
+    var o = a.createOscillator(), g = a.createGain();
+    o.frequency.value = f; g.gain.value = .05;
+    o.connect(g); g.connect(a.destination);
+    o.start(); o.stop(a.currentTime + d);
+  } catch (e) {}
+}
+
+function spawn() {
+  if (over) return;
+  var ad = pick(ADS);
+  var tricky = Math.random() < .3;
+  var w = document.createElement('div');
+  w.className = 'win';
+  w.style.left = Math.random() * (desk.clientWidth - 220) + 'px';
+  w.style.top = Math.random() * (desk.clientHeight - 170) + 'px';
+  var title = tricky ? pick(FAKE_TITLES) : 'Advertisement';
+  var body = '<b>' + ad[0] + '</b><br>' + ad[1];
+  if (tricky) body += '<br><small style="color:#888">the X above is real. probably.</small>';
+  w.innerHTML = '<h4><span style="flex:1">' + title + '</span><span class="x">X</span></h4><div class="body">' + body + '</div>';
+  w.querySelector('.x').addEventListener('pointerdown', function (e) {
+    e.stopPropagation();
+    if (tricky && Math.random() < .5) {
+      spawn(); spawn();
+      beep(200, .1);
+      w.querySelector('.body').innerHTML = '<b style="color:#c00">that X was decorative.</b>';
+      return;
+    }
+    closeWin(w);
+  });
+  desk.appendChild(w);
+  beep(320, .03);
+  upd();
+  if (desk.querySelectorAll('.win').length >= 14) crash();
+}
+
+function closeWin(w) {
+  w.remove();
+  closed++;
+  document.getElementById('n').textContent = closed;
+  beep(600, .06);
+  upd();
+}
+
+function upd() {
+  var n = desk.querySelectorAll('.win').length;
+  document.getElementById('ons').textContent = n;
+  if (n === 0 && !over) for (var i = 0; i < 4; i++) setTimeout(spawn, i * 300);
+}
+
+function crash() {
+  over = true;
+  desk.innerHTML = '<div style="background:#000080;color:#fff;height:100%;padding:40px;font-family:Consolas">' +
+    '<b>A fatal exception 0E has occurred.<br>The desktop has been consumed by advertising.</b><br><br>' +
+    '* You closed ' + closed + ' popups. Legends say 30 clears the curse. You were brave.<br><br>' +
+    '<button onclick="location.reload()" style="font-family:inherit;padding:6px 16px">return to 1998</button></div>';
+  beep(120, .5);
+}
+
+setInterval(function () {
+  if (over) return;
+  time--;
+  document.getElementById('tm').textContent = time;
+  if (time <= 0) {
+    over = true;
+    desk.innerHTML = '<div style="text-align:center;padding-top:140px">' +
+      '<h2 style="color:#ffe">YOU SURVIVED THE INTERNET OF 1998</h2>' +
+      '<p>' + closed + ' popups closed. The cursor remembers your sacrifice.</p>' +
+      '<button onclick="location.reload()" style="padding:8px 20px;font-family:inherit">re-enter the storm</button></div>';
+  }
+}, 1000);
+
+setInterval(spawn, 1400);
+spawn(); setTimeout(spawn, 400); setTimeout(spawn, 800);
+
+document.getElementById('startb').addEventListener('click', function () {
+  if (!over) { spawn(); beep(500, .04); }
+});
+
+</script>
+</body>
+</html>

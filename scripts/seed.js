@@ -251,6 +251,42 @@ const CATALOG_HANDMADE = [
     tags: 'multiplayer pvp sports realtime'
   },
   {
+    file: 'salad-slicer.html',
+    title: 'SALAD SLICER',
+    description: 'Fruit launches through the air. Drag your cursor through it like a knife-wielding chef with unresolved anger.\n\nSlice watermelons, kiwis and rare dragonfruit for combos. Do NOT slice the soap. Or the rubber duck. We have talked about this.',
+    tags: 'slicing reflex fruit combo'
+  },
+  {
+    file: 'pinata-smash.html',
+    title: 'PIÑATA PANIC',
+    description: 'Six piñatas stand between you and candy greatness: a llama, a unicorn, a T-Rex, your self-doubt...\n\nTime your swings on the power bar for sweet-spot hits. Watch cracks spread. Then the candy explosion. Dentists notified in advance.',
+    tags: 'timing smash candy escalation'
+  },
+  {
+    file: 'mosquito-dark.html',
+    title: 'THE MOSQUITO IN THE DARK',
+    description: 'A flashlight that follows your cursor. A mosquito you can only HEAR — the buzz gets louder as it closes in. Slap when it enters the light.\n\nSlap the darkness instead and it starts respecting you as a rival.',
+    tags: 'stealth audio hunt tense'
+  },
+  {
+    file: 'popup-purge.html',
+    title: 'POPUP PURGE 98',
+    description: 'A fake Windows 98 desktop drowning in ads: HOT SINGLES IN YOUR RAM, MONKEY BUTLER, BONZI BUDDY (there is no uninstall).\n\nClose them by their X buttons — but some X buttons are lies that spawn two more. Survive 90 seconds of the old internet.',
+    tags: 'clicking retro comedy chaos'
+  },
+  {
+    file: 'tongue-of-justice.html',
+    title: 'TONGUE OF JUSTICE',
+    description: 'You are a frog with a cursor-aimed tongue and a dream. Snatch flies mid-air; dragonflies are worth triple.\n\nBees are NOT food. Licking a bee costs a life and teaches nothing. Your eyes track the cursor independently. It is unsettling.',
+    tags: 'aiming animals reflex frog'
+  },
+  {
+    file: 'laser-overheat.html',
+    title: 'LASER OVERHEAT',
+    description: 'A turret fires at your cursor and has serious anger management issues. Zap descending drones before they reach the base — but heat builds fast.\n\nOverheat once and endure 1.5 seconds of shame while drones fall from the sky unbothered.',
+    tags: 'defense aiming heat waves'
+  },
+  {
     file: 'waiting-room.html',
     title: 'WAITING ROOM',
     description: 'Take a number. Sit. The fluorescent hum is free of charge.\n\nWatch numbers get called while bonding silently with strangers, reading a 2011 magazine quiz, and aging at the exact speed of bureaucracy.',

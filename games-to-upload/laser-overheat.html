@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>LASER OVERHEAT</title>
+<style>
+  html,body{margin:0;height:100%;background:#0a0a14;color:#dfe6ff;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+  h1{font-size:.95rem;color:#7c9eff;margin:0;text-align:center}
+  canvas{border:4px solid #26305e;background:#080b18;cursor:none;touch-action:none}
+  #hud{display:flex;gap:22px;font-size:.95rem}b{color:#fff}
+  #heatWrap{width:200px;height:14px;border:3px solid #39446b;background:#101528}
+  #heat{height:100%;width:0%;background:linear-gradient(90deg,#39ff88,#ffe600,#ff5c5c)}
+  #say{min-height:24px;color:#93a4d8;text-align:center;padding:0 10px;width:min(480px,92vw)}
+</style>
+</head>
+<body>
+<h1>LASER OVERHEAT<br>(the turret fires at your cursor. the turret has anger issues.)</h1>
+<canvas id="c" width="600" height="400"></canvas>
+<div id="hud"><span>SCORE <b id="sc">0</b></span><span>WAVE <b id="wv">1</b></span><span>BASE \u2665\u2665\u2665</span><span>HEAT <span id="heatWrap"><span id="heat" style="display:inline-block"></span></span></span></div>
+<div id="say">click to fire. heat builds. overheated = 1.5s of shame. drones reaching the bottom hurt everyone.</div>
+<script>
+const cv=document.getElementById('c'),x=cv.getContext('2d'),W=600,H=400;
+let mx=W/2,my=H/2,heat=0,locked=0,score=0,wave=1,drones=[],parts=[],beams=[],t=0,hp=3;
+cv.addEventListener('pointermove',e=>{const r=cv.getBoundingClientRect();mx=(e.clientX-r.left)*(W/r.width);my=(e.clientY-r.top)*(H/r.height);});
+cv.addEventListener('pointerdown',()=>fire());
+function fire(){
+  if(locked>0)return;
+  if(heat>=100){locked=90;__beep(150,.3,'sawtooth');say('OVERHEATED. the turret is embarrassed.');return;}
+  heat=Math.min(100,heat+16);
+  beams.push({x1:W/2,y1:H-20,x2:mx,y2:my,life:6});
+  __beep(900,.04,'square');
+  for(let i=drones.length-1;i>=0;i--){
+    const d=drones[i];
+    if(Math.hypot(d.x-mx,d.y-my)<d.r+10){
+      drones.splice(i,1);score+=d.big?30:10;
+      document.getElementById('sc').textContent=score;
+      boom(d.x,d.y);
+      if(score>wave*80){wave++;document.getElementById('wv').textContent=wave;say('WAVE '+wave+'. they brought friends.');}
+      return;
+    }
+  }
+  // missed shot still makes a spark
+  for(let i=0;i<6;i++)parts.push({x:mx,y:my,vx:(Math.random()-.5)*4,vy:(Math.random()-.5)*3,l:12,col:'#8899ff'});
+}
+function boom(bx,by){
+  shake=6;__beep(300,.12,'sawtooth');
+  for(let i=0;i<14;i++)parts.push({x:bx,y:by,vx:(Math.random()-.5)*7,vy:-Math.random()*6,l:25,col:i%2?'#ffd23e':'#ff5c5c'});
+}
+let shake=0;
+setInterval(()=>{
+  t++;if(over)return;
+  if(locked>0){locked--;if(locked<=0)say('cooled down. forgiveness granted.');}
+  heat=Math.max(0,heat-.55);
+  document.getElementById('heat').style.width=heat+'%';
+  if(t%Math.max(34,70-wave*6)===0)drones.push({x:40+Math.random()*(W-80),y:-24,r:14+(wave>3?Math.random()*8:0),vy:.7+wave*.16,big:false});
+  if(wave>=2&&t%260===0)drones.push({x:60+Math.random()*(W-120),y:-30,r:24,vy:.45+wave*.08,big:true});
+  for(let i=drones.length-1;i>=0;i--){
+    const d=drones[i];d.y+=d.vy;d.x+=Math.sin(t*.03+i)*.7;
+    if(d.y>H-24){
+      drones.splice(i,1);hp--;
+      shake=10;__beep(120,.25,'sawtooth');
+      say('A DRONE GOT THROUGH. base morale -1.');
+      if(hp<=0){over=true;say('THE BASE HAS BEEN DRONED. final score '+score+'. refresh to avenge.');}
+      continue;
+    }
+  }
+},16);
+let over=false;
+(function draw(){
+  requestAnimationFrame(draw);
+  x.clearRect(0,0,W,H);
+  x.save();
+  if(shake>0){x.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);shake--;}
+  x.fillStyle='#141a33';x.fillRect(0,H-20,W,20);
+  for(const d of drones){
+    x.fillStyle=d.big?'#ff5c5c':'#9ae66e';
+    x.beginPath();x.arc(d.x,d.y,d.r*.55,0,7);x.fill();
+    x.strokeStyle=d.col='#ffd23e';x.lineWidth=2;
+    const s=Math.sin(Date.now()/50)*d.r*.5;
+    x.beginPath();x.moveTo(d.x-d.r,d.y-s*.3);x.lineTo(d.x+d.r,d.y+s*.3);x.stroke();
+  }
+  for(const b of beams){
+    x.strokeStyle='rgba(124,158,255,'+(b.life/6)+')';x.lineWidth=b.life;
+    x.beginPath();x.moveTo(b.x1,b.y1);x.lineTo(b.x2,b.y2);x.stroke();b.life--;
+  }
+  for(let i=parts.length-1;i>=0;i--){
+    const p=parts[i];
+    p.x+=p.vx;p.y+=p.vy;p.vy+=.25;
+    if(--p.l<0||p.y>H+10){parts.splice(i,1);continue;}
+    x.fillStyle=p.col;x.fillRect(p.x,p.y,4,4);
+  }
+  // turret
+  x.fillStyle='#7c9eff';
+  const ta=Math.atan2(my-(H-16),mx-W/2);
+  x.save();x.translate(W/2,H-16);x.rotate(ta-Math.PI/2);
+  x.fillRect(-8,-6,16,22);
+  x.fillRect(-4,-20,8,18);
+  x.restore();
+  // crosshair
+  x.strokeStyle=locked>0?'#ff5c5c':'#7dff8a';x.lineWidth=2;
+  x.beginPath();x.arc(mx,my,14,0,7);x.stroke();
+  x.beginPath();x.moveTo(mx-20,my);x.lineTo(mx-8,my);x.moveTo(mx+8,my);x.lineTo(mx+20,my);x.stroke();
+  x.restore();
+})();
+(function(){window.__beep=function(f,d,t){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.05;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>

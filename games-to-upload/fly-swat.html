@@ -19,6 +19,7 @@
 <script>
 const cv=document.getElementById('c'),x=cv.getContext('2d'),W=640,H=380;
 let mx=200,my=200,flies=[],splats=[],score=0,gen=1,ch=3,cool=0,t=0,over=false;
+let combo=0,lastHit=0,moms=[];
 const GENNAMES=['regular flies','suspiciously smart flies','flight-school graduates','philosophy flies','THE SEEN-THINGS','your ancestors'];
 function say(t2){document.getElementById('say').textContent=t2;}
 cv.addEventListener('pointermove',e=>{const r=cv.getBoundingClientRect();mx=e.clientX-r.left;my=e.clientY-r.top;});
@@ -27,27 +28,51 @@ cv.addEventListener('pointerdown',()=>{
   cool=14;
   __beep(220,.05,'sawtooth');
   x.fillStyle='rgba(255,255,255,.15)';x.beginPath();x.arc(mx,my,34,0,7);x.fill();
+  for(let i=moms.length-1;i>=0;i--){
+    const m=moms[i];
+    if(Math.hypot(m.x-mx,m.y-my)<44){
+      m.hp--;shake=6;__beep(300,.09,'sawtooth');
+      if(m.hp<=0){
+        moms.splice(i,1);score+=10;
+        document.getElementById('s').textContent=score;
+        say('THE MOTHER IS DOWN. hundreds of orphaned flies weep.');
+        for(let k=0;k<18;k++)splats.push({x:m.x+(Math.random()-.5)*40,y:m.y+(Math.random()-.5)*30,r:4+Math.random()*5,a:.9});
+      } else say('MOTHER FLY HIT! hp: '+m.hp+' (she remembers this)');
+    }
+  }
   for(let i=flies.length-1;i>=0;i--){
     const f=flies[i];
     if(Math.hypot(f.x-mx,f.y-my)<30){
-      flies.splice(i,1);score++;
+      flies.splice(i,1);
+      const now=Date.now();
+      combo=(now-lastHit<800)?combo+1:1;lastHit=now;
+      let gain=combo>=8?4:combo>=5?3:combo>=3?2:1;
+      if(f.gold){gain*=6;say('GOLDEN FLY!! +'+gain+'. it was pure. it was beautiful.');__beep(900,.15);}
+      score+=gain;
+      if(combo>1&&combo%5===0)say('COMBO x'+combo+'! your swatting arm ascends.');
       document.getElementById('s').textContent=score;
       splats.push({x:f.x,y:f.y,r:5+Math.random()*4,a:.8});
-      __beep(150+Math.random()*150,.07,'sawtooth');
-      if(score%12===0){
+      __beep(150+Math.random()*150+Math.min(400,combo*25),.07,'sawtooth');
+      if(score%12===0&&score!==lastGenScore){lastGenScore=score;
         gen++;
         if(gen>6){over=true;say('GENERATION 6 HAS DECLARED PEACE. they respect you now. final splats: '+score+'.');return;}
         document.getElementById('g').textContent=gen;
         ch=Math.min(5,ch+1);
         say('GEN '+gen+' HATCHED ('+GENNAMES[Math.min(gen-1,5)]+')... they learned.');
         for(let k=0;k<3;k++)spawnFly(true);
+        if(gen%2===0)spawnMother();
       }
     }
   }
 });
+let lastGenScore=0;
 function spawnFly(elite){
   const sp=(gen*.35+.8)*(elite?1.25:1);
-  flies.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*sp*2,vy:(Math.random()-.5)*sp*2,ph:Math.random()*7,smart:gen>=3});
+  const gold=Math.random()<.05;
+  flies.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*sp*2,vy:(Math.random()-.5)*sp*2,ph:Math.random()*7,smart:gen>=3,gold});
+}
+function spawnMother(){
+  moms.push({x:W/2+(Math.random()-.5)*240,y:H/2+(Math.random()-.5)*140,hp:3,vx:.55,vy:.32});
 }
 for(let i=0;i<5;i++)spawnFly(false);
 setInterval(()=>{
@@ -65,6 +90,10 @@ setInterval(()=>{
     f.x=Math.max(6,Math.min(W-6,f.x));f.y=Math.max(6,Math.min(H-6,f.y));
     if(Math.random()<.006&&flies.length<26&&t%2)spawnFly(false);
   }
+  for(const m of moms){
+    m.x+=m.vx;m.y+=m.vy;
+    if(m.x<20||m.x>W-20)m.vx*=-1;if(m.y<20||m.y>H-20)m.vy*=-1;
+  }
 },16);
 (function draw(){
   x.clearRect(0,0,W,H);
@@ -76,11 +105,22 @@ setInterval(()=>{
   for(const f of flies){
     x.save();x.translate(f.x,f.y);
     const w=Math.sin(Date.now()/(gen>=4?18:28))*4;
-    x.fillStyle='rgba(255,255,255,.55)';
-    x.beginPath();x.ellipse(-4,-4+w/2,5,2,-.5,0,7);x.fill();
-    x.beginPath();x.ellipse(4,-4+w/2,5,2,.5,0,7);x.fill();
-    x.fillStyle=gen>=5?'#ff5c8a':'#222';
+    if(f.gold){
+      x.fillStyle='rgba(255,215,0,.4)';x.beginPath();x.arc(0,0,12,0,7);x.fill();
+      x.fillStyle='#ffd700';
+    } else x.fillStyle=gen>=5?'#ff5c8a':'#222';
+    x.fillStyle=f.gold?'#ffd700':(gen>=5?'#ff5c8a':'#222');
     x.beginPath();x.ellipse(0,0,6,4,0,0,7);x.fill();
+    x.restore();
+  }
+  for(const m of moms){
+    x.save();x.translate(m.x,m.y);
+    const w2=Math.sin(Date.now()/14)*5;
+    x.fillStyle='rgba(255,92,138,.35)';x.beginPath();x.arc(0,0,20,0,7);x.fill();
+    x.fillStyle='#5c0f2e';x.beginPath();x.ellipse(0,0,13,9,0,0,7);x.fill();
+    x.fillStyle='#ffd23e';
+    for(let h2=0;h2<m.hp;h2++)x.fillRect(-8+h2*7,-16,5,4);
+    x.fillStyle='#fff';x.fillRect(-6,-3,3,3);x.fillRect(3,-3,3,3);
     x.restore();
   }
   // swatter

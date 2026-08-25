@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MOSQUITO IN THE DARK</title>
+<style>
+  html,body{margin:0;height:100%;background:#000;color:#cfd8dc;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+  h1{font-size:.95rem;color:#9e9e9e;margin:0;text-align:center}
+  canvas{border:3px solid #222;background:#000;touch-action:none}
+  #hud{display:flex;gap:24px;font-size:.95rem}b{color:#ffd23e}
+  #say{min-height:24px;color:#888;text-align:center;padding:0 10px;width:min(480px,92vw)}
+</style>
+</head>
+<body>
+<h1>THE MOSQUITO IN THE DARK<br>(you hear it. you cannot see it. yet.)</h1>
+<canvas id="c" width="600" height="380"></canvas>
+<div id="hud"><span>SPLATS <b id="s">0</b></span><span>TIME <b id="tm">60</b></span></div>
+<div id="say">the flashlight follows your cursor. slap when it lands in the light.</div>
+<script>
+const cv=document.getElementById('c'),x=cv.getContext('2d'),W=600,H=380;
+let mx=300,my=190,mq={x:450,y:100,vx:-1.6,vy:.8},splat=0,time=60,scared=0;
+let buzz=null,buzzGain=null;
+function say(t2){document.getElementById('say').textContent=t2;}
+cv.addEventListener('pointermove',e=>{const r=cv.getBoundingClientRect();mx=(e.clientX-r.left)*(W/r.width);my=(e.clientY-r.top)*(H/r.height);});
+cv.addEventListener('pointerdown',()=>{
+  const d=Math.hypot(mq.x-mx,mq.y-my);
+  if(d<55){
+    splat++;document.getElementById('s').textContent=splat;
+    __beep(180,.12,'sawtooth');
+    say(pick(['SPLAT. justice is sticky.','gotcha. the night shifts uneasily.','one down. its family will seek revenge.','squish. satisfying. concerning.']));
+    respawn();
+  } else if(d<130){
+    scared=Math.min(90,scared+30);
+    __beep(700,.05);
+    say('you slapped the dark. the mosquito now respects you as a rival.');
+  } else {
+    say('you slapped... nothing. absolutely nothing.');
+  }
+});
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+function respawn(){
+  const edge=Math.floor(Math.random()*4);
+  mq={x:[Math.random()*W,-20,W+20,Math.random()*W][edge],y:[-20,Math.random()*H,Math.random()*H,H+20][edge],vx:(W/2-mq.x)*.004,vy:(H/2-mq.y)*.004};
+  scared=Math.max(scared,50);
+}
+setInterval(()=>{
+  time--;document.getElementById('tm').textContent=time;
+  if(time<=0){
+    say(splat>=8?'MOSQUITO NINJA. the dark fears your palms.':splat>=4?'competent slapping. respectable.':'the mosquito wins the night. it always does. refresh?');
+    clearInterval(buzzIv);buzz=null;
+    setTimeout(()=>location.reload(),3500);
+  }
+},1000);
+const buzzIv=setInterval(()=>{
+  if(!buzz){
+    try{
+      const a=new (window.AudioContext||window.webkitAudioContext)();
+      buzz={o:a.createOscillator(),g:a.createGain(),a};
+      buzz.o.type='sawtooth';buzz.o.frequency.value=420;
+      buzz.g.gain.value=.001;buzz.o.connect(buzz.g);buzz.g.connect(a.destination);
+      buzz.o.start();
+    }catch(e){}
+  }
+  if(buzz){
+    const d=Math.hypot(mq.x-mx,mq.y-my);
+    buzz.g.gain.value=Math.max(.001,.09*Math.max(0,1-d/320));
+    buzz.o.frequency.value=380+Math.sin(Date.now()/60)*60+(90-scared);
+  }
+},80);
+(function draw(){
+  requestAnimationFrame(draw);
+  x.fillStyle='#000';x.fillRect(0,0,W,H);
+  // faint room hints
+  x.fillStyle='#111';
+  x.fillRect(40,H-40,80,24);x.fillRect(W-140,H-36,90,20);
+  x.fillStyle='#151515';x.beginPath();x.arc(90,70,26,0,7);x.fill();
+  // mosquito (only visible within light)
+  mq.x+=(mx-mq.x)*.004+mq.vx+Math.sin(Date.now()/90)*2.2;
+  mq.y+=(my-mq.y)*.004+mq.vy+Math.cos(Date.now()/110)*2.2;
+  if(scared>0)scared-=.5;
+  const spd=1+scared/40;
+  mq.x+=Math.sin(Date.now()/137)*spd*2;mq.y+=Math.cos(Date.now()/113)*spd*1.6;
+  mq.x=Math.max(-30,Math.min(W+30,mq.x));mq.y=Math.max(-30,Math.min(H+30,mq.y));
+  const md=Math.hypot(mq.x-mx,mq.y-my);
+  if(md<95){
+    x.save();x.globalAlpha=Math.max(.25,1-md/95);
+    x.fillStyle='#2e2e2e';
+    x.beginPath();x.ellipse(mq.x,mq.y,7,4,.3,0,7);x.fill();
+    const w=Math.sin(Date.now()/18)*6;
+    x.strokeStyle='rgba(255,255,255,.75)';x.lineWidth=2;
+    x.beginPath();x.moveTo(mq.x-5,mq.y-w/2);x.lineTo(mq.x+5,mq.y+w/2);x.stroke();
+    x.restore();
+  }
+  // flashlight
+  const grad=x.createRadialGradient(mx,my,10,mx,my,110);
+  grad.addColorStop(0,'rgba(255,250,220,.16)');
+  grad.addColorStop(1,'rgba(0,0,0,0)');
+  x.fillStyle=grad;x.fillRect(0,0,W,H);
+  x.strokeStyle='rgba(255,240,200,.35)';x.lineWidth=2;
+  x.beginPath();x.arc(mx,my,12,0,7);x.stroke();
+})();
+(function(){window.__beep=function(f,d,t){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.06;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>
