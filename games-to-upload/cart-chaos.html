@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CART CHAOS: DOWNHILL GROCERY</title>
+<style>
+  html,body{margin:0;height:100%;background:#12100a;color:#f5eeda;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+  h1{font-size:.95rem;color:#ffd23e;margin:0;text-align:center}
+  canvas{border:4px solid #4d3820;background:#1c1610;touch-action:none}
+  #hud{display:flex;gap:18px;font-size:.92rem;color:#c9b48c}b{color:#ffe600}
+  #say{min-height:24px;color:#ff9d7a;text-align:center;padding:0 10px}
+</style>
+</head>
+<body>
+<h1>CART CHAOS: DOWNHILL GROCERY<br>(brakes sold separately)</h1>
+<canvas id="c" width="640" height="380"></canvas>
+<div id="hud"><span>SPEED <b id="sp">0</b></span><span>LIST <b id="li">0/3</b></span><span>HEALTH <b id="hp">\u2665\u2665\u2665</b></span></div>
+<div id="say">arrows / A-D to steer. grab your list. dodge everything else. the hill does not stop.</div>
+<script>
+const cv=document.getElementById('c'),x=cv.getContext('2d'),W=640,H=380;
+let cx=W/2,vx=0,speed=2,hp=3,dist=0,items=[],done=false,t=0,shake=0;
+let list=[];
+const LISTNAMES=['MILK','EGGS','DONUTS','TOFU','SODA'];
+const DODGE=['DISPLAY','WET FLOOR','SHOPPER'];
+const keys={};
+addEventListener('keydown',e=>{keys[e.key]=keys[e.key.toLowerCase()]=1;});
+addEventListener('keyup',e=>{keys[e.key]=keys[e.key.toLowerCase()]=0;});
+function newRound(){
+  list=[0,1,2].map(()=>LISTNAMES[Math.floor(Math.random()*LISTNAMES.length)]);
+  while(new Set(list).size<3)list[2]=LISTNAMES[Math.floor(Math.random()*LISTNAMES.length)];
+  document.getElementById('li').textContent='0/3';
+  say('get: '+list.join(', '));
+}
+newRound();
+setInterval(()=>{
+  if(done)return;
+  t++;speed=Math.min(11,speed+.008);dist+=speed*.1;
+  if(keys.ArrowLeft||keys.a)vx-=1.1;
+  if(keys.ArrowRight||keys.d)vx+=1.1;
+  vx*=.9;cx=Math.max(40,Math.min(W-40,cx+vx));
+  document.getElementById('sp').textContent=(speed*7|0);
+  if(t%Math.max(20,46-Math.floor(dist))===0){
+    const isListItem=list.length&&Math.random()<.28;
+    const lane=30+Math.random()*(W-60);
+    items.push({lane,y:-30,kind:isListItem?list[0]:DODGE[Math.floor(Math.random()*DODGE.length)],good:isListItem});
+  }
+  for(let i=items.length-1;i>=0;i--){
+    const it=items[i];it.y+=speed*1.15;
+    if(it.y>296&&it.y<344&&Math.abs(it.lane-cx)<44){
+      items.splice(i,1);
+      if(it.good){
+        list.splice(list.indexOf(it.kind),1);
+        document.getElementById('li').textContent=(3-list.length)+'/3';
+        __beep(750,.08);say('got the '+it.kind+'!');
+        if(!list.length)return finish(true);
+      }else{
+        hp--;shake=14;__beep(110,.22,'sawtooth');
+        document.getElementById('hp').textContent='\u2665'.repeat(Math.max(0,hp));
+        say('SMASHED INTO '+it.kind+'.');
+        if(hp<=0)return finish(false);
+      }
+    } else if(it.y>H+40)items.splice(i,1);
+  }
+},16);
+function finish(win){
+  done=true;
+  shake=win?0:20;
+  say(win?'SURVIVED with '+ (3-hp) +' crashes. groceries: acquired. dignity: pending.'
+        :'the cart has chosen violence. run over. press R.');
+  __beep(win?800:100,win?.2:.45,win?'square':'sawtooth');
+}
+addEventListener('keydown',e=>{if(done&&(e.key==='r'||e.key==='R')){hp=3;speed=2;dist=0;items=[];done=false;document.getElementById('hp').textContent='\u2665\u2665\u2665';newRound();}});
+(function draw(){
+  x.clearRect(0,0,W,H);
+  x.save();
+  if(shake>0){x.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);shake-=1;}
+  x.fillStyle='#241d12';for(let i=(-t*speed)%60;i<W;i+=60)x.fillRect(i,0,4,H);
+  x.fillStyle='#33291a';for(let j=(-t*speed)%90;j<H;j+=90)x.fillRect(0,j,W,3);
+  for(const it of items){
+    x.fillStyle=it.good?'#7dff8a':'#ff6b6b';
+    x.fillRect(it.lane-16,it.y-14,32,28);
+    x.fillStyle='#111';x.font='bold 9px Consolas';x.textAlign='center';
+    x.fillText(it.kind.slice(0,9),it.lane,it.y+2);x.textAlign='left';
+  }
+  // cart
+  x.fillStyle='#c94f2a';x.fillRect(cx-36,306,72,30);
+  x.fillStyle='#e8611f';x.fillRect(cx-42,300,10,10);x.fillRect(cx+32,300,10,10);
+  x.fillStyle='#111';x.beginPath();x.arc(cx-24,340,8,0,7);x.arc(cx+24,340,8,0,7);x.fill();
+  if(!done&&t<180){x.fillStyle='#fff';x.font='bold 16px Consolas';x.textAlign='center';x.fillText('STEER!',W/2,80);x.textAlign='left';}
+  x.restore();
+  requestAnimationFrame(draw);
+})();
+(function(){window.__beep=function(f,d,t2){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t2||'square';o.frequency.value=f;g.gain.value=.06;g.gain.exponentialRampToValueAtTime(.001,a.currentTime+d);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>

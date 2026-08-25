@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CATCH! ...NOT THAT ONE</title>
+<style>
+  html,body{margin:0;height:100%;background:#141021;color:#f2ecff;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+  h1{font-size:.95rem;color:#ffb347;margin:0}
+  canvas{border:4px solid #3a2a68;background:#1d1633;cursor:none;touch-action:none}
+  #hud{display:flex;gap:22px;font-size:.95rem;color:#b9a8e0}
+  b{color:#ffe600}
+</style>
+</head>
+<body>
+<h1>CATCH! ...NOT THAT ONE</h1>
+<canvas id="c" width="600" height="400"></canvas>
+<div id="hud"><span>SCORE <b id="sc">0</b></span><span>COMBO <b id="cb">x1</b></span><span>TIME <b id="tm">60</b></span></div>
+<script>
+const cv=document.getElementById('c'),x=cv.getContext('2d'),W=600,H=400;
+let bx=W/2,score=0,combo=1,time=60,items=[],t=0,running=false,msg='',msgT=0;
+const KINDS=[
+ {n:'pizza',good:1,v:10,col:'#ffb347'},
+ {n:'sushi',good:1,v:15,col:'#9ae66e',rare:1},
+ {n:'donut',good:1,v:10,col:'#ff8fab'},
+ {n:'pineapple pizza',good:0,v:-20,col:'#ffd23e',rare:1},
+ {n:'broccoli',good:0,v:-10,col:'#6ab04c'},
+ {n:'wet sock',good:0,v:-25,col:'#cfd8dc',rare:1}
+];
+addEventListener('pointermove',e=>{const r=cv.getBoundingClientRect();bx=Math.max(40,Math.min(W-40,e.clientX-r.left));});
+cv.addEventListener('pointerdown',()=>{if(!running)start();});
+document.getElementById('tm').parentElement.addEventListener('click',()=>{});
+function start(){
+  score=0;combo=1;time=60;items=[];t=0;running=true;msg='GO!';msgT=40;
+  const iv=setInterval(()=>{time--;document.getElementById('tm').textContent=time;if(time<=0){clearInterval(iv);end();}},1000);
+}
+function end(){
+  running=false;
+  const rank=score>=800?'FRIDGE GOD':score>=500?'certified snack handler':score>=250?'acceptable catcher':'the floor eats tonight';
+  msg='TIME! final '+score+' \u2014 '+rank+'. click to rematch.';msgT=99999999;
+  __beep(150,.4,'sawtooth');
+}
+function beep(f,d){__beep(f,d);}
+setInterval(()=>{
+  if(!running)return;
+  t++;
+  if(t%Math.max(16,34-Math.floor(score/60))===0){
+    let pool=KINDS.filter(k=>!k.rare||Math.random()<.3);
+    const k=pool[Math.floor(Math.random()*pool.length)];
+    items.push({k,x:30+Math.random()*(W-60),y:-20,v:2+Math.random()*1.6+t*.008,rot:Math.random()*7});
+  }
+},40);
+function loop(){
+  requestAnimationFrame(loop);
+  x.clearRect(0,0,W,H);
+  x.fillStyle='#241b45';x.fillRect(0,360,W,40);
+  if(running){
+    for(let i=items.length-1;i>=0;i--){
+      const it=items[i];it.y+=it.v;it.rot+=.06;
+      drawItem(it);
+      if(it.y>340&&it.y<372&&Math.abs(it.x-bx)<46){
+        items.splice(i,1);
+        if(it.k.good){score+=it.k.v*combo;combo=Math.min(5,combo+1);beep(500+combo*80,.06);}
+        else{score=Math.max(0,score+it.k.v);combo=1;msg='NOT THE '+it.k.n.toUpperCase()+'!!';msgT=50;beep(120,.2,'sawtooth');}
+        document.getElementById('sc').textContent=score;document.getElementById('cb').textContent='x'+combo;
+      } else if(it.y>H+30){items.splice(i,1);}
+    }
+    if(msgT-->0){}
+  }
+  drawBasket();
+  if(msgT>0){x.fillStyle='#ffe600';x.font='bold 20px Consolas';x.textAlign='center';x.fillText(msg,W/2,60);x.textAlign='left';if(!running)msgT--;}
+  if(!running&&!msg.length)msg='click to start. catch dinner. reject betrayal.';
+  if(!running&&msgT<=0){msg='catch dinner. reject betrayal. click to begin.';}
+}
+function drawItem(it){
+  x.save();x.translate(it.x,it.y);x.rotate(it.rot*Math.min(1,.4));
+  if(it.k.n==='pizza'||it.k.n==='pineapple pizza'){
+    x.fillStyle=it.k.n==='pizza'?'#ffb347':'#ffe9a8';
+    x.beginPath();x.moveTo(0,-12);x.lineTo(11,10);x.lineTo(-11,10);x.closePath();x.fill();
+    x.fillStyle=it.k.n==='pizza'?'#e05252':'#ffd23e';
+    x.beginPath();x.arc(-3,2,3,0,7);x.arc(4,-2,3,0,7);x.fill();
+  } else if(it.k.n==='donut'){
+    x.fillStyle='#ff8fab';x.beginPath();x.arc(0,0,11,0,7);x.fill();
+    x.fillStyle='#1d1633';x.beginPath();x.arc(0,0,4,0,7);x.fill();
+  } else if(it.k.n==='broccoli'){
+    x.fillStyle='#6ab04c';for(const [dx,dy] of [[-5,-4],[5,-4],[0,-8]]){x.beginPath();x.arc(dx,dy,6,0,7);x.fill();}
+    x.fillStyle='#4c8c3a';x.fillRect(-2,0,4,10);
+  } else if(it.k.n==='sock'){
+    x.fillStyle='#eceff1';x.fillRect(-5,-12,10,18);x.fillRect(-5,2,14,8);
+  } else {
+    x.fillStyle='#fff';x.beginPath();x.ellipse(0,0,12,6,-.4,0,7);x.fill();
+    x.fillStyle='#1d1633';x.fillRect(-8,-2,4,4);x.fillRect(2,-4,4,4);
+  }
+  x.restore();
+}
+function drawBasket(){
+  x.fillStyle='#b8863f';x.fillRect(bx-44,344,88,26);
+  x.fillStyle='#8f6527';
+  for(let i=-36;i<=36;i+=12)x.fillRect(bx+i,344,4,26);
+}
+loop();
+(function(){window.__beep=function(f,d,t){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.06;g.gain.exponentialRampToValueAtTime(.001,a.currentTime+d);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>

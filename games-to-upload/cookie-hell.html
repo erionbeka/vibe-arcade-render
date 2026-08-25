@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>COOKIE CONSENT</title>
+<style>
+  html,body{margin:0;height:100%;background:#1a1a2e;color:#eee;font-family:'Segoe UI',Consolas,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+  h1{font-size:.9rem;color:#9281bd;margin-bottom:20px}
+  .banner{position:fixed;background:#fff;color:#222;border-radius:10px;padding:18px 22px;width:min(400px,88vw);box-shadow:0 10px 40px rgba(0,0,0,.5);z-index:10}
+  .banner p{font-size:.85rem;margin:6px 0 12px;line-height:1.5}
+  .row{display:flex;gap:10px}
+  button{padding:9px 16px;border-radius:6px;border:1px solid #999;background:#fff;cursor:pointer;font-size:.85rem;font-family:inherit}
+  .accept{background:#0d6efd;color:#fff;border-color:#0d6efd}
+  #bg{font-size:.8rem;color:#555;text-align:center;padding:20px}
+</style>
+</head>
+<body>
+<h1>we value your privacy (financially)</h1>
+<div id="bg">this website is made of websites.</div>
+<div class="banner" id="b">
+  <b>We use cookies \u{1F36A}</b>
+  <p id="txt">We and our <span id="n">312</span> partners store cookies to enhance browsing, measure vibes, and remember that thing you did in 2019.</p>
+  <div class="row">
+    <button class="accept" onclick="more(1)">Accept all</button>
+    <button onclick="more(2)">Reject non-essential</button>
+    <button onclick="more(3)">Manage 847 preferences</button>
+  </div>
+</div>
+<script>
+let count=0;
+const PARTNERS=['advertising','analytics','mood-tracking','astrological','vibes-based','revenge','emotional support','tax purposes'];
+const MORE=['Our partners have partners.','Cookies require consent to request consent.','A cookie manager is loading... it also uses cookies.','Your rejection was noted, filed, and gently ignored.','Essential cookies are essential to us specifically.'];
+function more(choice){
+  count++;
+  const n=document.getElementById('n');
+  n.textContent=parseInt(n.textContent)*2+7;
+  document.getElementById('txt').innerHTML=MORE[count%MORE.length]+' We and our '+count*3+' additional '+PARTNERS[count%PARTNERS.length]+' partners say hi.';
+  if(count>=6){
+    document.body.innerHTML='<div style="max-width:520px;margin:15vh auto;text-align:center"><h1 style="color:#ffd23e">CONGRATULATIONS!</h1><p style="line-height:1.7">You have accepted cookies recursively.<br>The cookies now accept YOU.<br><br>Legal note: this page stored a memory of you storing a memory of it.<br><br>\u{1F36A} \u{1F36A} \u{1F36A}<br><br><a href="" style="color:#89b8dd">start a fresh life</a></p></div>';
+  }
+}
+</script>
+</body>
+</html>

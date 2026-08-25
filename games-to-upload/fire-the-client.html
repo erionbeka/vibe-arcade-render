@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FIRE THE CLIENT</title>
+<style>
+  html,body{margin:0;height:100%;background:#101418;color:#e8eef2;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+  h1{font-size:.95rem;color:#89b8dd;margin:0;text-align:center}
+  #card{width:min(480px,92vw);background:#1d262d;border:3px solid #37474f;padding:18px;font-size:.98rem;line-height:1.55}
+  #card b{color:#ffd23e}
+  .row{display:flex;gap:10px;margin-top:14px}
+  button{flex:1;padding:11px 8px;font-family:inherit;border:3px solid #37474f;background:#182128;color:#cfe3ee;cursor:pointer;font-size:.85rem}
+  #fireb{border-color:#ff5c5c;color:#ffb3b3}
+  #fireb:hover{background:#3a1212}
+  #meterWrap{display:flex;gap:10px;align-items:center}
+  #mb{width:200px;height:14px;border:3px solid #37474f;background:#0b1114}
+  #mf{height:100%;width:50%;background:#7dff8a}
+  #say{min-height:24px;color:#9fb0c0;text-align:center;padding:0 8px;width:min(480px,92vw)}
+</style>
+</head>
+<body>
+<h1>FIRE THE CLIENT<br>(agency simulator, catharsis DLC)</h1>
+<div id="card"></div>
+<div class="row">
+  <button id="okb">SAY "SURE THING!"</button>
+  <button id="fireb">\u{1F525} FIRE THEM</button>
+</div>
+<div id="meterWrap">AGENCY SANITY <div id="mb"><div id="mf"></div></div></div>
+<div id="say"></div>
+<script>
+const CLIENTS=[
+ ['Brenda from "Synergy Co"','Wants the logo "bigger but smaller" and the website to feel "more yellow, less color". Budget: exposure.'],
+ ['Mike, Serial Pitcher','"Quick call that became a 3-hour scope creep." Wants everything moved 2px left. Then 2px right. Then back.'],
+ ['The Rebranders','Third rebrand this year. New font is Comic Sans "but premium". Deadline: yesterday.'],
+ ['Passive Aggressive Paul','Emails begin with "Per my last email..." and end with ":)". The smiley means war.'],
+ ['Exposure Frank','Pays in "great portfolio pieces" and one (1) expired coupon. Wants source files, forever, for free.'],
+ ['Meeting Marge','Books daily syncs about scheduling syncs. Has said nothing of substance since March.']
+];
+const FIRELINES=['security escorts them out. the office applauds quietly.','their invoice bursts into flames. satisfying.','you block 47 email chains at once. birds sing.','the team throws a party. cake is real.','legal says it was "technically self-defense".'];
+const OKLINES=['your soul leaves your body politely.','the request list grows a new limb.','somewhere, a designer whispers "why".','invoice unpaid. as tradition demands.'];
+let sanity=50,i=0,fired=0,endured=0;
+function render(){
+  const c=CLIENTS[i%CLIENTS.length];
+  document.getElementById('card').innerHTML='<b>'+c[0]+'</b><br><br>'+c[1];
+}
+document.getElementById('okb').addEventListener('click',()=>{
+  endured++;sanity=Math.max(0,sanity-16);
+  upd();say(pick(OKLINES));
+});
+document.getElementById('fireb').addEventListener('click',()=>{
+  fired++;sanity=Math.min(100,sanity+22);
+  i++;upd();render();
+  say(pick(FIRELINES));
+});
+function upd(){
+  const f=document.getElementById('mf');
+  f.style.width=sanity+'%';
+  f.style.background=sanity>=60?'#7dff8a':sanity>=30?'#ffd23e':'#ff5c5c';
+  if(sanity<=0){
+    document.getElementById('card').innerHTML='<b>YOU ACCEPTED EVERYTHING.</b><br><br>You now answer to 6 clients, 2 pets named after fonts, and a plant with opinions.<br><br>Survived: '+endured+' requests. Fired: '+fired+' clients.<br><br><button onclick="location.reload()">start an agency again (why)</button>';
+    document.querySelector('.row').style.display='none';
+    return;
+  }
+  if(sanity>=100){
+    document.getElementById('card').innerHTML='<b style="color:#7dff8a">AGENCY NIRVANA.</b><br><br>All clients fired. The office is quiet. The plants are watered. You have never been happier.<br><br>Fired: '+fired+' \u00B7 Endured: '+endured+'<br><br><button onclick="location.reload()">get bored, rehire them</button>';
+    document.querySelector('.row').style.display='none';
+  }
+}
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+render();upd();
+</script>
+</body>
+</html>

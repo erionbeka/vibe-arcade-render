@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>GRAVITY FLIP CORRIDOR</title>
+<style>
+  html,body{margin:0;height:100%;background:#05060f;color:#e8ecff;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+  h1{font-size:.95rem;color:#7c9eff;margin:0;text-align:center}
+  canvas{border:4px solid #26305e;background:#0b0f22;touch-action:none}
+  #hud{display:flex;gap:24px;color:#93a4d8;font-size:.95rem}
+  b{color:#fff}
+</style>
+</head>
+<body>
+<h1>GRAVITY FLIP CORRIDOR<br>(the floor gave up, use the ceiling)</h1>
+<canvas id="c" width="700" height="320"></canvas>
+<div id="hud"><span>DIST <b id="dist">0</b>m</span><span>BEST <b id="best">0</b>m</span><span>FLIPS <b id="fl">0</b></span></div>
+<script>
+const cv=document.getElementById('c'),x=cv.getContext('2d'),W=700,H=320,FLOOR=280,CEIL=40;
+let py=FLOOR-16,grav=1,vy=0,speed=3.2,dist=0,best=0,flips=0,obs=[],dead=true,t=0;
+const QUIPS=['you have become decoration.','the corridor wins again.','physics filed a complaint.','that spike was minding its business.','gravity: still undefeated.'];
+document.getElementById('c').addEventListener('pointerdown',flip);
+addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();if(dead)restart();else flip();}});
+function flip(){
+  if(dead)return;
+  grav*=-1;vy=0;flips++;
+  document.getElementById('fl').textContent=flips;
+  __beep(grav>0?400:650,.06);
+}
+function restart(){
+  py=FLOOR-16;grav=1;vy=0;speed=3.2;dist=0;flips=0;obs=[];dead=false;t=0;
+}
+setInterval(()=>{
+  if(dead)return;
+  t++;dist+=speed;
+  speed=Math.min(8.5,speed+.0035);
+  if(t%Math.max(30,72-Math.floor(dist/28))===0){
+    const fromTop=Math.random()<.5,len=24+Math.random()*36;
+    obs.push({x:W+40,top:fromTop,len});
+    if(dist>500&&Math.random()<.35)obs.push({x:W+40+(fromTop?90:-90),top:!fromTop,len:20+Math.random()*20});
+  }
+  for(let i=obs.length-1;i>=0;i--){
+    const o=obs[i];o.x-=speed;
+    if(o.x<-70){obs.splice(i,1);continue;}
+    const px=110,pw=22;
+    if(px+pw>o.x&&px<o.x+26){
+      if(o.top?(py<CEIL+o.len-4):(py+22>FLOOR-o.len+4))return die(o);
+    }
+  }
+  vy+=grav*.55;
+  vy=Math.max(-9,Math.min(9,vy));
+  py+=vy;
+  if(py>=FLOOR-22){py=FLOOR-22;vy=0;}
+  if(py<=CEIL){py=CEIL;vy=0;}
+  document.getElementById('dist').textContent=Math.floor(dist);
+},16);
+function die(o){
+  dead=true;
+  best=Math.max(best,Math.floor(dist));
+  document.getElementById('best').textContent=best;
+  __beep(120,.3,'sawtooth');
+  say(QUIPS[Math.floor(Math.random()*QUIPS.length)]+' click to defy death.');
+}
+function say(t2){document.getElementById('hud').title=t2;msgEl.textContent=t2;}
+const msgEl=document.createElement('div');
+msgEl.style.cssText='min-height:24px;color:#ffd23e;text-align:center';
+document.querySelector('#hud').after(msgEl);
+(function draw(){
+  x.clearRect(0,0,W,H);
+  x.fillStyle='#141b3a';x.fillRect(0,0,W,CEIL);
+  x.fillStyle='#141b3a';x.fillRect(0,FLOOR,W,H-FLOOR);
+  x.fillStyle='#232c58';for(let i=(-t*speed)%48;i<W;i+=48){x.fillRect(i,CEIL+6,24,3);x.fillRect(i,FLOOR-9,24,3);}
+  for(const o of obs){
+    x.fillStyle='#ff5c8a';
+    x.beginPath();
+    if(o.top){x.moveTo(o.x,CEIL);x.lineTo(o.x+13,CEIL+o.len);x.lineTo(o.x+26,CEIL);}
+    else{x.moveTo(o.x,FLOOR);x.lineTo(o.x+13,FLOOR-o.len);x.lineTo(o.x+26,FLOOR);}
+    x.closePath();x.fill();
+  }
+  x.save();x.translate(121,py+11);
+  if(grav<0)x.scale(1,-1);
+  x.fillStyle='#7c9eff';x.fillRect(-11,-11,22,22);
+  x.fillStyle='#0b0f22';x.fillRect(2,-6,5,5);x.fillRect(-7,-6,4,5);
+  x.restore();
+  requestAnimationFrame(draw);
+})();
+say('click / space to flip gravity. survive the spikes. click to begin.');
+(function(){window.__beep=function(f,d,t){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.06;g.gain.exponentialRampToValueAtTime(.001,a.currentTime+d);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+cv.addEventListener('pointerdown',()=>{if(dead)restart();});
+</script>
+</body>
+</html>

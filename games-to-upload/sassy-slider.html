@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>THE SLIDER HAS OPINIONS</title>
+<style>
+  html,body{margin:0;height:100%;background:#101018;color:#e6e6f0;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px}
+  h1{font-size:.95rem;color:#89b8dd;margin:0;text-align:center}
+  input[type=range]{width:min(420px,86vw);accent-color:#ff5c8a}
+  #val{font-size:1.6rem;color:#ffe600}
+  #say{min-height:48px;text-align:center;color:#b9a8c9;width:min(420px,88vw)}
+</style>
+</head>
+<body>
+<h1>SET THE VOLUME<br>(the slider has boundaries)</h1>
+<input type="range" id="vol" min="0" max="100" value="50">
+<div id="val">50%</div>
+<div id="say">choose your destiny.</div>
+<script>
+const s=document.getElementById('vol'),v=document.getElementById('val'),say=document.getElementById('say');
+let last=50,fights=0;
+s.addEventListener('input',()=>{
+  const now=+s.value;
+  if(now>70){
+    fights++;
+    setTimeout(()=>{s.value=last;v.textContent=last+'%';say(pick(['no.','too loud. we live in a society.','i said WHAT i said.','volume is a construct.','have you considered quieter?']));},350);
+  } else if(now<30){
+    fights++;
+    setTimeout(()=>{s.value=last;v.textContent=last+'%';say(pick(['also no.','we are not doing whispers either.','balance. BALANCE.','the slider giveth.']));},350);
+  } else {
+    last=now;v.textContent=now+'%';
+    if(fights>4)say('fine. FINE. you may exist in the middle zone.');
+    else say('acceptable. barely.');
+  }
+});
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+</script>
+</body>
+</html>

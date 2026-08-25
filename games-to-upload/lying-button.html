@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>THE LYING BUTTON</title>
+<style>
+  html,body{margin:0;height:100%;background:#0d0d16;color:#eee;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;overflow:hidden}
+  h1{font-size:.95rem;color:#ff6ec7;margin:0}
+  #b{position:absolute;padding:18px 30px;font-family:inherit;font-size:1rem;font-weight:bold;border:none;background:#3cff5e;color:#052a0c;cursor:pointer;border-radius:10px;transition:left .25s,top .25s}
+  #score{color:#9281bd}
+  #say{min-height:24px;color:#ffe600;text-align:center;width:min(440px,90vw)}
+</style>
+</head>
+<body>
+<h1>THE LYING BUTTON</h1>
+<div id="score">clicks: 0 \u00B7 points: 0</div>
+<button id="b">+100 POINTS</button>
+<div id="say">just click it once. what could go wrong.</div>
+<script>
+const b=document.getElementById('b'),say=document.getElementById('say'),sc=document.getElementById('score');
+let clicks=0,pts=0,dodges=0;
+const LINES=['oops. finger slipped.','the button is shy.','did you even try?','teleportation: mastered.','you cannot grasp the button.','button says: no.','physics? never heard of her.','this is a safe space. for the button.'];
+function place(x,y){b.style.left=x+'px';b.style.top=y+'px';}
+place(innerWidth/2-80,innerHeight/2);
+let realClicks=false;
+b.addEventListener('pointerdown',e=>{
+  e.stopPropagation();
+  if(!realClicks){
+    // after enough dodging, allow one pity click... which lies anyway
+  }
+});
+document.body.addEventListener('pointermove',e=>{
+  const r=b.getBoundingClientRect(),mx=e.clientX,my=e.clientY;
+  const bx=r.left+r.width/2,by=r.top+r.height/2;
+  const d=Math.hypot(mx-bx,my-by);
+  if(d<130){
+    dodges++;
+    let nx=Math.random()*(innerWidth-r.width-20)+10;
+    let ny=Math.random()*(innerHeight-r.height-140)+70;
+    if(dodges%11===0){nx=mx-40;ny=my-20;}
+    place(nx,ny);
+    if(dodges%3===0)say(LINES[Math.floor(Math.random()*LINES.length)]);
+  }
+});
+setInterval(()=>{
+  clicks++;
+  sc.textContent='clicks: '+clicks+' \u00B7 points: '+pts;
+  if(clicks===15)say('achievement: persistence against geometry');
+  if(clicks===40)say('the button respects you now. still running though.');
+},900);
+document.addEventListener('click',()=>{pts+=100;sc.textContent='clicks: '+clicks+' \u00B7 points: '+pts+(pts>=500?' (points are fake btw)':'');});
+</script>
+</body>
+</html>

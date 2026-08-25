@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>THE ARGUING ADVENTURE</title>
+<style>
+  html,body{margin:0;height:100%;background:#14101f;color:#efe8ff;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+  h1{font-size:.95rem;color:#c792ea;margin:0}
+  #story{width:min(480px,92vw);min-height:110px;text-align:center;line-height:1.6;font-size:1.02rem}
+  #opts{display:flex;flex-direction:column;gap:8px;width:min(420px,88vw)}
+  #opts button{text-align:left}
+  #narr{color:#ff9de2;min-height:24px;text-align:center;font-style:italic;width:min(460px,90vw)}
+</style>
+</head>
+<body>
+<h1>THE ARGUING ADVENTURE</h1>
+<div id="story">You stand before a cave. The narrator clears his throat.</div>
+<div id="opts">
+  <button onclick="step(0)">Enter the cave bravely</button>
+  <button onclick="step(1)">Ask the narrator for advice</button>
+  <button onclick="step(2)">Go home. This is silly.</button>
+</div>
+<div id="narr"></div>
+<script>
+const NARR=[
+ 'Bravely? You checked your phone twice on the way here.',
+ 'Advice? I am a disembodied voice with a mortgage. No.',
+ 'Home? HOME? I wrote lore for this cave!',
+ 'That was luck and you know it.',
+ 'Stop meta-gaming my narration.',
+ 'I am choosing to interpret that as genius.'
+];
+const STAGES=[
+ 'Inside: a fork in the path. Left smells like adventure. Right smells like soup.',
+ [['Left. Obviously.','Right. Soup sounds nice.','Lick the wall to assert dominance']],
+ 'The path splits again because this is that kind of cave.',
+ [['Complain to the narrator','Walk backwards dramatically','Sit and refuse']],
+ 'Your refusal summoned the Cave Manager. He offers a refund.',
+ [['Accept the refund','Demand store credit','Ask about his weekend']],
+ 'The refund is a single raisin. It is warm.',
+ [['Eat the raisin','Keep the raisin forever','Feed the raisin to the narrator']]
+];
+let stage=0;
+function step(choice){
+  document.getElementById('narr').textContent=NARR[Math.floor(Math.random()*NARR.length)];
+  __beep(300+stage*40,.05);
+  advance();
+}
+function advance(){
+  stage++;
+  const ti=(stage-1)*2;
+  if(ti>=STAGES.length){
+    document.getElementById('story').innerHTML='<b style="color:#ffd23e">THE END: you leave the cave changed. Not spiritually. You just have raisin breath.</b>';
+    document.getElementById('opts').innerHTML='<button onclick="location.reload()">adventure again (the narrator sighs)</button>';
+    return;
+  }
+  document.getElementById('story').textContent=STAGES[ti];
+  const box=document.getElementById('opts');box.innerHTML='';
+  STAGES[ti+1][0].forEach(t=>{
+    const b=document.createElement('button');b.textContent=t;
+    b.addEventListener('click',()=>step(0));
+    box.appendChild(b);
+  });
+}
+ setTimeout(()=>{document.getElementById('narr').textContent='yes. YOU. the person clicking buttons.';},800);
+ (function(){window.__beep=function(f,d,t){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.05;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>

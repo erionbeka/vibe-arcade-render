@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TAX DOCUMENTS: WOOD CHIPPER</title>
+<style>
+  html,body{margin:0;height:100%;background:#151210;color:#f0e8dc;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+  h1{font-size:.95rem;color:#ffb347;margin:0;text-align:center}
+  canvas{border:4px solid #4d3820;background:#241c12;cursor:pointer}
+  #hud{display:flex;gap:24px}b{color:#ffd23e}
+</style>
+</head>
+<body>
+<h1>TAX DOCUMENTS: WOOD CHIPPER<br>(filed under: catharsis)</h1>
+<canvas id="c" width="600" height="360"></canvas>
+<div id="hud"><span>DOCS CHIPPED <b id="n">0</b></span><span>REFUND STATUS <b>lol</b></span><span>AUDIT RISK <b id="risk">0%</b></span></div>
+<script>
+const cv=document.getElementById('c'),x=cv.getContext('2d');
+let docs=[],n=0,risk=0,t=0;
+function spawn(){
+  docs.push({x:-40,y:60+Math.random()*140,vx:1.6+Math.random(),rot:Math.random(),label:['W2','1099','receipts','receipts??','that letter','schedule C','schedule WHY'][Math.floor(Math.random()*7)]});
+}
+setInterval(()=>{if(docs.length<5)spawn();},800);
+for(let i=0;i<4;i++)spawn();
+cv.addEventListener('click',e=>{
+  const r=cv.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;
+  for(let i=docs.length-1;i>=0;i--){
+    const d=docs[i];
+    if(Math.abs(mx-d.x)<26&&Math.abs(my-d.y)<20){
+      if(d.x>380){
+        docs.splice(i,1);n++;__beep(180,.12,'sawtooth');shake=8;
+        risk+=Math.round(Math.random()*3);
+        document.getElementById('n').textContent=n;
+        document.getElementById('risk').textContent=Math.min(99,risk)+'%';
+      }
+    }
+  }
+});
+let shake=0;
+(function draw(){
+  x.clearRect(0,0,600,360);
+  x.save();if(shake>0){x.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);shake--;}
+  // chipper
+  x.fillStyle='#39424d';x.fillRect(400,140,190,110);
+  x.fillStyle='#111';x.fillRect(388,150,14,90);
+  x.fillStyle='#ff5c5c';x.font='bold 12px Consolas';
+  x.fillText('FEED',430,120);
+  x.fillStyle='#55636b';x.fillRect(420,100,150,44);
+  t++;
+  x.fillStyle='#666';for(let i=0;i<5;i++){const a=t*.3+i*1.25;x.save();x.translate(455+i*24,122);x.rotate(a);x.fillRect(-10,-3,20,6);x.restore();}
+  for(let i=docs.length-1;i>=0;i--){
+    const d=docs[i];d.x+=d.vx;d.rot+=.02;
+    x.save();x.translate(d.x,d.y);x.rotate(d.rot);
+    x.fillStyle='#fdf6d8';x.fillRect(-18,-13,36,26);
+    x.strokeStyle='#b8ad93';x.strokeRect(-18,-13,36,26);
+    x.fillStyle='#888';for(let l=-8;l<10;l+=5)x.fillRect(-12,l+4,24,2);
+    x.restore();
+    if(d.x>388&&!cv.__eaten){}
+    if(d.x>388&&d.x<420){docs.splice(i,1);n++;document.getElementById('n').textContent=n;}
+    else if(d.x>W)docs.splice(i,1);
+  }
+  x.fillStyle='#fff';x.font='bold 12px Consolas';
+  x.fillText('click documents to shove them in faster',14,26);
+  x.restore();
+  requestAnimationFrame(draw);
+})();
+(function(){window.__beep=function(f,d,t){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.05;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ROCKET LANDING INC.</title>
+<style>
+  html,body{margin:0;height:100%;background:#020208;color:#dfe8ff;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+  h1{font-size:.95rem;color:#ff9de2;margin:0;text-align:center}
+  canvas{border:4px solid #26264f;background:#05051a;touch-action:none}
+  #hud{display:flex;gap:22px;font-size:.95rem;color:#93a4d8}b{color:#fff}
+  #say{min-height:24px;color:#ffd23e;text-align:center;padding:0 10px}
+</style>
+</head>
+<body>
+<h1>ROCKET LANDING INC.<br>(we removed the simulator part)</h1>
+<canvas id="c" width="520" height="420"></canvas>
+<div id="hud"><span>FUEL <b id="fuel">100</b></span><span>ALT <b id="alt">0</b></span><span>SPEED <b id="spd">0</b></span><span>LANDINGS <b id="wins">0</b></span></div>
+<div id="say">arrows: \u2190\u2192 rotate, \u2191 thrust. land on the pad gently. or become geology.</div>
+<script>
+const cv=document.getElementById('c'),x=cv.getContext('2d'),W=520,H=420;
+let l={x:W/2,y:40,vx:(Math.random()-.5)*1.6,vy:0,a:0,fuel:100},pad={x:W*.25+Math.random()*W*.5},dead=false,won=false,wins=0,t=0;
+const keys={};
+addEventListener('keydown',e=>keys[e.key]=1);
+addEventListener('keyup',e=>keys[e.key]=0);
+function say(t2){document.getElementById('say').textContent=t2;}
+function boom(){
+  dead=true;__beep(90,.5,'sawtooth');
+  const v=Math.hypot(l.vx,l.vy).toFixed(1);
+  say(v>6?'THAT WAS NOT LANDING. THAT WAS GEOLOGY.':'so close. and yet: explosion. ('+v+' speed)');
+  setTimeout(newRound,2200);
+}
+function land(){
+  won=true;wins++;document.getElementById('wins').textContent=wins;
+  __beep(700,.15);__beep(900,.2);
+  say('LANDED! '+l.fuel.toFixed(0)+'% fuel left. mission control pretends they were nervous.');
+  setTimeout(newRound,1800);
+}
+function newRound(){
+  l={x:W*.2+Math.random()*W*.6,y:40,vx:(Math.random()-.5)*2,vy:.5,a:(Math.random()-.5)*.4,fuel:100};
+  pad.x=W*.2+Math.random()*W*.55;
+  dead=false;won=false;t=0;
+}
+setInterval(()=>{
+  t++;if(dead||won)return;
+  if(keys.ArrowLeft)l.a-=.07;
+  if(keys.ArrowRight)l.a+=.07;
+  l.a=Math.max(-1.2,Math.min(1.2,l.a));
+  let th=false;
+  if(keys.ArrowUp&&l.fuel>0){th=true;l.fuel-=.55;
+    l.vx+=Math.sin(l.a)*.09;l.vy-=Math.cos(l.a)*.09;}
+  document.getElementById('fuel').textContent=Math.max(0,l.fuel).toFixed(0);
+  l.vy+=.05;l.vx*=.995;
+  l.x+=l.vx;l.y+=l.vy;
+  l.x=Math.max(10,Math.min(W-10,l.x));
+  document.getElementById('alt').textContent=Math.max(0,(380-l.y)).toFixed(0);
+  document.getElementById('spd').textContent=Math.hypot(l.vx,l.vy).toFixed(1);
+  if(l.y>=382){
+    const onPad=Math.abs(l.x-pad.x)<46;
+    const soft=l.vy<1.25&&Math.abs(l.vx)<1&&Math.abs(((l.a%(Math.PI*2))+Math.PI*3)%(Math.PI*2)-Math.PI)<.45;
+    if(onPad&&soft)land();else boom();
+  }
+},16);
+(function draw(){
+  x.clearRect(0,0,W,H);
+  x.fillStyle='#0a0a24';for(let i=0;i<40;i++){const sx=(i*97+t*.4)%W,sy=(i*61)%300;x.fillRect(sx,sy,2,2);}
+  x.fillStyle='#20204a';x.fillRect(0,382,W,38);
+  x.fillStyle='#39ff88';x.fillRect(pad.x-46,376,92,6);
+  x.fillStyle='#7dff8a';x.font='bold 11px Consolas';x.textAlign='center';
+  x.fillText('PAD',pad.x,370);x.textAlign='left';
+  x.save();x.translate(l.x,l.y);x.rotate(l.a);
+  x.fillStyle='#e8ecff';x.beginPath();x.moveTo(0,-16);x.lineTo(10,10);x.lineTo(-10,10);x.closePath();x.fill();
+  x.fillStyle='#ff5c8a';x.fillRect(-10,10,20,4);
+  if(keys.ArrowUp&&l.fuel>0&&!dead&&!won){
+    x.fillStyle='#ffd23e';x.beginPath();x.moveTo(-5,14);x.lineTo(0,14+Math.random()*14+6);x.lineTo(5,14);x.closePath();x.fill();
+  }
+  x.restore();
+  requestAnimationFrame(draw);
+})();
+(function(){window.__beep=function(f,d,t2){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t2||'square';o.frequency.value=f;g.gain.value=.06;g.gain.exponentialRampToValueAtTime(.001,a.currentTime+d);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>

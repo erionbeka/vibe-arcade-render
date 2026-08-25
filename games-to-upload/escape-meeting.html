@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ESCAPE THE MEETING</title>
+<style>
+  html,body{margin:0;height:100%;background:#1a1c20;color:#e8eaf0;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+  h1{font-size:.95rem;color:#fbbf24;margin:0;text-align:center}
+  #scene{width:min(520px,92vw);min-height:130px;background:#262a33;border:3px solid #3a3f4b;padding:16px;font-size:1rem;line-height:1.6;text-align:center}
+  .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+  button{padding:12px 16px;font-family:inherit;border:3px solid #4a505c;background:#22262e;color:#d5dae2;cursor:pointer;font-size:.88rem}
+  button:hover:not(:disabled){border-color:#fbbf24}
+  button:disabled{opacity:.4}
+  #hud{display:flex;gap:22px}b{color:#ffd23e}#sus b{color:#ff8a8a}
+  #say{min-height:24px;text-align:center;color:#9fb0c0;width:min(500px,92vw)}
+</style>
+</head>
+<body>
+<h1>ESCAPE THE MEETING<br>(it could have been an email. it was not.)</h1>
+<div id="scene"></div>
+<div class="row" id="opts"></div>
+<div id="hud"><span>MEETING MINUTES <b id="min">0</b></span><span id="sus">SUSPICION <b>0%</b></span></div>
+<div id="say"></div>
+<script>
+let minutes=0,suspicion=0,cool=0,over=false;
+const BOSS=['...so as I was saying, before I said that other thing...','...let\'s circle back to the circling back...','...this slide is a picture of my dog, but the POINT stands...','...we\'ll do a deep dive into why we need more deep dives...'];
+const EXITS=[
+ {t:'Fake a phone call ("Hello? YES I\'M SIGNING NOW.")',risk:35},
+ {t:'The slow lean + laptop close + vanish',risk:55},
+ {t:'Pretend the wifi died (dramatic sigh)',risk:25},
+ {t:'Cough uncontrollably toward the door',risk:40},
+ {t:'Stand up and say "well THIS meeting is over"',risk:80}
+];
+function scene(t2){document.getElementById('scene').innerHTML=t2;}
+function say(t2){document.getElementById('say').textContent=t2;}
+function render(){
+  if(over)return;
+  scene('<b style="color:#fbbf24">'+BOSS[Math.floor(Math.random()*BOSS.length)]+'</b><br><br>nobody has said anything real for '+minutes+' minutes.');
+  const box=document.getElementById('opts');box.innerHTML='';
+  const choices=[...EXITS].sort(()=>Math.random()-.5).slice(0,3);
+  choices.forEach(ex=>{
+    const b=document.createElement('button');
+    b.textContent=ex.t;b.disabled=cool>0;
+    b.addEventListener('click',()=>tryExit(ex));
+    box.appendChild(b);
+  });
+}
+function tryExit(ex){
+  const roll=Math.random()*100;
+  if(roll<ex.risk){
+    suspicion+=ex.risk*.7+15;
+    __beep(140,.2,'sawtooth');
+    say(pick(['the boss made eye contact mid-exit. you sat back down slowly.','someone said "wait where are YOU going". betrayal.','your chair squeaked. chairs always snitch.']));
+  } else {
+    minutes+=8+Math.floor(Math.random()*10);
+    cool=2;
+    __beep(700,.08);
+    say('SLIPPED OUT. freedom tastes like hallway air. (+minutes of life)');
+  }
+  upd();
+  setTimeout(render,900);
+}
+function upd(){
+  document.getElementById('min').textContent=minutes;
+  document.getElementById('sus').innerHTML='SUSPICION <b>'+Math.min(100,suspicion|0)+'%</b>';
+  if(minutes>=60){
+    over=true;
+    scene('<b style="color:#7dff8a">YOU ESCAPED A FULL HOUR.</b><br><br>Outside, the sun exists. Birds sing songs about your exit.<br><br>The meeting continues without you. It always did.');
+    document.getElementById('opts').innerHTML='<button onclick="location.reload()">attend another (why)</button>';
+  }
+  if(suspicion>=100){
+    over=true;
+    scene('<b style="color:#ff5c5c">BUSTED.</b><br><br>"Since you\'re standing up — why don\'t YOU present next quarter\'s goals."<br><br>You are now IN the meeting forever.');
+    document.getElementById('opts').innerHTML='<button onclick="location.reload()">fake your death instead</button>';
+  }
+}
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+setInterval(()=>{if(!over){minutes++;upd();}},1200);
+render();upd();
+(function(){window.__beep=function(f,d,t){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.05;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PUNCH THE ALARM</title>
+<style>
+  html,body{margin:0;height:100%;background:#1c1220;color:#f5e9ff;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+  h1{font-size:.95rem;color:#e0a3ff;margin:0;text-align:center}
+  canvas{border:4px solid #4a2a68;background:#241631;cursor:pointer}
+  #hud{display:flex;gap:22px}b{color:#ffd23e}
+  #say{min-height:24px;text-align:center;color:#d9b8f0;padding:0 10px}
+</style>
+</head>
+<body>
+<h1>PUNCH THE ALARM CLOCK<br>(7:00 AM. again. somehow.)</h1>
+<canvas id="c" width="600" height="360"></canvas>
+<div id="hud"><span>LATENESS <b id="late">0%</b></span><span>SNOOZES <b id="sn">0</b></span><span>CLOCKS DESTROYED <b id="cd">0</b></span></div>
+<div id="say">click the clock: punch it. punching = 5 min snooze + satisfaction. it respawns. mornings respawn too.</div>
+<script>
+const cv=document.getElementById('c'),x=cv.getContext('2d');
+let late=0,snoozes=0,destroyed=0,parts=[],shake=0;
+let clock={x:300,y:180,r:56,hp:3,alive:true};
+function say(t){document.getElementById('say').textContent=t;}
+cv.addEventListener('pointerdown',e=>{
+  const r=cv.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;
+  if(Math.hypot(mx-clock.x,my-clock.y)<clock.r+14){
+    shake=12;
+    for(let i=0;i<10;i++)parts.push({x:clock.x,y:clock.y,vx:(Math.random()-.5)*8,vy:-Math.random()*6,l:25});
+    if(Math.random()<.35){
+      clock.alive=false;destroyed++;
+      document.getElementById('cd').textContent=destroyed;
+      __beep(100,.3,'sawtooth');
+      say(pick(['THE CLOCK IS DEAD. a new one rises. such is morning.','you have achieved violence. lateness continues.','the clock saw that coming. it has kids.']));
+      setTimeout(()=>{clock={x:120+Math.random()*360,y:110+Math.random()*140,r:52+Math.random()*14,hp:3,alive:true};},700);
+    } else {
+      snooze();
+    }
+  } else {
+    late+=2;snooze(true);
+    say('MISSED. you punched your nightstand. the nightstand remembers.');
+  }
+});
+function snooze(missed){
+  if(!missed){snoozes++;late+=5;}
+  __beep(500,.07);
+  document.getElementById('sn').textContent=snoozes;
+  updLate();
+}
+setInterval(()=>{late+=3;updLate();if(late>=100)fire();},900);
+function updLate(){document.getElementById('late').textContent=Math.min(100,late)+'%';}
+function fire(){
+  say('LATE % reached MAXIMUM. you are fired via carrier pigeon. clocks destroyed: '+destroyed+'. worth it? ...yeah. refresh to relive the glory.');
+  late=101;
+}
+(function draw(){
+  x.clearRect(0,0,W,H=360);
+  x.save();
+  if(shake>0){x.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);shake--;}
+  x.fillStyle='#31184a';x.fillRect(0,H-60,W,60);
+  if(clock.alive){
+    const wig=Math.sin(Date.now()/60)*3;
+    x.fillStyle='#ffe066';x.strokeStyle='#b8860b';x.lineWidth=6;
+    x.beginPath();x.arc(clock.x+wig,clock.y,clock.r,0,7);x.fill();x.stroke();
+    x.fillStyle='#111';
+    x.fillRect(clock.x-4,clock.y-clock.r*.55,8,clock.r*.6);
+    x.fillRect(clock.x+2,clock.y-4,clock.r*.5,7);
+    x.fillStyle='#ff5c5c';x.font='bold 13px Consolas';x.textAlign='center';
+    x.fillText('BEEP BEEP',clock.x+wig,clock.y-clock.r-12);x.textAlign='left';
+  }
+  for(let i=parts.length-1;i>=0;i--){
+    const p=parts[i];p.x+=p.vx;p.y+=p.vy;p.vy+=.3;if(--p.l<0){parts.splice(i,1);continue;}
+    x.fillStyle='#ffe066';x.fillRect(p.x,p.y,5,5);
+  }
+  x.restore();
+  requestAnimationFrame(draw);
+})();
+(function(){window.__beep=function(f,d,t){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.05;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>

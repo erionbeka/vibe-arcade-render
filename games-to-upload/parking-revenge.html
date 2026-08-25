@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>THE CLAW (PARKING REVENGE)</title>
+<style>
+  html,body{margin:0;height:100%;background:#0d1420;color:#dfeaf2;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+  h1{font-size:.95rem;color:#7ddcff;margin:0;text-align:center}
+  canvas{border:4px solid #2c4a5e;background:#141d29;touch-action:none}
+  #say{min-height:24px;text-align:center;color:#ffd23e;padding:0 10px}
+</style>
+</head>
+<body>
+<h1>THE CLAW<br>(someone took YOUR spot. the claw remembers.)</h1>
+<canvas id="c" width="600" height="380"></canvas>
+<div id="say">move mouse to position claw \u00B7 click to drop \u00B7 grab their car \u00B7 deposit it in "compensation bay"</div>
+<script>
+const cv=document.getElementById('c'),x=cv.getContext('2d'),W=600,H=380;
+let cx=W/2,clawY=60,dropping=false,open=true,car={x:W-160,y:H-90},grabbed=false,deposited=0,attempts=0;
+cv.addEventListener('pointermove',e=>{if(!dropping&&!grabbed){const r=cv.getBoundingClientRect();cx=Math.max(50,Math.min(W-50,e.clientX-r.left));}});
+cv.addEventListener('pointerdown',()=>{
+  if(dropping||grabbed)return;
+  dropping=true;attempts++;__beep(300,.08);
+});
+setInterval(()=>{
+  if(!grabbed&&dropping){
+    clawY+=7;
+    if(clawY>=car.y-20){
+      if(Math.abs(cx-car.x)<55){grabbed=true;__beep(650,.1);say('GOT IT. the car belongs to the sky now.');}
+      else{clawY=Math.min(clawY,H-30);}
+    }
+    if(clawY>=H-24&&!grabbed){dropping=false;clawY=60;say(pick(['empty claws. empty dreams.','you grabbed pure parking-lot energy.','miss. the car mocks you with its alarm.']));}
+  } else if(grabbed){
+    car.x+=(cx-car.x)*.2;car.y+=(clawY+26-car.y)*.2;clawY-=6;
+    if(clawY<=60){
+      dropping=false;clawY=60;
+      if(car.x>W-140&&car.x<W-30){
+        deposited++;
+        say('DEPOSITED! compensation secured. ('+deposited+' cars relocated)');
+        __beep(800,.15);__beep(1000,.2);
+        car={x:W-160,y:H-90};
+      } else {
+        say('dropped it outside the bay. it rolled away. poetic.');
+      }
+      grabbed=false;
+      car.y=H-90;if(!(car.x>W-140))car.x=W-160;
+    }
+  }
+},16);
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+(function draw(){
+  x.clearRect(0,0,W,H);
+  x.fillStyle='#1c2836';x.fillRect(0,H-70,W,70);
+  x.strokeStyle='#ffd700';x.setLineDash([14,10]);x.lineWidth=3;
+  x.strokeRect(W-130,H-80,120,72);x.setLineDash([]);
+  x.fillStyle='#89b8dd';x.font='bold 11px Consolas';x.textAlign='center';
+  x.fillText('COMPENSATION BAY',W-70,H-88);
+  // their car
+  if(!grabbed||true){
+    x.save();x.translate(car.x+(grabbed?0:0),car.y);
+    x.fillStyle='#e05252';x.fillRect(-48,-16,96,30);
+    x.fillStyle='#f28b8b';x.fillRect(-24,-30,48,18);
+    x.fillStyle='#111';x.beginPath();x.arc(-30,16,9,0,7);x.arc(30,16,9,0,7);x.fill();
+    x.restore();
+  }
+  // crane
+  x.fillStyle='#39424d';x.fillRect(0,0,W,34);
+  x.strokeStyle='#8a97a5';x.lineWidth=4;
+  x.beginPath();x.moveTo(cx,34);x.lineTo(cx,clawY);x.stroke();
+  const spread=grabbed?18:34;
+  x.beginPath();
+  x.moveTo(cx-4,clawY);x.lineTo(cx-spread,clawY+22);
+  x.moveTo(cx+4,clawY);x.lineTo(cx+spread,clawY+22);
+  x.stroke();
+  x.restore&&0;
+  requestAnimationFrame(draw);
+})();
+(function(){window.__beep=function(f,d,t){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.05;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>

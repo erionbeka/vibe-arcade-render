@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SLAP YOUR OWN HAND</title>
+<style>
+  html,body{margin:0;height:100%;background:#1a1210;color:#f5e9dc;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+  h1{font-size:.95rem;color:#ffb347;margin:0;text-align:center}
+  canvas{border:4px solid #4d3820;background:#241a12;cursor:none;touch-action:none}
+  #hud{display:flex;gap:22px}b{color:#ffd23e}
+  #say{min-height:24px;color:#c9a97a;text-align:center;padding:0 10px;width:min(460px,92vw)}
+</style>
+</head>
+<body>
+<h1>DIET MODE: SLAP YOUR OWN HAND<br>(the donut is a trap. your hand knows.)</h1>
+<canvas id="c" width="600" height="360"></canvas>
+<div id="hud"><span>DONUTS RESISTED <b id="w">0</b></span><span>DONUTS CONSUMED <b id="l">0</b></span><span>WILLPOWER <b id="wp">100%</b></span></div>
+<div id="say">your traitor hand crawls toward the donut on its own. click ON the hand to slap it away. the donut never moves. it doesn't have to.</div>
+<script>
+const cv=document.getElementById('c'),x=cv.getContext('2d');
+let hx=80,hy=180,hvx=0,hvy=0,wins=0,loss=0,will=100,t=0;
+const DONUT={x:480,y:180};
+cv.addEventListener('pointerdown',e=>{
+  const r=cv.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;
+  if(Math.hypot(mx-hx,my-hy)<40){
+    const d=Math.hypot(DONUT.x-hx,DONUT.y-hy);
+    if(d<90){
+      wins++;will=Math.min(100,will+6);
+      __beep(700,.07);say('SLAP! the hand retreats in shame.');
+    } else {
+      __beep(300,.05);say('slapped air. the donut giggles somewhere.');
+    }
+    hvx*=-1.2;hvy=(Math.random()-.5)*8-4;
+  } else {will-=3;upd();say('you slapped the table. strategy: questionable.');}
+});
+setInterval(()=>{
+  t++;
+  const dx=DONUT.x-hx,dy=DONUT.y-hy,d=Math.hypot(dx,dy);
+  hvx+=dx/d*.09;hvy+=dy/d*.09;
+  const wob=Math.sin(t*.05)*(1-will/150);
+  hvx+=Math.cos(t*.13)*wob*.5;hvy+=Math.sin(t*.17)*wob*.5;
+  hx+=hvx;hy+=hvy;
+  if(hx<20||hx>W-20)hvx*=-1;if(hx<20)hx=20;if(hx>W-20)hx=W-20;
+  if(hy<20||hy>H-20)hvy*=-1;if(hy<20)hy=20;if(hy>H-20)hy=H-20;
+  if(d<34){
+    loss++;wins=Math.max(0,wins);will-=18;
+    hx=60;hy=60+Math.random()*200;hvx=hvy=0;
+    __beep(120,.25,'sawtooth');say('CONSUMED. the donut wins round '+loss+'. "just one," you said, '+loss+' times.');
+    upd();
+    if(will<=0){say('WILLPOWER DEPLETED. you are now 40% glaze. final score: '+wins+' slaps of honor vs '+loss+' defeats. refresh to diet again.');}
+  }
+},16);
+function upd(){
+  document.getElementById('w').textContent=wins;
+  document.getElementById('l').textContent=loss;
+  document.getElementById('wp').textContent=Math.max(0,Math.round(will))+'%';
+}
+(function draw(){
+  x.clearRect(0,0,600,360);
+  // donut
+  x.fillStyle='#ff9d76';x.beginPath();x.arc(DONUT.x,DONUT.y,30,0,7);x.fill();
+  x.fillStyle='#241a12';x.beginPath();x.arc(DONUT.x,DONUT.y,10,0,7);x.fill();
+  x.fillStyle='#ff5c8a';for(const [dx,dy] of [[-14,-8],[10,-12],[16,6],[-8,12]]){x.beginPath();x.arc(DONUT.x+dx,DONUT.y+dy,3,0,7);x.fill();}
+  x.font='bold 11px Consolas';x.fillStyle='#ffb347';x.textAlign='center';
+  x.fillText('THE DONUT',DONUT.x,DONUT.y+48);
+  // hand
+  x.fillStyle='#e8a97e';x.beginPath();x.ellipse(hx,hy,22,15,Math.atan2(hvy,hvx),0,7);x.fill();
+  x.fillStyle='#d99a6c';x.beginPath();x.ellipse(hx+14,hy,8,6,Math.atan2(hvy,hvx),0,7);x.fill();
+  x.fillStyle='#111';x.fillRect(hx-6,hy-8,3,3);
+  x.textAlign='left';
+  requestAnimationFrame(draw);
+})();
+(function(){window.__beep=function(f,d,t){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.05;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>

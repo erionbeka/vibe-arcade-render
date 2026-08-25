@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PERFORMANCE REVIEW: FINAL BOSS</title>
+<style>
+  html,body{margin:0;height:100%;background:#1a0d0d;color:#ffe9e0;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+  h1{font-size:.95rem;color:#ff5c5c;margin:0;text-align:center}
+  canvas{border:4px solid #5e2f18;background:#241210;touch-action:none}
+  #say{min-height:24px;color:#ffd23e;text-align:center;padding:0 10px}
+</style>
+</head>
+<body>
+<h1>PERFORMANCE REVIEW: FINAL BOSS</h1>
+<canvas id="c" width="600" height="400"></canvas>
+<div id="say">arrows/A-D to dodge memos \u00B7 click / space to throw staplers \u00B7 survive his review score</div>
+<script>
+const cv=document.getElementById('c'),x=cv.getContext('2d'),W=600,H=400;
+let px=W/2,hp=5,bossHp=100,t=0,memos=[],staplers=[],parts=[],dead=false,won=false,score=100,inv=0;
+const BOSSLINES=['your Q3 output was "a vibe"','we are moving your desk to the load-bearing wall','per my last email...','this will go in your permanent record','synergy seminar: mandatory. weekend.','i too once had dreams'];
+addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','a','d'].includes(e.key))keys[e.key]=1;if(e.code==='Space')throwSt();});
+addEventListener('keyup',e=>keys[e.key]=0);
+const keys={};
+cv.addEventListener('pointerdown',throwSt);
+function throwSt(){
+  if(dead||won)return;
+  staplers.push({x:px,y:H-70,vy:-9});
+  __beep(600,.05);
+}
+setInterval(()=>{
+  if(dead||won)return;
+  t++;
+  if(keys.ArrowLeft||keys.a)px-=6;
+  if(keys.ArrowRight||keys.d)px+=6;
+  px=Math.max(30,Math.min(W-30,px));
+  if(t%Math.max(26,60-Math.floor((100-score)))===0){
+    memos.push({x:40+Math.random()*(W-80),y:-20,v:2.4+Math.random()*1.4,line:BOSSLINES[Math.floor(Math.random()*BOSSLINES.length)]});
+    score=Math.max(0,score-1);
+  }
+  for(let i=memos.length-1;i>=0;i--){
+    const m=memos[i];m.y+=m.v;
+    if(m.y>330&&Math.abs(m.x-px)<34&&inv<=0){
+      memos.splice(i,1);hp--;inv=40;__beep(120,.25,'sawtooth');shake=12;
+      say('"'+m.line+'" -10 self esteem');
+      if(hp<=0)return die();
+    } else if(m.y>H+30)memos.splice(i,1);
+  }
+  for(let i=staplers.length-1;i>=0;i--){
+    const s=staplers[i];s.y+=s.vy;s.vy+=-.15;
+    if(s.y<130&&s.y>90&&Math.abs(s.x-W/2+(Math.sin(t*.05)*40))<60){
+      staplers.splice(i,1);
+      bossHp-=6;__beep(700,.06);shake=5;
+      parts.push({x:s.x,y:s.y,vx:(Math.random()-.5)*4,vy:-3,life:20});
+      if(bossHp<=0){win();}
+    }
+  }
+  inv--;
+},16);
+let shake=0;
+function die(){dead=true;say('you have been placed on a PIP (Personal Incineration Plan). refresh to unionize.');}
+function win(){won=true;__beep(800,.2);__beep(1000,.3);say('THE BOSS HAS BEEN REVIEWED. outcome: needs improvement. you: promoted to legend.');}
+function say(t2){document.getElementById('say').textContent=t2;}
+(function draw(){
+  x.clearRect(0,0,W,H);
+  x.save();
+  if(shake>0){x.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);shake--;}
+  // boss
+  const bx=W/2+Math.sin(t*.05)*40;
+  x.fillStyle='#5c1f1f';x.fillRect(bx-55,60,110,90);
+  x.fillStyle='#ffb997';x.beginPath();x.arc(bx,50,26,0,7);x.fill();
+  x.fillStyle='#222';x.fillRect(bx-14,42,28,8);
+  x.fillStyle='#fff';x.font='bold 11px Consolas';x.textAlign='center';
+  x.fillText('FINAL BOSS',bx,86);
+  x.fillStyle='#ff5c5c';x.fillText(score+'% review',bx,102);
+  // boss hp bar
+  x.fillStyle='#300';x.fillRect(150,20,300,14);
+  x.fillStyle='#ff5c5c';x.fillRect(150,20,300*bossHp/100,14);
+  x.restore();
+  for(const m of memos){x.fillStyle='#fdf6d8';x.save();x.translate(m.x,m.y);x.rotate(.2);x.fillRect(-13,-9,26,18);x.strokeStyle='#999';x.strokeRect(-13,-9,26,18);x.restore();}
+  for(const s of staplers){x.fillStyle='#e05252';x.fillRect(s.x-7,s.y-4,14,8);}
+  for(let i=parts.length-1;i>=0;i--){const p=parts[i];p.x+=p.vx;p.y+=p.vy;p.vy+=.2;if(--p.life<0){parts.splice(i,1);continue;}x.fillStyle='#ffd23e';x.fillRect(p.x,p.y,4,4);}
+  // player
+  x.fillStyle='#42a5f5';x.fillRect(px-22,H-64,44,44);
+  x.fillStyle='#fff';x.fillRect(px-10,H-52,20,6);
+  x.restore();
+  requestAnimationFrame(draw);
+})();
+(function(){window.__beep=function(f,d,t2){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t2||'square';o.frequency.value=f;g.gain.value=.05;g.gain.exponentialRampToValueAtTime(.001,a.currentTime+d);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>

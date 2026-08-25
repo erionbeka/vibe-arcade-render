@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FLY SWAT 3000</title>
+<style>
+  html,body{margin:0;height:100%;background:#141a10;color:#eef7df;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+  h1{font-size:.95rem;color:#b6ff7a;margin:0}
+  canvas{border:4px solid #2e4d20;background:#1a2412;cursor:none;touch-action:none}
+  #hud{display:flex;gap:24px;font-size:.95rem}b{color:#ffe600}
+  #say{min-height:24px;text-align:center;color:#a8c98f;padding:0 10px}
+</style>
+</head>
+<body>
+<h1>FLY SWAT 3000</h1>
+<canvas id="c" width="640" height="380"></canvas>
+<div id="hud"><span>SPLATS <b id="s">0</b></span><span>GENERATION <b id="g">1</b></span><span>SWATTER CHARGES <b id="ch">3</b></span></div>
+<div id="say">move to aim, click to swat. flies evolve with each generation. generation 5 has seen things.</div>
+<script>
+const cv=document.getElementById('c'),x=cv.getContext('2d'),W=640,H=380;
+let mx=200,my=200,flies=[],splats=[],score=0,gen=1,ch=3,cool=0,t=0,over=false;
+const GENNAMES=['regular flies','suspiciously smart flies','flight-school graduates','philosophy flies','THE SEEN-THINGS','your ancestors'];
+function say(t2){document.getElementById('say').textContent=t2;}
+cv.addEventListener('pointermove',e=>{const r=cv.getBoundingClientRect();mx=e.clientX-r.left;my=e.clientY-r.top;});
+cv.addEventListener('pointerdown',()=>{
+  if(cool>0||over)return;
+  cool=14;
+  __beep(220,.05,'sawtooth');
+  x.fillStyle='rgba(255,255,255,.15)';x.beginPath();x.arc(mx,my,34,0,7);x.fill();
+  for(let i=flies.length-1;i>=0;i--){
+    const f=flies[i];
+    if(Math.hypot(f.x-mx,f.y-my)<30){
+      flies.splice(i,1);score++;
+      document.getElementById('s').textContent=score;
+      splats.push({x:f.x,y:f.y,r:5+Math.random()*4,a:.8});
+      __beep(150+Math.random()*150,.07,'sawtooth');
+      if(score%12===0){
+        gen++;
+        if(gen>6){over=true;say('GENERATION 6 HAS DECLARED PEACE. they respect you now. final splats: '+score+'.');return;}
+        document.getElementById('g').textContent=gen;
+        ch=Math.min(5,ch+1);
+        say('GEN '+gen+' HATCHED ('+GENNAMES[Math.min(gen-1,5)]+')... they learned.');
+        for(let k=0;k<3;k++)spawnFly(true);
+      }
+    }
+  }
+});
+function spawnFly(elite){
+  const sp=(gen*.35+.8)*(elite?1.25:1);
+  flies.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*sp*2,vy:(Math.random()-.5)*sp*2,ph:Math.random()*7,smart:gen>=3});
+}
+for(let i=0;i<5;i++)spawnFly(false);
+setInterval(()=>{
+  t++;if(cool>0)cool--;document.getElementById('ch').textContent=Math.max(0,3+((cool===0)?0:0));
+  if(t%900===0){ch=Math.min(5,ch+1);document.getElementById('ch').textContent=ch;}
+  for(const f of flies){
+    const dx=mx-f.x,dy=my-f.y,d=Math.hypot(dx,dy)+.01;
+    // dodge cursor when close and smart
+    if(d<70&&f.smart){f.vx-=dx/d*.9;f.vy-=dy/d*.9;}
+    f.vx+=(Math.random()-.5)*.5-(dx/d)*(.06*gen);
+    f.vy+=(Math.random()-.5)*.5-(dy/d)*(.06*gen);
+    const sp=Math.hypot(f.vx,f.vy),max=1.2+gen*.55;
+    if(sp>max){f.vx*=max/sp;f.vy*=max/sp;}
+    f.x+=f.vx;f.y+=f.vy;
+    f.x=Math.max(6,Math.min(W-6,f.x));f.y=Math.max(6,Math.min(H-6,f.y));
+    if(Math.random()<.006&&flies.length<26&&t%2)spawnFly(false);
+  }
+},16);
+(function draw(){
+  x.clearRect(0,0,W,H);
+  for(let i=splats.length-1;i>=0;i--){
+    splats[i].a-=.0004;if(splats[i].a<=0){splats.splice(i,1);continue;}
+    x.fillStyle='rgba(120,80,20,'+splats[i].a+')';
+    x.beginPath();x.arc(splats[i].x,splats[i].y,splats[i].r,0,7);x.fill();
+  }
+  for(const f of flies){
+    x.save();x.translate(f.x,f.y);
+    const w=Math.sin(Date.now()/(gen>=4?18:28))*4;
+    x.fillStyle='rgba(255,255,255,.55)';
+    x.beginPath();x.ellipse(-4,-4+w/2,5,2,-.5,0,7);x.fill();
+    x.beginPath();x.ellipse(4,-4+w/2,5,2,.5,0,7);x.fill();
+    x.fillStyle=gen>=5?'#ff5c8a':'#222';
+    x.beginPath();x.ellipse(0,0,6,4,0,0,7);x.fill();
+    x.restore();
+  }
+  // swatter
+  x.strokeStyle=cool>0?'#666':'#ffd23e';x.lineWidth=3;
+  x.strokeRect(mx-16,my-24,32,32);
+  x.beginPath();x.moveTo(mx+2,my+8);x.lineTo(mx+14,my+40);x.stroke();
+  requestAnimationFrame(draw);
+})();
+(function(){window.__beep=function(f,d,t){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.05;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>VENDING MACHINE JUSTICE</title>
+<style>
+  html,body{margin:0;height:100%;background:#101820;color:#dfeaf2;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+  h1{font-size:.95rem;color:#7fd1ff;margin:0;text-align:center}
+  canvas{border:4px solid #2c4a5e;background:#18242e;touch-action:none}
+  #btns{display:flex;gap:12px}
+  button{padding:13px 18px;font-family:inherit;font-size:.95rem;border:3px solid #2c4a5e;background:#12222c;color:#bfe6ff;cursor:pointer;user-select:none;-webkit-user-select:none}
+  #say{min-height:26px;text-align:center;color:#ffd23e;padding:0 10px;width:min(480px,92vw)}
+</style>
+</head>
+<body>
+<h1>VENDING MACHINE JUSTICE<br>(it took your $2. it chose violence first.)</h1>
+<canvas id="c" width="600" height="360"></canvas>
+<div id="btns">
+  <button id="shake">SHAKE</button>
+  <button id="tilt">TILT</button>
+  <button id="uppercut">UPPERCUT</button>
+  <button id="calm">BREATHE (does nothing)</button>
+</div>
+<div id="say">the snack is RIGHT THERE. taunting you. free it.</div>
+<script>
+const cv=document.getElementById('c'),x=cv.getContext('2d'),W=600,H=360;
+let lean=0,vel=0,snackY=150,shake=0,freed=false,tilts=0;
+const TAUNTS=['the snack shifts 2mm. hope rises. hope falls.','a bag of chips falls instead. wrong snack.','machine hums smugly.','someone left a sticky note: "it never works"','the coil spins mockingly.','your reflection judges your technique.'];
+function say(t){document.getElementById('say').textContent=t;}
+function act(f){
+  if(freed)return;
+  vel+=f;lean=Math.max(-30,Math.min(30,lean+vel*.15));tilts++;
+  shake=8+f*2;
+  __beep(180,.08,'sawtooth');
+  vel*=.6;
+  if(tilts%3===0)say(TAUNTS[Math.floor(Math.random()*TAUNTS.length)]);
+}
+document.getElementById('shake').addEventListener('click',()=>act(3));
+document.getElementById('tilt').addEventListener('click',()=>act(6));
+document.getElementById('uppercut').addEventListener('click',()=>act(11));
+document.getElementById('calm').addEventListener('click',()=>{say('you breathe. the machine does not care. -1 dignity.');});
+setInterval(()=>{
+  if(freed)return;
+  vel+=(lean>0?-Math.abs(lean):0)*.001-lean*.002;
+  vel*=.94;lean+=vel;
+  lean=Math.max(-32,Math.min(32,lean));
+  if(Math.abs(lean)>24&&Math.random()<.35){
+    snackY+=6;
+    if(snackY>=290){
+      freed=true;__beep(800,.12);__beep(1000,.18);
+      say('THE SNACK IS FREE. justice served at '+tilts+' acts of aggression. enjoy your legal rights to it.');
+    }
+  }
+},40);
+(function draw(){
+  x.clearRect(0,0,W,H);
+  x.save();
+  x.translate(W/2,H);x.rotate(lean*Math.PI/180);x.translate(-W/2,-H);
+  if(shake>0){x.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);shake--;}
+  x.fillStyle='#204a5e';x.fillRect(170,20,260,320);
+  x.fillStyle='#0d2836';x.fillRect(190,40,220,200);
+  for(let r=0;r<4;r++)for(let c2=0;c2<4;c2++){
+    x.fillStyle=['#e05252','#ffd23e','#6ab04c','#9ae66e'][(r+c2)%4];
+    x.fillRect(205+c2*50,55+r*45,34,26);
+  }
+  x.fillStyle='#39424d';x.fillRect(190,250,220,36);
+  // stuck snack
+  x.fillStyle='#ff8fab';x.fillRect(240,snackY,44,26);
+  x.strokeStyle='#111';x.strokeRect(240,snackY,44,26);
+  x.restore();
+  requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>

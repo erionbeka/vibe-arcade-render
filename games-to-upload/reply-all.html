@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>REPLY ALL: APOCALYPSE</title>
+<style>
+  html,body{margin:0;height:100%;background:#0e1420;color:#dfe8f2;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+  h1{font-size:.95rem;color:#ff8a8a;margin:0;text-align:center}
+  #feed{width:min(520px,92vw);height:250px;border:3px solid #2c3a47;background:#141c26;overflow:hidden;padding:10px;font-size:.85rem;line-height:1.5}
+  .m{padding:6px 10px;margin-bottom:6px;background:#1c2836;border-left:4px solid #58a6ff}
+  .m.bad{border-color:#ff5c5c}
+  .m b{color:#ffd23e}
+  button{padding:12px 22px;font-family:inherit;border:3px solid #ff5c5c;background:#241210;color:#ffc9c9;cursor:pointer;font-size:.95rem}
+  #hud{color:#9fb0c0}b{color:#7dff8a}
+</style>
+</head>
+<body>
+<h1>REPLY-ALL APOCALYPSE<br>you replied "lol nice" to the ENTIRE company. recall it before the CEO reads.</h1>
+<div id="feed"></div>
+<button id="recall">RECALL! RECALL!!</button>
+<div id="hud">READS BLOCKED: <b id="n">0</b> \u00B7 CEO PROGRESS <span id="ceo">0%</span></div>
+<script>
+const NAMES=['Dave','Linda','HR Bot','Kevin','the intern','Accounting','Facilities','Dave (again)'];
+const CHAOS=['"lol nice" - seen by all 842 employees','Dave replied "what\'s nice?"','Linda explained what was nice. in detail.','HR scheduled a meeting about tone.','Kevin replied-all asking to be removed. adding everyone again.','the printer replied somehow.','legal is now CC\'d. legal has questions.','the CEO just opened their phone...'];
+let blocked=0,ceo=0,t=0,over=false;
+const feed=document.getElementById('feed');
+function addM(text,bad){
+  const d=document.createElement('div');d.className='m'+(bad?' bad':'');
+  d.innerHTML=text;
+  feed.prepend(d);
+  while(feed.children.length>6)feed.lastChild.remove();
+}
+setInterval(()=>{
+  if(over)return;
+  t++;
+  ceo+=Math.random()*1.4+blocked*.05;
+  document.getElementById('ceo').textContent=Math.min(100,Math.round(ceo))+'%';
+  if(t%2===0){
+    const nm=NAMES[Math.floor(Math.random()*NAMES.length)];
+    addM('<b>'+nm+'</b> is typing...');
+  } else {
+    addM('<b>'+nm()+'</b><br>'+CHAOS[Math.floor(Math.random()*CHAOS.length)],true);
+  }
+  if(ceo>=100){
+    over=true;
+    feed.innerHTML='<div class="m bad"><b>CEO:</b> "nice."<br><br>You have been invited to a special meeting.<br>It will not have been an email.</div>';
+    document.getElementById('recall').style.display='none';
+  }
+},700);
+function nm(){return NAMES[Math.floor(Math.random()*NAMES.length)];}
+document.getElementById('recall').addEventListener('click',()=>{
+  blocked++;__beep(600,.06);
+  ceo=Math.max(0,ceo-2.5);
+  document.getElementById('n').textContent=blocked;
+  document.getElementById('ceo').textContent=Math.min(100,Math.round(ceo))+'%';
+  const kids=feed.children;if(kids.length)kids[Math.floor(Math.random()*kids.length)].remove();
+});
+(function(){window.__beep=function(f,d,t){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.05;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MOM INCOMING: SPEED CLEAN</title>
+<style>
+  html,body{margin:0;height:100%;background:#141a12;color:#eaf5ea;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+  h1{font-size:.95rem;color:#8ef58e;margin:0;text-align:center}
+  canvas{border:4px solid #2e5c2e;background:#18231a;touch-action:none}
+  #say{min-height:26px;text-align:center;color:#b7d9b7;padding:0 10px;width:min(480px,92vw)}
+</style>
+</head>
+<body>
+<h1>MOM INCOMING: SPEED CLEAN<br>(hide the mess before she crosses the driveway)</h1>
+<canvas id="c" width="600" height="380"></canvas>
+<div id="say">drag each mess item into the closet (top-right) before the timer ends. she notices EVERYTHING.</div>
+<script>
+const cv=document.getElementById('c'),x=cv.getContext('2d'),W=600,H=380;
+let mess=[],drag=null,timer=30,momX=-80,won=false,over=false;
+const NAMES=['dirty sock','pizza box','homework (F-)','mystery cup','gym bag','suspicious stain','game controller','week-old fries'];
+function spawn(){
+  mess.length=0;
+  for(let i=0;i<6;i++)mess.push({x:40+Math.random()*380,y:120+Math.random()*200,name:NAMES[i],w:70});
+}
+spawn();
+cv.addEventListener('pointerdown',e=>{
+  const r=cv.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;
+  drag=mess.find(m=>Math.abs(mx-m.x)<45&&Math.abs(my-m.y)<22)||null;
+});
+addEventListener('pointermove',e=>{
+  if(!drag)return;
+  const r=cv.getBoundingClientRect();
+  drag.x=e.clientX-r.left;drag.y=e.clientY-r.top;
+});
+addEventListener('pointerup',()=>{
+  if(!drag)return;
+  if(drag.x>W-120&&drag.y<110){
+    mess.splice(mess.indexOf(drag),1);
+    __beep(700,.06);
+    say('hidden: '+drag.name+'! ('+mess.length+' to go)');
+    if(!mess.length){won=true;}
+  }
+  drag=null;
+});
+setInterval(()=>{
+  if(over)return;
+  timer-=.25;
+  momX=Math.min(W*.62,momX+(30-timer)*.012+1.4);
+  if(timer<=0||momX>=W*.55&&!mess.length){}
+  if(won){
+    over=true;momX=W*.62;
+    setTimeout(()=>{
+      say('CLEAN! Mom inspects. finds nothing. says "good boy" to a 34-year-old. VICTORY nonetheless.');
+      __beep(800,.15);__beep(1000,.2);
+    },400);
+  }
+},250);
+setInterval(()=>{
+  if(over)return;
+  timer-=1;
+  document.getElementById('say').textContent='mom ETA: '+Math.ceil(timer)+'s \u00B7 items left: '+mess.length;
+  if(timer<=0){
+    over=true;won=false;
+    say('SHE ARRIVED. she found the mystery cup. she always finds the mystery cup.<br>refresh for another chance at maternal approval.');
+  }
+},1000);
+(function draw(){
+  x.clearRect(0,0,W,H);
+  x.fillStyle='#20301f';x.fillRect(0,H-60,W,60);
+  // closet
+  x.fillStyle='#3a2d18';x.fillRect(W-130,20,120,100);
+  x.strokeStyle='#ffd23e';x.lineWidth=3;x.strokeRect(W-130,20,120,100);
+  x.fillStyle='#ffe9a8';x.font='bold 12px Consolas';x.textAlign='center';
+  x.fillText('CLOSET',W-70,74);x.textAlign='left';
+  // mom approaching
+  x.fillStyle='#e8b04b';x.beginPath();x.arc(momX,H-90,16,0,7);x.fill();
+  x.fillStyle='#c94f4f';x.fillRect(momX-14,H-72,28,44);
+  x.fillStyle='#fff';x.font='bold 10px Consolas';x.textAlign='center';
+  x.fillText('MOM',momX,H-96);x.textAlign='left';
+  for(const m of mess){
+    x.fillStyle=m===drag?'#fff':'#b8a888';
+    x.fillRect(m.x-35,m.y-14,70,28);
+    x.fillStyle='#111';x.font='bold 9px Consolas';x.textAlign='center';
+    x.fillText(m.name,m.x,m.y+3);x.textAlign='left';
+  }
+  requestAnimationFrame(draw);
+})();
+(function(){window.__beep=function(f,d,t){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.05;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>

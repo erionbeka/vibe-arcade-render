@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>UNSUBSCRIBE FOREVER</title>
+<style>
+  html,body{margin:0;height:100%;background:#101418;color:#e8eef2;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+  h1{font-size:.95rem;color:#89b8dd;margin:0;text-align:center}
+  .box{width:min(460px,92vw);background:#1a222b;border:3px solid #37474f;padding:20px;text-align:center;font-size:.95rem;line-height:1.6}
+  .box b{color:#ffd23e}
+  .row{display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap}
+  button{padding:10px 16px;font-family:inherit;border:none;border-radius:6px;cursor:pointer;font-size:.85rem}
+  .no{background:#37474f;color:#b0bec5}
+  .yes{background:#43a047;color:#fff}
+  .tiny{font-size:.72rem !important;opacity:.7}
+</style>
+</head>
+<body>
+<h1>UNSUBSCRIBE FOREVER<br>(one newsletter to end them all)</h1>
+<div class="box" id="box">
+  <b>Are you sure you want to unsubscribe?</b>
+  <p style="color:#888;margin-top:8px">This newsletter brings joy to thousands. (citation needed)</p>
+  <div class="row">
+    <button class="no">Keep subscribing</button>
+    <button class="yes" onclick="next(1)">Yes, unsubscribe</button>
+  </div>
+</div>
+<script>
+let step=0;
+const STEPS=[
+ ['Wait. Are you SURE sure?','We will tell the other newsletters about this.'],
+ ['Please complete this quick survey (11 pages)','Why are you leaving? Options: [all of them apply]','Rate your unsubscribe experience out of 10.'],
+ ['Emotional stage: denial','This is probably a mistake on YOUR end.','Have you tried not unsubscribing instead?'],
+ ['Our lawyer would like a word','The newsletter waives its right to remain silent.','It says it loves you. Newsletters can lie though.'],
+ ['Final confirmation (we mean it this time)','By unsubscribing you also unsubscribe from peace.','Last chance to click the OTHER button. We are begging.']
+];
+function next(n){
+  step+=n;
+  const box=document.getElementById('box');
+  if(step>=STEPS.length+1){
+    box.innerHTML='<b style="color:#7dff8a">UNSUBSCRIBED!</b><p style="color:#888;margin-top:8px">You will receive a confirmation email shortly,<br>followed by a farewell email,<br>followed by a "we miss you" email,<br>followed by a NEW newsletter from a different department of the same company.<br><br>\u2713 freedom (terms apply)</p><button class="yes" onclick="location.reload()">subscribe again out of guilt</button>';
+    return;
+  }
+  const lines=STEPS[Math.min(STEPS.length-1,step)];
+  let html='<b>'+(typeof lines==='string'?lines:lines[0])+'</b>';
+  if(Array.isArray(lines))html+='<p style="color:#888;margin-top:8px">'+lines.slice(1).join('<br>')+'</p>';
+  html+='<div class="row"><button class="no" onclick="next(0)">Fine, keep subscribing</button><button class="yes" style="font-size:'+(0.85-step*.06)+'rem" onclick="next(1)">unsubscribe (for real)</button></div>';
+  if(step>2)html+='<button class="no tiny" style="margin-top:8px" onclick="next(1)">i am 100% absolutely certain (tiny button)</button>';
+  document.getElementById('box').innerHTML=html+'';
+  __beep(300+step*80,.05);
+}
+(function(){window.__beep=function(f,d,t){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.05;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>INBOX ZERO (RAGE EDITION)</title>
+<style>
+  html,body{margin:0;height:100%;background:#101418;color:#e8eef2;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+  h1{font-size:.95rem;color:#89b8dd;margin:0;text-align:center}
+  #mail{width:min(520px,92vw);height:300px;border:3px solid #37474f;background:#182128;position:relative;overflow:hidden}
+  .em{position:absolute;left:8px;right:8px;padding:8px 12px;background:#22303a;border-left:5px solid #ff5c5c;font-size:.85rem;cursor:pointer;user-select:none}
+  .em small{color:#8fa0b0}
+  #hud{display:flex;gap:24px}b{color:#7dff8a}
+</style>
+</head>
+<body>
+<h1>INBOX ZERO (RAGE EDITION)<br>click emails to shred them into nothing</h1>
+<div id="mail"></div>
+<div id="hud"><span>SHREDDED <b id="n">0</b></span><span>THERAPY BILLS SAVED <b id="d">$0</b></span></div>
+<script>
+const FROMS=['CEO (urgent!!)','noreply-no-reply@actual-no-reply','HR but fun','"Re: Re: Re: Re: Re:"','your landlord','crypto cousin','meeting bot','the printer','legal-ish','DEFINITELY not spam'];
+const SUBJ=['Synergy alignment sync #482','URGENT: the color blue','Quick question (47 pages attached)','You have been invited to watch a calendar','RENT UP 40% :)','to the moon cousin...','Meeting about the meeting doc','PC LOAD LETTER','Per my last 14 emails','claim your FREE crypto (real)'];
+let n=0,dollars=0;
+const box=document.getElementById('mail');
+function spawn(){
+  const d=document.createElement('div');d.className='em';
+  d.innerHTML='<b>'+FROMS[Math.floor(Math.random()*FROMS.length)]+'</b><br><small>'+SUBJ[Math.floor(Math.random()*SUBJ.length)]+'</small>';
+  d.style.top=Math.random()*(240)+'px';
+  d.addEventListener('click',()=>{
+    d.remove();n++;dollars+=17;
+    document.getElementById('n').textContent=n;
+    document.getElementById('d').textContent='$'+dollars;
+    __beep(200+Math.random()*400,.05,'sawtooth');
+  });
+  box.appendChild(d);
+}
+for(let i=0;i<9;i++)spawn();
+setInterval(()=>{if(box.children.length<12)spawn();},700);
+(function(){window.__beep=function(f,d,t){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.04;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AIR HOCKEY vs THE WALL</title>
+<style>
+  html,body{margin:0;height:100%;background:#0a1a24;color:#e3f6ff;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+  h1{font-size:.95rem;color:#4dd0e1;margin:0}
+  canvas{border:4px solid #14506b;background:#0d2836;cursor:none;touch-action:none}
+  #taunt{min-height:28px;color:#ffd23e;text-align:center;padding:0 10px}
+  #score{font-size:1.2rem;color:#fff}
+</style>
+</head>
+<body>
+<h1>AIR HOCKEY vs THE WALL OF REJECTION</h1>
+<canvas id="c" width="500" height="600"></canvas>
+<div id="score">you 0 &mdash; 0 wall</div>
+<div id="taunt">first to 7. the wall has never lost. technically.</div>
+<script>
+const cv=document.getElementById('c'),x=cv.getContext('2d'),W=500,H=600;
+let px=W/2,puck={x:W/2,y:H/2,vx:2.5,vy:3},ps=0,ws=0,rally=0,frozen=true;
+const TAUNTS=['the wall remains unbothered.','my grandmother hits harder.','is the puck scary?','i am a wall. and yet.','skill issue detected.','air friction sends regards.'];
+const PRAISE=['lucky.','beginner luck noted.','the wall felt that one. barely.'];
+cv.addEventListener('pointermove',e=>{const r=cv.getBoundingClientRect();px=Math.max(50,Math.min(W-50,e.clientX-r.left));});
+function serve(dir){puck={x:W/2,y:H/2,vx:(Math.random()-.5)*4,vy:dir*(3+Math.random()*1.5)};frozen=false;}
+function reset(scorer){
+  frozen=true;
+  if(scorer==='p'){ps++;__beep(800,.12);document.getElementById('taunt').textContent=PRAISE[Math.floor(Math.random()*PRAISE.length)];}
+  else{ws++;__beep(150,.25,'sawtooth');document.getElementById('taunt').textContent=TAUNTS[Math.floor(Math.random()*TAUNTS.length)];}
+  document.getElementById('score').innerHTML='you '+ps+' &mdash; '+ws+' wall';
+  if(ps>=7||ws>=7){
+    const won=ps>=7;
+    document.getElementById('taunt').innerHTML=won?'<b style="color:#7dff8a">IMPOSSIBLE. THE WALL HAS BEEN DEFEATED.</b><br>the wall demands a rematch in its heart.':'<b style="color:#ff5c5c">THE WALL WINS.</b><br>as prophesied. as always.';
+    ps=0;ws=0;
+    setTimeout(()=>serve(won?-1:1),1800);
+    return;
+  }
+  setTimeout(()=>serve(scorer==='w'?-1:1),900);
+}
+setInterval(()=>{
+  if(frozen)return;
+  rally++;
+  puck.x+=puck.vx;puck.y+=puck.vy;
+  if(puck.x<14){puck.x=14;puck.vx*=-1;__beep(300,.03);}
+  if(puck.x>W-14){puck.x=W-14;puck.vx*=-1;__beep(300,.03);}
+  // wall paddle (AI)
+  const target=puck.x+(rally%9===0?(Math.random()-.5)*90:Math.sin(Date.now()/400)*18);
+  wx+=Math.max(-7.5,Math.min(7.5,target-wx));
+  // collisions
+  hit(wx,40,-1);
+  hit(px,H-40,1);
+  if(puck.y<-20)reset('p');
+  if(puck.y>H+20)reset('w');
+},16);
+let wx=W/2;
+function hit(padX,padY,side){
+  const dx=puck.x-padX;
+  if(Math.abs(dx)<52&&((side<0&&puck.y<padY+26&&puck.y>padY-16)||(side>0&&puck.y>padY-26&&puck.y<padY+16))){
+    puck.y=padY+side*27;
+    const speed=Math.min(11,Math.hypot(puck.vx,puck.vy)+.55);
+    const angle=(dx/52)*(Math.PI/3);
+    puck.vx=Math.sin(angle)*speed+puck.vx*.15;
+    puck.vy=-side*Math.abs(Math.cos(angle)*speed);
+    __beep(side<0?250:450,.05);
+    rally=0;
+  }
+}
+(function draw(){
+  x.clearRect(0,0,W,H);
+  x.strokeStyle='#1b4a61';x.lineWidth=3;
+  x.beginPath();x.moveTo(0,H/2);x.lineTo(W,H/2);x.stroke();
+  x.beginPath();x.arc(W/2,H/2,56,0,7);x.stroke();
+  x.fillStyle='#ef5350';x.fillRect(wx-50,22,100,16);
+  x.fillStyle='#42a5f5';x.fillRect(px-50,H-38,100,16);
+  x.beginPath();x.arc(px,H-30,26,.2,Math.PI-.2);x.fill();
+  x.fillStyle='#fff';x.shadowColor='#fff';x.shadowBlur=12;
+  x.beginPath();x.arc(puck.x,puck.y,13,0,7);x.fill();
+  x.shadowBlur=0;
+  requestAnimationFrame(draw);
+})();
+serve(1);frozen=true;setTimeout(()=>serve(1),1200);
+(function(){window.__beep=function(f,d,t){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.06;g.gain.exponentialRampToValueAtTime(.001,a.currentTime+d);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>

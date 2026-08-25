@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>REVERSE MAZE</title>
+<style>
+  html,body{margin:0;height:100%;background:#0a0f14;color:#cfe8ff;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+  h1{font-size:.95rem;color:#4dd0e1;margin:0;text-align:center}
+  canvas{border:4px solid #1e3d52;background:#0d1620;touch-action:none}
+  #say{min-height:24px;color:#ffd23e;text-align:center;padding:0 10px;width:min(480px,92vw)}
+</style>
+</head>
+<body>
+<h1>REVERSE MAZE<br>(the controls signed a new contract)</h1>
+<canvas id="c" width="520" height="420"></canvas>
+<div id="say">reach the green door. after your first move, the maze renegotiates your controls.</div>
+<script>
+const c=document.getElementById('c'),x=c.getContext('2d');
+const MAZE=[
+ '#########################',
+ '#S..#...........#.......#',
+ '#.#.#.#########.#.#####.#',
+ '#.#...#....#..#...#...#.#',
+ '#.#####.##.#.#####.#.#.#',
+ '#.....#..#.#.....#.#...#',
+ '#####.##.#.#####.#.###.#',
+ '#...#..#.#...#...#...#.#',
+ '#.#.##.#.###.#.#####.#.#',
+ '#.#.#..#...#.#.....#.#.#',
+ '#.#.#.####.#.#####.#.#.#',
+ '#...#....#.#...#...#.#.#',
+ '#.#######.#####.#.###.#.',
+ '#.#.....#.....#.#...#.#',
+ '#.#.###.#####.#.###.#.#',
+ '#...#.......#.#..E....#',
+ '#########################'
+].map(r=>r.padEnd(25,'#').slice(0,25));
+let px=1,py=1,moved=false,inverted=false,wins=0;
+const keys={};
+addEventListener('keydown',e=>{
+  const m={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0]};
+  if(!m[e.key])return;
+  e.preventDefault();
+  let [dx,dy]=m[e.key];
+  if(inverted){dx*=-1;dy*=-1;}
+  moved=true;
+  const nx=px+dx,ny=py+dy;
+  if(MAZE[ny]&&MAZE[ny][nx]&&MAZE[ny][nx]!=='#'){px=nx;py=ny;__beep(300,.03);}
+  if(MAZE[py][px]==='E'){
+    wins++;inverted=false;moved=false;
+    document.getElementById('say').innerHTML='<b style="color:#7dff8a">ESCAPED! ('+wins+')</b> new maze. controls reset. for now.';
+    shuffleMaze();px=1;py=1;
+    __beep(800,.15);
+  }
+});
+function shuffleMaze(){
+  // rotate maze rows to make a "new" maze
+  MAZE.push(MAZE.shift());
+}
+setInterval(()=>{
+  if(moved&&!inverted&&Math.random()<.02){
+    inverted=true;
+    __beep(180,.12);
+    const LINES=['your controls have been... restructured.','up is down. down is up. HR approved this.','the arrows unionized against you.','directions are merely suggestions now.'];
+    document.getElementById('say').textContent=LINES[Math.floor(Math.random()*LINES.length)];
+  }
+},400);
+(function draw(){
+  x.clearRect(0,0,520,420);
+  for(let j=0;j<MAZE.length;j++)for(let i=0;i<MAZE[j].length;i++){
+    if(MAZE[j][i]==='#'){x.fillStyle='#2a5a72';x.fillRect(i*20,j*20,20,20);}
+    else if(MAZE[j][i]==='E'){
+      x.fillStyle='#3cff5e';x.fillRect(i*20+3,j*20+3,14,14);
+      x.fillStyle='#052a0c';x.font='bold 11px Consolas';x.textAlign='center';x.fillText('E',i*20+10,j*20+14);x.textAlign='left';
+    } else if(MAZE[j][i]==='S'){x.fillStyle='#123';}
+  }
+  x.fillStyle=inverted?'#ff6ec7':'#ffd23e';
+  x.beginPath();x.arc(px*20+10,py*20+10,8,0,7);x.fill();
+  x.fillStyle='#111';x.font='bold 9px Consolas';x.textAlign='center';
+  x.fillText(inverted?'?!':':)',px*20+10,py*20+13);x.textAlign='left';
+  requestAnimationFrame(draw);
+})();
+(function(){window.__beep=function(f,d,t){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.06;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>

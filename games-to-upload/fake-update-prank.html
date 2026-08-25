@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>IMPORTANT UPDATE</title>
+<style>
+  html,body{margin:0;height:100%;background:#0b1220;color:#dbe7ff;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+  #bar{width:min(480px,90vw);height:26px;border:3px solid #2a4a75;background:#08101d}
+  #fill{height:100%;width:0%;background:#2f81f7}
+  #pct{font-size:1.4rem}
+  #st{color:#8fb0d9;text-align:center;min-height:22px;padding:0 10px}
+  #bsod{display:none;position:fixed;inset:0;background:#0078d7;color:#fff;font-family:'Segoe UI',sans-serif;z-index:99;padding:8vh 10vw;font-size:1.05rem;line-height:1.7}
+  #bsod .face{font-size:5rem}
+  #glitch{display:none;position:fixed;inset:0;background:#000;z-index:98}
+</style>
+</head>
+<body>
+<div id="bar"><div id="fill"></div></div>
+<div id="pct">0%</div>
+<div id="st">Preparing things you did not ask for...</div>
+<div id="glitch"></div>
+<div id="bsod">
+  <div class="face">:(</div>
+  <p>Your session ran into a problem and needs to restart.<br>We're just collecting some error info, and also judging you.</p>
+  <p><span id="prog">0%</span> complete</p>
+  <p style="opacity:.7">STOP CODE: YOU_CLICKED_THE_THING</p>
+</div>
+<script>
+let p=0,stalled=false;
+const st=document.getElementById('st');
+const MSGS=['Downloading more update','Removing features you liked','Installing candy crush (again)','Rearranging your desktop icons','Teaching Cortana to ignore you','Applying feelings'];
+const iv=setInterval(()=>{
+  if(stalled){
+    p+=Math.random()*.02;
+    st.textContent=MSGS[Math.floor(Math.random()*MSGS.length)]+' (for real this time)';
+  } else {
+    p+=Math.random()*3.5;
+    st.textContent=MSGS[Math.floor(Math.random()*MSGS.length)];
+    if(p>=87)stalled=true;
+  }
+  p=Math.min(99.9,p);
+  document.getElementById('fill').style.width=p+'%';
+  document.getElementById('pct').textContent=p.toFixed(1)+'%';
+  if(p>=99.85){
+    clearInterval(iv);prank();
+  }
+},150);
+function prank(){
+  document.getElementById('glitch').style.display='block';
+  __beep(200,.3,'sawtooth');
+  setTimeout(()=>{
+    document.getElementById('glitch').style.display='none';
+    const bs=document.getElementById('bsod');bs.style.display='block';
+    let q=0;
+    const pi=setInterval(()=>{
+      q+=Math.random()*13;
+      document.getElementById('prog').textContent=Math.min(100,q|0)+'%';
+      if(q>=100){clearInterval(pi);finish();}
+    },420);
+  },700);
+}
+function finish(){
+  document.getElementById('bsod').innerHTML=
+   '<div style="max-width:640px;margin:0 auto;text-align:center">'+
+   '<h1 style="font-size:2rem;color:#ffd23e">JUST KIDDING.</h1>'+
+   '<p>There was no update. There was never an update.<br>'+
+   'There is only the waiting, and us, watching you wait.</p>'+
+   '<p style="font-size:2.4rem;margin-top:40px">\u{1F4F8} we got you.</p>'+
+   '<button onclick="location.reload()" style="margin-top:30px;padding:12px 26px;font-size:1rem;background:#fff;color:#0078d7;border:0;cursor:pointer;font-family:Consolas">fall for it again</button></div>';
+}
+(function(){window.__beep=function(f,d,t){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.06;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>

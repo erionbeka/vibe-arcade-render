@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>GROUP PROJECT GRAVES</title>
+<style>
+  html,body{margin:0;height:100%;background:#10141a;color:#dfe7ee;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+  h1{font-size:.95rem;color:#89b8dd;margin:0;text-align:center}
+  #yard{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;width:min(680px,95vw);min-height:170px}
+  .grave{width:130px;background:#232c36;border:3px solid #37475a;border-radius:60px 60px 8px 8px;padding:14px 10px;text-align:center;font-size:.78rem;line-height:1.5}
+  .grave b{display:block;color:#ffd23e;margin-bottom:6px}
+  button{padding:11px 18px;font-family:inherit;border:3px solid #89b8dd;background:#18222c;color:#cfe3f2;cursor:pointer;font-size:.9rem}
+  #say{min-height:24px;color:#9fb0c0;text-align:center;padding:0 10px;width:min(480px,92vw)}
+</style>
+</head>
+<body>
+<h1>GROUP PROJECT GRAVEYARD<br>(they did nothing. now they rest.)</h1>
+<div id="yard"></div>
+<button id="dig">BURY ANOTHER ONE</button>
+<div id="say">every tombstone is a real excuse someone actually said. probably.</div>
+<script>
+const NAMES=['Tyler','Ashley','Jayden','Madison','Brayden','Chloe','Hunter','Kaylee'];
+const EXCUSES=[
+ '"my dog read the email"',
+ '"i thought YOU were doing it"',
+ '"my wifi believed in me too little"',
+ '"group work? i thought we were friends"',
+ '"i was busy being the ideas guy"',
+ '"the doc wouldn\'t load on my phone" (he has a laptop)',
+ '"i did it in my head" (he did not)',
+ '"sorry i was at my cabin" (it was Tuesday)'
+];
+const EPITAPHS=['Here lies accountability','Rest in "I\'ll do it tonight"','Beloved contributor (never seen)','Survived by 47 unread pings'];
+let buried=[];
+document.getElementById('dig').addEventListener('click',()=>{
+  const yard=document.getElementById('yard');
+  let name,exc;
+  do{name=NAMES[Math.floor(Math.random()*NAMES.length)];exc=EXCUSES[Math.floor(Math.random()*EXCUSES.length)];}
+  while(buried.some(b=>b[0]===name&&b[1]===exc));
+  buried.push([name,exc]);
+  const g=document.createElement('div');g.className='grave';
+  g.innerHTML='<b>R.I.P.</b>'+name+'<br><br>"'+exc+'"<br><br><small>'+EPITAPHS[Math.floor(Math.random()*EPITAPHS.length)]+'</small>';
+  g.style.opacity='0';yard.appendChild(g);
+  requestAnimationFrame(()=>{g.style.transition='opacity .8s';g.style.opacity='1';});
+  __beep(200,.15,'sawtooth');
+  say('burial complete. the group chat grows quieter.');
+  if(buried.length>=8)say('the whole team rests now. you did everything AND this. legend.');
+});
+function say(t){document.getElementById('say').textContent=t;}
+(function(){window.__beep=function(f,d,t){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.05;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>

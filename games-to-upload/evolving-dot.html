@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CLICK THE DOT</title>
+<style>
+  html,body{margin:0;height:100%;background:#120d1c;color:#eee;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;overflow:hidden}
+  h1{font-size:.95rem;color:#c792ea;margin:0}
+  #dot{position:absolute;border-radius:50%;background:#3cff5e;cursor:pointer;transition:all .18s}
+  #info{color:#9281bd;min-height:24px}
+</style>
+</head>
+<body>
+<h1>CLICK THE DOT</h1>
+<div id="info">it starts friendly. it does not stay friendly.</div>
+<div id="dot"></div>
+<script>
+const dot=document.getElementById('dot'),info=document.getElementById('info');
+let size=64,x=innerWidth/2-32,y=innerHeight/2-32,hits=0;
+const STAGES=[
+ [3,'easy mode. enjoy it.'],
+ [6,'slightly smaller. slightly ruder.'],
+ [9,'now with 100% more teleporting.'],
+ [12,'i am legally not allowed to make it smaller. so it moves mid-click.'],
+ [15,'final form. the dot is one pixel of pure disrespect.'],
+ [17,'okay wow. fine. you win this round.']
+];
+function place(){
+  x=30+Math.random()*(innerWidth-size-60);
+  y=80+Math.random()*(innerHeight-size-160);
+  dot.style.width=size+'px';dot.style.height=size+'px';
+  dot.style.left=x+'px';dot.style.top=y+'px';
+}
+place();
+dot.addEventListener('pointerdown',()=>{
+  hits++;
+  __beep(400+hits*40,.05);
+  const st=STAGES.find(s=>s[0]===hits);
+  if(st){info.textContent=st[1];}
+  if(hits>=18){
+    info.textContent='you actually clicked all of them. the dot bows to you.';
+    dot.style.background='#ffd23e';size=90;place();return;
+  }
+  size=Math.max(3,64-hits*3.6);
+  place();
+  if(hits>=9&&Math.random()<.65){setTimeout(place,120+Math.random()*250);}
+});
+(function(){window.__beep=function(f,d,t){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.06;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>

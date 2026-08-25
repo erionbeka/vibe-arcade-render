@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BLOCK THE EX</title>
+<style>
+  html,body{margin:0;height:100%;background:#111827;color:#e5e7eb;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+  h1{font-size:.95rem;color:#93c5fd;margin:0;text-align:center}
+  #phone{width:min(380px,90vw);height:340px;background:#030712;border:8px solid #374151;border-radius:26px;padding:16px;overflow:hidden;display:flex;flex-direction:column-reverse;gap:8px}
+  .txt{background:#1f2937;border-radius:12px;padding:9px 13px;font-size:.86rem;line-height:1.45}
+  .me{background:#1d4ed8;align-self:flex-end}
+  button{padding:12px 24px;font-family:inherit;font-size:.95rem;border:none;background:#dc2626;color:#fff;border-radius:10px;cursor:pointer}
+  button:hover{filter:brightness(1.15)}
+  #count{color:#9ca3af}
+</style>
+</head>
+<body>
+<h1>BLOCK THE EX<br>(the texts keep coming. the button keeps working.)</h1>
+<div id="phone"></div>
+<button id="block">BLOCK AGAIN</button>
+<div id="count">blocks: <span id="n">0</span></div>
+<script>
+const MSGS=[
+ 'hey. saw a dog today. thought of u',
+ 'did you block me? weird.',
+ 'ok unblock. this is silly',
+ 'i showed your favorite song to my NEW friend btw',
+ 'happy birthday (i know its not today)',
+ 'my mom says hi. she misses you more than me tbh',
+ 'found your hoodie. wearing it to the gym',
+ 'new phone who dis (its me)',
+ 'saw the moon. it was fine i guess',
+ 'this is my last message (msg 47)'
+];
+const REPLIES=['blocked.','blocked with feeling.','blocked respectfully.','blocked aggressively.','blocked in cursive.','blocked on all planes of existence.','blocked so hard the router felt it.','galaxy-brain blocked.','preemptively blocked their future messages.','legendary block. scholars will study it.'];
+let n=0;
+const phone=document.getElementById('phone');
+function addMsg(text,mine){
+  const d=document.createElement('div');
+  d.className='txt'+(mine?' me':'');
+  d.textContent=text;
+  phone.prepend(d);
+  while(phone.children.length>7)phone.lastChild.remove();
+}
+addMsg(MSGS[0]);
+document.getElementById('block').addEventListener('click',()=>{
+  if(n>=MSGS.length){
+    document.body.innerHTML='<div style="text-align:center;margin-top:20vh"><h1 style="color:#7dff8a">PEACE ACHIEVED.</h1><p style="line-height:1.7">'+n+' blocks deployed.<br>Their final message, translated from desperate:<br><br><b>"i respect your boundaries now"</b><br><br>\u2713 you are free \u2713</p><br><a href="" style="color:#93c5fd">block someone new</a></div>';
+    return;
+  }
+  addMsg(REPLIES[n%REPLIES.length],true);
+  __beep(600+n*30,.06);
+  setTimeout(()=>{addMsg(MSGS[n]);},700);
+  n++;
+  document.getElementById('n').textContent=n;
+});
+(function(){window.__beep=function(f,d,t){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.05;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>

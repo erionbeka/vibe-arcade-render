@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PAPER TOSS PRO</title>
+<style>
+  html,body{margin:0;height:100%;background:#101418;color:#e8eef2;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+  h1{font-size:.95rem;color:#89b8dd;margin:0}
+  canvas{border:4px solid #2c3a47;background:#1a222b;touch-action:none}
+  #wind{color:#7ddcff;font-size:.95rem}
+  #say{min-height:26px;text-align:center;color:#ffd23e;padding:0 10px}
+</style>
+</head>
+<body>
+<h1>PAPER TOSS PRO<br>(quarterly mandatory fun)</h1>
+<canvas id="c" width="600" height="360"></canvas>
+<div id="wind">AC wind: calm</div>
+<div id="say">drag the paper back and release. slingshot style. impress absolutely no one.</div>
+<script>
+const cv=document.getElementById('c'),x=cv.getContext('2d'),W=600,H=360;
+let paper={x:110,y:H-70,vx:0,vy:0,fly:false,rot:0};
+let bin={x:W-140,w:56,h:52};
+let wind=0,streak=0,made=0,tries=0,drag=null,msg='',msgT=0;
+const MISS=['the bin dodged mentally.','air ball. the AC apologizes.','colleague Dave saw that. Dave says nothing.','paper has been fired. from employment of flight.','almost is a word used by losers (affectionate).'];
+const HIT=['SWISH. Dave is impressed (internally).','money shot. HR applauds quietly.','the bin respects you now.','sponsorship deal pending.'];
+function newWind(){
+  wind=(Math.random()-.5)*.5;
+  document.getElementById('wind').textContent='AC wind: '+(Math.abs(wind)<.08?'calm':(wind>0?'pushing right ':'pushing left ')+Math.abs(wind*200|0));
+}
+newWind();
+cv.addEventListener('pointerdown',e=>{
+  const r=cv.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;
+  if(!paper.fly&&Math.abs(mx-paper.x)<50&&Math.abs(my-paper.y)<50){drag={mx,my};}
+});
+addEventListener('pointermove',e=>{
+  if(!drag)return;
+  const r=cv.getBoundingClientRect();
+  drag.cx=e.clientX-r.left;drag.cy=e.clientY-r.top;
+});
+addEventListener('pointerup',()=>{
+  if(!drag)return;
+  const dx=paper.x-(drag.cx??drag.mx),dy=paper.y-(drag.cy??drag.my);
+  if(Math.hypot(dx,dy)>18){
+    paper.vx=dx*.09;paper.vy=dy*.09;paper.fly=true;tries++;
+    __beep(400,.06);
+  }
+  drag=null;
+});
+setInterval(()=>{
+  if(!paper.fly)return;
+  paper.vy+=.16;paper.vx+=wind*.02;
+  paper.x+=paper.vx;paper.y+=paper.vy;paper.rot+=paper.vx*.06;
+  if(paper.x>bin.x&&paper.x<bin.x+bin.w&&paper.y>330-bin.h&&paper.y<340){
+    made++;streak++;msg=HIT[Math.floor(Math.random()*HIT.length)];__beep(800,.12);
+    reset(true);
+  } else if(paper.y>H+30||paper.x>W+40||paper.x<-40){
+    streak=0;msg=MISS[Math.floor(Math.random()*MISS.length)];__beep(150,.15,'sawtooth');
+    reset(false);
+  }
+},16);
+function reset(scored){
+  msgT=120;
+  paper={x:110,y:H-70,vx:0,vy:0,fly:false,rot:0};
+  if(scored)bin.x=W-90-Math.random()*(W*.35);
+  newWind();
+}
+(function draw(){
+  x.clearRect(0,0,W,H);
+  x.fillStyle='#232d38';x.fillRect(0,300,W,60);
+  x.fillStyle='#39424d';x.fillRect(0,296,W,6);
+  // bin
+  x.fillStyle='#3cff5e';
+  x.beginPath();x.moveTo(bin.x,330-bin.h);x.lineTo(bin.x+bin.w,330-bin.h);x.lineTo(bin.x+bin.w-8,330);x.lineTo(bin.x+8,330);x.closePath();x.fill();
+  x.fillStyle='#2aa844';x.fillRect(bin.x-4,326,bin.w+8,6);
+  // desk hint
+  x.fillStyle='#4a3a28';x.fillRect(40,H-46,140,10);
+  // trajectory preview
+  if(drag&&drag.cx!==undefined){
+    x.strokeStyle='rgba(255,255,255,.25)';x.setLineDash([4,4]);
+    x.beginPath();x.moveTo(paper.x,paper.y);x.lineTo(paper.x+(paper.x-drag.cx)*.8,paper.y+(paper.y-drag.cy)*.8);x.stroke();x.setLineDash([]);
+  }
+  x.save();x.translate(paper.x,paper.y);x.rotate(paper.rot);
+  x.fillStyle='#f5f0dc';x.fillRect(-9,-11,18,22);
+  x.strokeStyle='#c9c2a8';x.strokeRect(-9,-11,18,22);
+  x.restore();
+  x.fillStyle='#fff';x.font='bold 14px Consolas';
+  x.fillText('streak '+streak+'   made '+made+'/'+tries,14,26);
+  if(msgT-->0&&msg){x.fillStyle='#ffe600';x.textAlign='center';x.fillText(msg,W/2,60);x.textAlign='left';if(msgT<=0)msg='';}
+  requestAnimationFrame(draw);
+})();
+(function(){window.__beep=function(f,d,t2){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t2||'square';o.frequency.value=f;g.gain.value=.06;g.gain.exponentialRampToValueAtTime(.001,a.currentTime+d);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>

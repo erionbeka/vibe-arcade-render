@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DO NOTHING</title>
+<style>
+  html,body{margin:0;height:100%;background:#000;color:#888;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+  #t{font-size:2.4rem;color:#555}
+  #say{min-height:26px;text-align:center;color:#666;width:min(440px,90vw)}
+  .scold{color:#ff5c5c !important;font-size:1.1rem}
+</style>
+</head>
+<body>
+<div id="t">0.0s of doing nothing</div>
+<div id="say">the only rule: do nothing. no mouse. no keys. nothing.</div>
+<script>
+let t=0,best=0,broken=false;
+const tEl=document.getElementById('t'),say=document.getElementById('say');
+const SCOLDS=['you MOVED. is stillness a foreign concept?','a KEY? really?','clicking is doing. doing is forbidden.','fidget detected. shame.','your ancestors sat still for hours. and you?'];
+setInterval(()=>{
+  if(broken)return;
+  t+=0.1;
+  tEl.textContent=t.toFixed(1)+'s of doing nothing';
+  if(t>5)say('still nothing. impressive. suspicious, but impressive.');
+  if(t>12)say('ok you are weirdly good at this.');
+  if(t>20)say('have you considered a career in statues?');
+  if(t>30)say('this is the part where we admit there is no prize. keep going anyway.');
+},100);
+function breakIt(what){
+  if(broken||t<0.4)return;
+  broken=true;
+  best=Math.max(best,t);
+  sayEl();
+  function sayEl(){
+    say.innerHTML='<span class="scold">'+SCOLDS[Math.floor(Math.random()*SCOLDS.length)]+'</span><br><br>record: '+best.toFixed(1)+'s<br><span style="color:#555">reloading to give you another chance at peace...</span>';
+    setTimeout(()=>location.reload(),2600);
+  }
+}
+addEventListener('pointermove',()=>breakIt('move'));
+addEventListener('pointerdown',()=>breakIt('click'));
+addEventListener('keydown',e=>{if(e.key!=='F5'&&!(e.ctrlKey&&e.key==='r'))breakIt('key');});
+addEventListener('wheel',()=>breakIt('scroll'),{passive:true});
+</script>
+</body>
+</html>

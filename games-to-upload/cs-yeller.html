@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CUSTOMER SERVICE YELLER</title>
+<style>
+  html,body{margin:0;height:100%;background:#12100c;color:#f0ead8;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+  h1{font-size:.95rem;color:#ffb347;margin:0;text-align:center}
+  #bot{width:min(480px,92vw);min-height:120px;background:#1e1a12;border:3px solid #4d3820;padding:16px;font-size:1rem;line-height:1.6;text-align:center}
+  .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;width:min(520px,94vw)}
+  button{padding:13px 15px;font-family:inherit;font-size:.85rem;border:3px solid #b8863f;background:#2a2013;color:#ffe9c2;cursor:pointer;flex:1;min-width:130px}
+  .yell{border-color:#ff5c5c;color:#ffb3b3;background:#2a1210}
+  #lvl{color:#9fb08a;font-size:.9rem;min-height:22px;text-align:center}
+</style>
+</head>
+<body>
+<h1>CUSTOMER SERVICE YELLER<br>(reach a human. there is no human.)</h1>
+<div id="bot">Thank you for calling! For quality purposes, this call may be used against you.</div>
+<div class="row">
+  <button onclick="say(1)">Press 1 for billing</button>
+  <button onclick="say(2)">Press 2 for support</button>
+  <button class="yell" id="yell">HOLD TO YELL "AGENT!!!"</button>
+</div>
+<div id="lvl">rage level: calm</div>
+<script>
+let rage=0,menuDepth=0;
+const bot=document.getElementById('bot'),lvl=document.getElementById('lvl');
+const MENUS=[
+ ['For billing, press 1. For support, press 2. To scream into the void, hold the red button.','You have reached billing-adjacent. Billing itself is on sabbatical.','Your estimated wait time is: a number we will change constantly.'],
+ ['Did you know many answers are in our FAQ? The FAQ has been deleted. Good luck.','Transferring you to support... support hung up first.','Your call is important to us. That is why we play this flute music at it.'],
+ ['You are now speaking with our advanced AI. It is a calculator from 2004.','The AI suggests turning it off and on. "It" being you.','Connecting to agent... agent disconnected... connecting to agent...'],
+ ['Congratulations! You have been escalated to a HUMAN. Just kidding. Dave is a very realistic parrot.','Your patience has been noted and spent.','We value your feedback. Please hold while we ignore it professionally.']
+];
+function say(d){
+  menuDepth=Math.min(menuDepth+1,MENUS.length);
+  bot.textContent=MENUS[Math.min(menuDepth,MENUS.length)-1]||MENUS[0];
+  __beep(400+menuDepth*60,.06);
+}
+document.getElementById('yell').addEventListener('pointerdown',()=>{
+  const iv=setInterval(()=>{
+    rage+=7;
+    lvl.textContent='rage level: '+'\u26A1'.repeat(Math.min(8,Math.floor(rage/12)))||'calm';
+    lvl.textContent='rage level: '+['calm','warm','toasty','boiling','volcanic','supernova'][Math.min(5,Math.floor(rage/20))];
+    if(rage>=100){
+      clearInterval(iv);
+      bot.innerHTML='<b style="color:#ff8a8a">AN ACTUAL HUMAN HAS JOINED THE CALL.</b><br><br>"Hi, this is Greg."<br><br>Greg solves everything in 40 seconds.<br><br>Rage was the answer all along. It usually is.';
+      __beep(800,.2);__beep(1000,.25);
+    }
+  },100);
+});
+(function(){window.__beep=function(f,d,t){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.05;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>

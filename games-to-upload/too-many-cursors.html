@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TOO MANY CURSORS</title>
+<style>
+  html,body{margin:0;height:100%;background:#0d1117;color:#eee;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;overflow:hidden;cursor:crosshair}
+  h1{font-size:.95rem;color:#58a6ff;margin:0;z-index:5}
+  canvas{border:3px solid #30363d;background:#161b22}
+  #say{min-height:24px;color:#ffd23e;text-align:center;padding:0 10px}
+</style>
+</head>
+<body>
+<h1>TOO MANY CURSORS</h1>
+<canvas id="c" width="640" height="380"></canvas>
+<div id="say">one of these cursors is yours. click the GOLD TARGET while the fakes gaslight you.</div>
+<script>
+const cv=document.getElementById('c'),x=cv.getContext('2d'),W=640,H=380;
+let mx=300,my=200,fakes=[],target={x:500,y:80,r:18},score=0,lives=3,t=0,fakeRate=26;
+cv.addEventListener('pointermove',e=>{const r=cv.getBoundingClientRect();mx=e.clientX-r.left;my=e.clientY-r.top;});
+cv.addEventListener('pointerdown',()=>{
+  // hit test against target only
+  if(Math.hypot(mx-target.x,my-target.y)<target.r+4){
+    score++;__beep(700,.08);
+    fakeRate=Math.max(10,fakeRate-2);
+    target={x:40+Math.random()*(W-80),y:40+Math.random()*(H-80),r:Math.max(9,18-score)};
+    fakes=[];say(pick(['got it through the fog of lies!','your cursor is the realest.','the fakes grow in number...']));
+  } else {
+    lives--;__beep(140,.15,'sawtooth');say(pick(['that cursor belongs to the government.','you clicked a lie.','not even close (it was close-ish).']));
+    if(lives<=0){
+      cv.onpointerdown=null;
+      say('GAME OVER. you can no longer tell which parts of you are real.');
+      setTimeout(()=>location.reload(),3000);
+    }
+  }
+});
+setInterval(()=>{
+  t++;
+  if(t%fakeRate===0)fakes.push({x:mx,y:my,vx:(Math.random()-.5)*3,vy:(Math.random()-.5)*3,ph:Math.random()*7});
+},40);
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+(function draw(){
+  x.clearRect(0,0,W,H);
+  for(const f of fakes){
+    f.ph+=.03;
+    f.vx+=(Math.random()-.5)*.25;f.vy+=(Math.random()-.5)*.25;
+    f.vx*=.97;f.vy*=.97;
+    f.x+=f.vx;f.y+=f.vy;
+    if(f.x<0||f.x>W)f.vx*=-1;if(f.y<0||f.y>H)f.vy*=-1;
+    drawCursor(f.x,f.y,'#8a8f98');
+  }
+  drawCursor(mx,my,'#fff');
+  x.fillStyle='#ffd23e';x.shadowColor='#ffd23e';x.shadowBlur=14;
+  x.beginPath();x.arc(target.x,target.y,target.r,0,7);x.fill();
+  x.shadowBlur=0;
+  x.fillStyle='#cfe3ff';x.font='bold 13px Consolas';
+  x.fillText('score '+score+'   lives '+'\u2665'.repeat(Math.max(0,lives)),14,24);
+  requestAnimationFrame(draw);
+})();
+function drawCursor(cx2,cy2,col){
+  x.fillStyle=col;x.strokeStyle='#000';x.lineWidth=1.5;
+  x.beginPath();
+  x.moveTo(cx2,cy2);x.lineTo(cx2+13,cy2+9);x.lineTo(cx2+8,cy2+10);x.lineTo(cx2+11,cy2+17);
+  x.lineTo(cx2+8,cy2+18);x.lineTo(cx2+5,cy2+11);x.lineTo(cx2,cy2+14);
+  x.closePath();x.fill();x.stroke();
+}
+(function(){window.__beep=function(f,d,t){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.05;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>

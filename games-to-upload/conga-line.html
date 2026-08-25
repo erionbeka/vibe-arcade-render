@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CONGA LINE (OFFICE EDITION)</title>
+<style>
+  html,body{margin:0;height:100%;background:#0f0a1e;color:#efe8ff;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+  h1{font-size:.95rem;color:#c792ea;margin:0}
+  canvas{border:4px solid #3d2a68;background:#171029;touch-action:none}
+  #hud{display:flex;gap:22px;font-size:.95rem;color:#b9a8e0}b{color:#ffe600}
+  #say{min-height:24px;color:#ffd23e;text-align:center;padding:0 10px}
+</style>
+</head>
+<body>
+<h1>CONGA LINE (OFFICE EDITION)</h1>
+<canvas id="c" width="600" height="400"></canvas>
+<div id="hud"><span>LINE <b id="len">1</b></span><span>BPM <b id="bpm">100</b></span></div>
+<div id="say">arrows to conga. recruit coworkers. do not bite yourself. HR is watching.</div>
+<script>
+const cv=document.getElementById('c'),x=cv.getContext('2d'),G=24,COLS=25,ROWS=16,W=600,H=400;
+let snake=[{x:5,y:8}],dir={x:1,y:0},nextDir=dir,food=null,dead=true,score=0,tickMs=150,timer=null,names=['Gerald','Linda','Bob from IT','Deb','Kevin (again)','Priya','Chad','Marge','Steve x2','Auditor Dan'];
+function spawnFood(){
+  let p;do{p={x:Math.floor(Math.random()*COLS),y:Math.floor(Math.random()*ROWS)};}
+  while(snake.some(s=>s.x===p.x&&s.y===p.y));
+  food={...p,name:names[Math.min(score,names.length-1)]};
+}
+function start(){
+  snake=[{x:5,y:8}];dir={x:1,y:0};nextDir=dir;score=0;tickMs=150;dead=false;
+  document.getElementById('len').textContent='1';
+  spawnFood();say('the music starts. you cannot stop it.');
+  clearInterval(timer);timer=setInterval(tick,tickMs);
+}
+function tick(){
+  dir=nextDir;
+  const h={x:(snake[0].x+dir.x+COLS)%COLS,y:(snake[0].y+dir.y+ROWS)%ROWS};
+  if(snake.some(s=>s.x===h.x&&s.y===h.y))return die();
+  snake.unshift(h);
+  if(food&&h.x===food.x&&h.y===food.y){
+    score++;__beep(500+score*20,.07);
+    document.getElementById('len').textContent=score+1;
+    say(food.name+' joins the conga!');
+    tickMs=Math.max(70,tickMs-4);
+    clearInterval(timer);timer=setInterval(tick,tickMs);
+    document.getElementById('bpm').textContent=(60000/tickMs)|0;
+    spawnFood();
+  } else snake.pop();
+}
+addEventListener('keydown',e=>{
+  const m={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0]};
+  if(m[e.key]){e.preventDefault();
+    const [dx,dy]=m[e.key];
+    if(dx!==-dir.x||dy!==-dir.y)nextDir={x:dx,y:dy};
+    if(dead)start();
+  }
+});
+function die(){
+  dead=true;clearInterval(timer);
+  __beep(110,.4,'sawtooth');
+  say(score>9?'the conga collapsed at '+score+' strong. HR opens an investigation. click to appeal.':'conga of '+score+'. the DJ shakes head slowly. click to retry.');
+}
+(function draw(){
+  x.clearRect(0,0,W,H);
+  x.strokeStyle='#241a45';x.lineWidth=1;
+  for(let i=0;i<=COLS;i++){x.beginPath();x.moveTo(i*G,0);x.lineTo(i*G,H);x.stroke();}
+  for(let j=0;j<=ROWS;j++){x.beginPath();x.moveTo(0,j*G);x.lineTo(W,j*G);x.stroke();}
+  if(food){
+    x.fillStyle='#ffd23e';x.beginPath();x.arc(food.x*G+12,food.y*G+12,9,0,7);x.fill();
+    x.fillStyle='#171029';x.font='bold 10px Consolas';x.textAlign='center';
+    x.fillText((food.name[0]||'?'),food.x*G+12,food.y*G+15);x.textAlign='left';
+  }
+  snake.forEach((s,i)=>{
+    x.fillStyle=i===0?'#c792ea':`hsl(${270+i*6},60%,${62-i}%)`;
+    x.fillRect(s.x*G+2,s.y*G+2,G-4,G-4);
+    if(i===0){x.fillStyle='#171029';x.fillRect(s.x*G+13,s.y*G+7,4,4);}
+    else if(i%3===0){x.fillStyle='#fff';x.font='bold 8px Consolas';x.textAlign='center';x.fillText('\u00B7',s.x*G+12,s.y*G+15);x.textAlign='left';}
+  });
+  requestAnimationFrame(draw);
+})();
+(function(){window.__beep=function(f,d,t2){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t2||'square';o.frequency.value=f;g.gain.value=.05;g.gain.exponentialRampToValueAtTime(.001,a.currentTime+d);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>

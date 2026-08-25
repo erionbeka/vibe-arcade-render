@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SMASH THE OFFICE</title>
+<style>
+  html,body{margin:0;height:100%;background:#171310;color:#f2e9dc;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+  h1{font-size:.95rem;color:#ffb347;margin:0}
+  canvas{border:4px solid #4d3820;background:#2b2117;cursor:crosshair}
+  #hud{display:flex;gap:24px;font-size:.95rem}b{color:#ffd23e}
+  #say{min-height:24px;color:#c9a97a;text-align:center;padding:0 10px}
+</style>
+</head>
+<body>
+<h1>SMASH THE OFFICE (stress relief program)</h1>
+<canvas id="c" width="640" height="400"></canvas>
+<div id="hud"><span>STRESS RELIEVED <b id="sr">0%</b></span><span>ITEMS DESTROYED <b id="it">0</b></span></div>
+<div id="say">click office items to smash. the company therapist (a plant) watches with concern.</div>
+<script>
+const cv=document.getElementById('c'),x=cv.getContext('2d'),W=640,H=400;
+let items=[],debris=[],relief=0,count=0,shake=0;
+const NAMES=['printer','copier','keurig','whiteboard','3-hole punch','motivational poster','the good chair','filing cabinet','water cooler'];
+function spawn(){
+  items.push({x:60+Math.random()*(W-120),y:120+Math.random()*(H-180),r:26+Math.random()*16,name:NAMES[Math.floor(Math.random()*NAMES.length)],hp:1+Math.floor(Math.random()*2),rot:Math.random()});
+}
+for(let i=0;i<7;i++)spawn();
+setInterval(()=>{if(items.length<7)spawn();},900);
+cv.addEventListener('pointerdown',e=>{
+  const r=cv.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;
+  shake=10;
+  for(let i=items.length-1;i>=0;i--){
+    const it=items[i];
+    if(Math.hypot(mx-it.x,my-it.y)<it.r+10){
+      it.hp--;
+      __beep(200,.06,'sawtooth');
+      if(it.hp<=0){
+        items.splice(i,1);count++;
+        relief=Math.min(100,relief+9);
+        document.getElementById('it').textContent=count;
+        document.getElementById('sr').textContent=Math.round(relief)+'%';
+        __beep(140,.15,'sawtooth');
+        say(pick(['the '+it.name+' has been dealt with.','HR files a note. worth it.','the '+it.name+' knew this day would come.','satisfying.','the plant looks away politely.']));
+        for(let j=0;j<14;j++)debris.push({x:it.x,y:it.y,vx:(Math.random()-.5)*9,vy:-Math.random()*7,life:30,col:'#'+['a89','ca8','ac9','99a'][j%4]});
+        break;
+      } else {
+        it.rot+=.4;
+        say('cracks forming on the '+it.name+'...');
+      }
+    }
+  }
+});
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+function say(t){document.getElementById('say').textContent=t;}
+(function draw(){
+  x.clearRect(0,0,W,H);
+  x.save();
+  if(shake>0){x.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);shake--;}
+  x.fillStyle='#3a2d1e';x.fillRect(0,H-50,W,50);
+  // the watching plant
+  x.fillStyle='#2e5c2e';x.fillRect(W-70,H-90,14,40);
+  x.fillStyle='#3cff5e';
+  x.beginPath();x.arc(W-63,H-100,16,0,7);x.fill();
+  x.fillStyle='#000';x.fillRect(W-68,H-104,4,4);x.fillRect(W-58,H-104,4,4);
+  for(const it of items){
+    x.save();x.translate(it.x,it.y);x.rotate(it.rot);
+    x.fillStyle=it.hp>1?'#7a8794':'#5c6670';
+    x.fillRect(-it.r,-it.r*.7,it.r*2,it.r*1.4);
+    x.strokeStyle='#222';x.strokeRect(-it.r,-it.r*.7,it.r*2,it.r*1.4);
+    if(it.hp===1){x.strokeStyle='#111';x.beginPath();x.moveTo(-it.r*.5,-it.r*.4);x.lineTo(it.r*.3,it.r*.4);x.moveTo(it.r*.2,-it.r*.5);x.lineTo(-it.r*.2,it.r*.3);x.stroke();}
+    x.fillStyle='#111';x.font='bold 9px Consolas';x.textAlign='center';
+    x.fillText(it.name.slice(0,12),0,it.r*.9);x.textAlign='left';
+    x.restore();
+  }
+  for(let i=debris.length-1;i>=0;i--){
+    const d=debris[i];d.x+=d.vx;d.y+=d.vy;d.vy+=.35;d.life--;
+    if(d.life<0||d.y>H){debris.splice(i,1);continue;}
+    x.fillStyle=d.col;x.fillRect(d.x,d.y,5,5);
+  }
+  x.restore();
+  requestAnimationFrame(draw);
+})();
+(function(){window.__beep=function(f,d,t){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.05;g.gain.exponentialRampToValueAtTime(.001,a.currentTime+d);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>
