@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PROGRESS BAR SIMULATOR</title>
+<style>
+  html,body{margin:0;height:100%;background:#0b1220;color:#dbe7ff;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+  h1{font-size:.95rem;color:#6fd3ff;margin:0}
+  #outer{width:min(520px,92vw);height:34px;border:3px solid #2a4a75;background:#08101d;position:relative}
+  #fill{position:absolute;left:0;top:0;height:100%;width:0%;background:linear-gradient(90deg,#2f81f7,#79c0ff)}
+  #pct{font-size:1.5rem;color:#79c0ff}
+  #status{min-height:28px;color:#8fb0d9;text-align:center;padding:0 12px;width:min(480px,92vw)}
+  #eta{color:#58a6ff}
+</style>
+</head>
+<body>
+<h1>PROGRESS BAR SIMULATOR</h1>
+<div id="outer"><div id="fill"></div></div>
+<div id="pct">0%</div>
+<div id="status">starting update...</div>
+<div id="eta">ETA: calculating (this is a lie)</div>
+<script>
+let p=0,stallAt=Math.random()<.5?98:99,stalled=false,t=0;
+const STATUSES=['copying files nobody will ever read','downloading more progress bar','consulting the cloud','warming up pixels','defragmenting vibes','asking permission from an old server'];
+const STALLS=['do not turn off your computer.','working on it. (thinking about it.)','99% is basically 100%. math is fluid.','the bar is resting. bars get tired.','it moved! wait. no. wind.','have you tried believing in it?'];
+setInterval(()=>{
+  t++;
+  if(!stalled){
+    p+=Math.random()*2.4;
+    if(p>=stallAt){
+      p=stallAt;stalled=true;
+      document.getElementById('status').textContent='almost done...';
+    }
+    document.getElementById('status').textContent=STATUSES[t%STATUSES.length];
+  } else if(t%3===0){
+    const s=document.getElementById('status');
+    s.textContent=STALLS[Math.floor(Math.random()*STALLS.length)];
+    __beep(200,.05);
+  }
+  p=Math.min(100,p);
+  document.getElementById('fill').style.width=p+'%';
+  document.getElementById('pct').textContent=p.toFixed(4)+'%';
+  document.getElementById('eta').textContent='ETA: '+Math.max(1,Math.ceil((100-p)/3))+' minutes'+(stalled?' (estimate unstable)':'');
+  if(stalled&&Math.random()<.008){
+    p=100;
+    document.getElementById('status').innerHTML='<b style="color:#7dff8a">UPDATE COMPLETE.</b> restart required to not update.';
+    document.getElementById('eta').textContent='ETA: LOL';
+    __beep(900,.2);
+  }
+},120);
+(function(){window.__beep=function(f,d){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.frequency.value=f;g.gain.value=.04;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>

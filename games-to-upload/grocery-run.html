@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>GROCERY RUN: MEMORY EDITION</title>
+<style>
+  html,body{margin:0;height:100%;background:#101c14;color:#e6f4ea;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+  h1{font-size:.95rem;color:#7dff8a;margin:0;text-align:center}
+  #list{width:min(480px,92vw);min-height:100px;text-align:center;font-size:1.1rem;color:#ffe600}
+  #store{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:min(520px,94vw)}
+  .item{padding:10px 6px;text-align:center;border:3px solid #2e5c3a;background:#12241a;color:#c9ffd2;cursor:pointer;font-size:.88rem}
+  .item.incart{border-color:#ffd23e;background:#2a2413}
+  button{padding:11px 22px;font-family:inherit;border:3px solid #7dff8a;background:#14331c;color:#c9ffd2;cursor:pointer}
+  #say{min-height:26px;color:#9fb8a5;text-align:center;padding:0 8px}
+</style>
+</head>
+<body>
+<h1>GROCERY RUN: MEMORY EDITION</h1>
+<div id="list">press START. memorize the list. you will forget the milk.</div>
+<div id="store" style="display:none"></div>
+<button id="go">START</button>
+<div id="say"></div>
+<script>
+const ALL=['BREAD','EGGS','CHEESE','SOUP','PICKLES','HOT SAUCE','YOGURT','NACHOS','APPLES','COOKIES','PASTA','SODA','TOFU','CANDY','RICE','DONUTS'];
+const NEEDED=['MILK'];
+let cart=new Set(),needed=[],phase=0;
+const listEl=document.getElementById('list'),store=document.getElementById('store'),btn=document.getElementById('go'),say=document.getElementById('say');
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+btn.addEventListener('click',()=>{
+  if(phase===0){
+    needed=shuffle(ALL).slice(0,5);
+    listEl.innerHTML='GET:<br>'+needed.map(n=>'\u2022 '+n).join('<br>')+'<br><br>(memorize!)';
+    btn.textContent='I MEMORIZED IT';
+    phase=1;
+    setTimeout(()=>{
+      if(phase!==1)return;
+      openStore();
+    },4000);
+  } else if(phase===2){
+    const got=[...cart];
+    const missed=needed.filter(n=>!got.includes(n));
+    let msg='checkout!<br>correct: '+got.filter(g=>needed.includes(g)).length+'/5';
+    if(missed.length)msg+='<br>forgotten: '+missed.join(', ');
+    const wrong=got.filter(g=>!needed.includes(g));
+    if(wrong.length)msg+='<br>impulse buys: '+wrong.join(', ')+' (why)';
+    if(!missed.includes('MILK')&&Math.random()<.75)msg+='<br><b style="color:#ff8a8a">...you forgot THE MILK anyway. it was the whole point.</b>';
+    listEl.innerHTML=msg;
+    store.style.display='none';btn.textContent='SHOP AGAIN';phase=0;cart.clear();
+    return;
+  }
+});
+function openStore(){
+  phase=2;listEl.textContent='find what you came for.';
+  btn.style.display='none';store.style.display='grid';
+  const items=shuffle([...needed,'MILK',...ALL.filter(a=>!needed.includes(a))]).slice(0,16);
+  items.forEach(n=>{
+    const d=document.createElement('div');d.className='item';d.textContent=n;
+    d.addEventListener('click',()=>{
+      if(cart.has(n)){cart.delete(n);d.classList.remove('incart');}
+      else{cart.add(n);d.classList.add('incart');__beep(600,.05);}
+      say('cart: '+[...cart].join(', '));
+    });
+    store.appendChild(d);
+  });
+  const co=document.createElement('button');co.textContent='CHECKOUT';co.style.gridColumn='span 4';
+  co.addEventListener('click',()=>{btn.style.display='block';btn.click();});
+  store.appendChild(co);
+  say('');
+}
+(function(){window.__beep=function(f,d){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.frequency.value=f;g.gain.value=.04;g.gain.exponentialRampToValueAtTime(.001,a.currentTime+d);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>

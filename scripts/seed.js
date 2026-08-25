@@ -182,6 +182,66 @@ const CATALOG_HANDMADE = [
     title: 'GHOST ROOMMATE AGREEMENT',
     description: 'Negotiate six house rules with a ghost named Reginald (or Gary, or Chad (dead)). Agreeing means nothing; refusing changes nothing.\n\nFinal Coexistence Score: exactly 50%. The lease is signed in cold breath. This is now legally your problem.',
     tags: 'casual ghosts comedy negotiation'
+  },
+  {
+    file: 'password-2000.html',
+    title: 'PASSWORD CREATOR 2000',
+    description: 'Create a password. Easy. Oh — a new requirement just appeared. And another. One of them is the word "sunday". Another bans the letter e.\n\nSatisfy every escalating rule to earn... an error: your password is TOO STRONG. Please weaken it.',
+    tags: 'puzzle logic comedy'
+  },
+  {
+    file: 'potato-futures.html',
+    title: 'POTATO FUTURES EXCHANGE',
+    description: 'Trade potatoes on a fully unregulated exchange driven by headlines like "PEAK CARB declared by magazine" and "gravy futures soar".\n\nNet worth displayed in fries. Insider trading is legal here because who would stop you.',
+    tags: 'trading sim comedy finance'
+  },
+  {
+    file: 'jar-speedrun.html',
+    title: 'SPEEDRUN: OPEN A JAR',
+    description: 'The final boss of kitchens. HOLD to build grip strength, then tap TWIST before your grip decays. Resistance varies; occasionally the lid was already loose and you question everything.\n\nPersonal bests tracked. The jar laughs in glass.',
+    tags: 'skill speedrun kitchen'
+  },
+  {
+    file: 'karaoke.html',
+    title: 'KARAOKE SCORER',
+    description: 'Read a lyric for 3 seconds, then perform it from memory into the text box. A drunk-but-honest audience scores your accuracy.\n\nThree songs per night. High scores mean nothing; the mic smells like quarters regardless.',
+    tags: 'memory music comedy'
+  },
+  {
+    file: 'thermostat-wars.html',
+    title: 'THERMOSTAT WARS',
+    description: 'One dial. You want it colder. Your roommate wants it warmer and adjusts it while you are not touching the slider.\n\nPassive-aggressive notes appear. Hidden space heaters discovered. Historians will doubt the harmony ending.',
+    tags: 'strategy comedy roommates'
+  },
+  {
+    file: 'microwave-etiquette.html',
+    title: 'MICROWAVE ETIQUETTE TRAINER',
+    description: 'Six break-room crises: overnight fish, exploded soup, the 9:59 timer, silent eye contact through glass. Choose your response; office karma keeps score.\n\nEndings range from BREAK ROOM MONARCH (top-shelf mug privileges) to banishment to the basement microwave.',
+    tags: 'choices office comedy karma'
+  },
+  {
+    file: 'grocery-run.html',
+    title: 'GROCERY RUN: MEMORY EDITION',
+    description: 'Memorize a 5-item list, then navigate the shelves from memory. Impulse buys are tracked and judged ("why").\n\nYou will forget the milk. It does not matter what the list said. You will forget the milk anyway. That is the game\'s one true prophecy.',
+    tags: 'memory shopping comedy'
+  },
+  {
+    file: 'crosswalk-button.html',
+    title: 'CROSSWALK BUTTON',
+    description: 'Press the button. Press it again. Pedestrians arrive and judge your technique in silence.\n\nThe light eventually changes, and a fun fact is revealed about the button\'s actual role in civic infrastructure.',
+    tags: 'toy comedy city waiting'
+  },
+  {
+    file: 'progress-bar.html',
+    title: 'PROGRESS BAR SIMULATOR',
+    description: 'Watch an update progress. Copying files nobody will ever read. Defragmenting vibes. It stalls at 98 or 99% while the ETA becomes "estimate unstable".\n\nCompletion chance per second: small but real. Restart required to not update.',
+    tags: 'idle tech comedy slow'
+  },
+  {
+    file: 'waiting-room.html',
+    title: 'WAITING ROOM',
+    description: 'Take a number. Sit. The fluorescent hum is free of charge.\n\nWatch numbers get called while bonding silently with strangers, reading a 2011 magazine quiz, and aging at the exact speed of bureaucracy.',
+    tags: 'idle comedy waiting'
   }
 ];
 
@@ -205,6 +265,7 @@ for (const g of CATALOG) {
   const existing = db.prepare('SELECT id FROM games WHERE title = ? AND user_id = ?').get(g.title, bot.id);
   if (existing) {
     // refresh the playable copy so source fixes reach published games
+    fs.mkdirSync(path.join(GAMES_DIR, String(existing.id)), { recursive: true });
     fs.copyFileSync(srcPath, path.join(GAMES_DIR, String(existing.id), 'index.html'));
     console.log(`refreshed: ${g.title} (#${existing.id})`);
     continue;

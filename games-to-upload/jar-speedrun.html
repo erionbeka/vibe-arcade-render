@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SPEEDRUN: OPEN A JAR</title>
+<style>
+  html,body{margin:0;height:100%;background:#17130c;color:#f3e9d2;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+  h1{font-size:.95rem;color:#ffd98a;margin:0;text-align:center}
+  #jar{font-size:5rem;height:100px;line-height:100px}
+  #grip{width:min(300px,80vw);height:18px;border:3px solid #8a6a33;background:#241b0d}
+  #gfill{height:100%;width:0%;background:#ffb347}
+  button{padding:14px 26px;font-family:inherit;font-size:1rem;border:3px solid #b8863f;background:#332413;color:#ffe9c2;cursor:pointer;user-select:none;-webkit-user-select:none}
+  #say{min-height:52px;text-align:center;width:min(440px,90vw)}
+  #best{color:#9fb08a}
+</style>
+</head>
+<body>
+<h1>SPEEDRUN: OPEN A JAR</h1>
+<div id="jar">\u{1FAD9}</div>
+<div id="grip"><div id="gfill"></div></div>
+<button id="hold">HOLD TO GRIP</button>
+<div id="say">hold GRIP to build hold strength, then TAP TWIST fast before grip runs out.</div>
+<button id="twist" style="display:none">TAP TO TWIST!</button>
+<div id="best">personal best: --</div>
+<script>
+document.getElementById('jar').innerHTML='&#129753;';
+let holding=false,grip=0,twists=0,phase='idle',t0=0,decay=null,best=null;
+const gf=document.getElementById('gfill'),say=document.getElementById('say');
+const RESIST=[10,14,18];
+let target=10;
+setInterval(()=>{
+  if(holding&&phase==='idle'){
+    grip=Math.min(100,grip+4);
+    gf.style.width=grip+'%';
+    if(grip>=60&&!document.getElementById('twist').style.display.includes('block')){
+      document.getElementById('twist').style.display='inline-block';
+      document.getElementById('hold').disabled=true;
+      phase='twist';twists=0;t0=Date.now();
+      target=RESIST[Math.floor(Math.random()*RESIST.length)];
+      say('GRIP LOCKED. twist! TWIST!');
+      decay=setInterval(()=>{grip=Math.max(0,grip-2.2);gf.style.width=grip+'%';if(grip<=0)slip();},80);
+    }
+  }
+},33);
+function slip(){
+  clearInterval(decay);phase='idle';grip=0;gf.style.width='0%';
+  document.getElementById('twist').style.display='none';
+  document.getElementById('hold').disabled=false;
+  say('BUTTERFINGERS. the jar laughs in glass.');
+}
+document.getElementById('hold').addEventListener('pointerdown',()=>holding=true);
+addEventListener('pointerup',()=>{holding=false;if(phase==='twist')slip();});
+document.getElementById('twist').addEventListener('click',()=>{
+  twists++;
+  if(twists===1&&Math.random()<.12){
+    win(true);return;
+  }
+  if(twists>=target)win(false);
+});
+function win(instant){
+  clearInterval(decay);
+  const t=((Date.now()-t0)/1000).toFixed(2);
+  phase='idle';grip=0;gf.style.width='0%';
+  document.getElementById('twist').style.display='none';
+  document.getElementById('hold').disabled=false;
+  if(best===null||+t<best){best=t;}
+  document.getElementById('best').textContent='personal best: '+best+'s';
+  say(instant?'the lid was ALREADY LOOSE. is this even a sport?':'POP! lid defeated in '+t+'s. the kitchen applauds.');
+}
+</script>
+</body>
+</html>

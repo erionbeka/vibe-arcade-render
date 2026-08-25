@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>POTATO FUTURES EXCHANGE</title>
+<style>
+  html,body{margin:0;height:100%;background:#0a1410;color:#dfeee2;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+  h1{font-size:.95rem;color:#7dff8a;margin:0;text-align:center}
+  canvas{border:3px solid #2e5c3a;background:#07120c}
+  #price{font-size:2rem;color:#ffe600}
+  #news{min-height:30px;color:#9fe0ff;text-align:center;padding:0 12px;width:min(480px,92vw)}
+  #row{display:flex;gap:12px}
+  button{padding:11px 18px;font-family:inherit;font-size:.95rem;border:3px solid #2e5c3a;background:#122418;color:#c9ffd2;cursor:pointer}
+  button:hover{background:#1a3624}
+  #stats{color:#9fb8a5;font-size:.95rem;text-align:center}
+</style>
+</head>
+<body>
+<h1>POTATO FUTURES EXCHANGE<br>(unregulated)</h1>
+<canvas id="c" width="480" height="160"></canvas>
+<div id="price">$10.00</div>
+<button id="buy">BUY POTATO</button><button id="sell">SELL POTATO</button>
+<div id="news">market opens. everyone is calm. for now.</div>
+<div id="stats">cash $100 \u00B7 potatoes: 0 \u00B7 net worth $100 (in fries)</div>
+<script>
+(function(){window.__beep=function(f,d){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.frequency.value=f;g.gain.value=.05;g.gain.exponentialRampToValueAtTime(.001,a.currentTime+d);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+let price=10,cash=100,taters=0;
+const hist=Array(60).fill(10);
+const NEWS=[['celebrity mashes potato live on stream',-1.5],['PEAK CARB declared by magazine',2],['gravy futures soar',1.8],['salad influencers attack','attack'],['new fry shape announced: curvier',1.2],['potato found shaped like moon. collectors frenzy',2.5],['someone described potatoes as "fine i guess"',-2],['chip shortage rumors (the crunchy kind)',1.6],['mash market crashes. lumps everywhere',-1.8]];
+function tickMarket(){
+  const n=NEWS[Math.floor(Math.random()*NEWS.length)];
+  document.getElementById('news').textContent='NEWS: '+n[0];
+  price=Math.max(1,price+(Math.random()-.48)*2+n[1]*.5);
+  hist.push(price);hist.shift();
+  draw();
+  upd();
+}
+function draw(){
+  const c=document.getElementById('c'),x=c.getContext('2d');
+  x.clearRect(0,0,480,160);
+  x.strokeStyle='#7dff8a';x.lineWidth=2;x.beginPath();
+  hist.forEach((p,i)=>{const px=i*8,py=150-(p-1)*4;i?x.lineTo(px,py):x.moveTo(px,py);});
+  x.stroke();
+}
+function upd(){
+  document.getElementById('price').textContent='$'+price.toFixed(2);
+  document.getElementById('stats').innerHTML='cash $'+cash.toFixed(2)+' \u00B7 potatoes: '+taters+' \u00B7 net worth $'+(cash+taters*price).toFixed(2)+' (in fries)';
+}
+document.getElementById('buy').addEventListener('click',()=>{if(cash>=price){cash-=price;taters++;__beep(500,.06);}upd();});
+document.getElementById('sell').addEventListener('click',()=>{if(taters>0){cash+=price;taters--;__beep(700,.06);}upd();});
+setInterval(tickMarket,2600);
+draw();upd();
+</script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>THERMOSTAT WARS</title>
+<style>
+  html,body{margin:0;height:100%;background:#0e1a24;color:#e3f2fd;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+  h1{font-size:.95rem;color:#4fc3f7;margin:0}
+  #temp{font-size:3.2rem;color:#ffd23e}
+  #slider{width:min(420px,88vw);accent-color:#4fc3f7}
+  #meters{display:flex;gap:30px;font-size:1rem}
+  .bar{width:130px;height:16px;border:3px solid #37474f;background:#0b141c}
+  .bar div{height:100%;width:50%}
+  #say{min-height:52px;text-align:center;width:min(440px,90vw)}
+  button{padding:11px 20px;font-family:inherit;border:3px solid #4fc3f7;background:#12283a;color:#d3ecff;cursor:pointer}
+</style>
+</head>
+<body>
+<h1>THERMOSTAT WARS</h1>
+<div id="temp">72°F</div>
+<input type="range" id="slider" min="58" max="82" value="72">
+<div id="meters">
+  <div>YOU <div class="bar"><div id="my" style="background:#4fc3f7"></div></div></div>
+  <div>ROOMMATE <div class="bar"><div id="rm" style="background:#ef9a9a"></div></div></div>
+</div>
+<div id="say">your roommate wants it warmer. you want it colder. there is one dial. this is war.</div>
+<button id="truce">PROPOSE TRUCE</button>
+<script>
+let temp=72,touching=false,roommate=76,mine=66,peaceT=0,war=true;
+const slider=document.getElementById('slider'),say=document.getElementById('say');
+const NOTES=['roommate: "i can see my breath in JULY."','you found a space heater. hidden. plotting.','passive-aggressive note detected on the fridge.','roommate wears a parka indoors. as a statement.','someone taped over the thermostat sensor.','the cat is the only comfortable one.'];
+function upd(){
+  document.getElementById('temp').textContent=Math.round(temp)+'\u00B0F';
+  const myC=Math.max(5,100-Math.abs(temp-mine)*8);
+  const rmC=Math.max(5,100-Math.abs(temp-roommate)*8);
+  document.getElementById('my').style.width=myC+'%';
+  document.getElementById('rm').style.width=rmC+'%';
+}
+setInterval(()=>{
+  if(!war)return;
+  if(!touching){
+    temp+=Math.sign(roommate-temp)*.35;
+    if(Math.random()<.25)say(NOTES[Math.floor(Math.random()*NOTES.length)]);
+  }
+  temp=Math.max(58,Math.min(82,temp));
+  upd();
+},700);
+slider.addEventListener('input',()=>{touching=true;war=true;peaceT=0;temp=+slider.value;upd();});
+slider.addEventListener('change',()=>setTimeout(()=>touching=false,400));
+document.getElementById('truce').addEventListener('click',()=>{
+  roommate=(roommate+mine)/2;
+  say.textContent='both parties agree to meet at '+(Math.round((roommate+mine)/2))+'\u00B0F. peace lasts 4 minutes.';
+});
+setInterval(()=>{
+  if(Math.abs(temp-roommate)<1.6&&Math.abs(temp-mine)<1.6){peaceT++;if(peaceT>=8&&war){war=false;say.innerHTML='<b style="color:#7dff8a">IMPOSSIBLE. HARMONY ACHIEVED.</b><br>historians will doubt this screenshot.';}}
+  else peaceT=0;
+},500);
+upd();
+</script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CROSSWALK BUTTON</title>
+<style>
+  html,body{margin:0;height:100%;background:#14181f;color:#e8eef2;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+  h1{font-size:.95rem;color:#ffd54f;margin:0;text-align:center}
+  #pole{position:relative;width:120px;height:220px;background:#39424d;border-radius:12px;display:flex;align-items:center;justify-content:center}
+  #btnx{width:64px;height:64px;border-radius:50%;background:#d33f49;border:6px solid #7a1f27;cursor:pointer;font-family:inherit;color:#fff;font-weight:bold}
+  #light{font-size:2rem;height:44px}
+  #street{width:min(420px,90vw);height:14px;background:#233;background-image:repeating-linear-gradient(90deg,#ffe600 0 30px,#111 30px 60px)}
+  #peds{display:flex;gap:8px;font-size:1.6rem;min-height:40px}
+  #say{min-height:52px;text-align:center;width:min(440px,90vw)}
+  #count{color:#8fa0b0}
+</style>
+</head>
+<body>
+<h1>CROSSWALK BUTTON</h1>
+<div id="light">&#128678;</div>
+<div id="street"></div>
+<div id="peds"></div>
+<div id="pole"><button id="btnx">PRESS</button></div>
+<div id="say">the light is red. press the button. that is the deal.</div>
+<div id="count">presses: <span id="pc">0</span></div>
+<script>
+let presses=0,cycle=0;
+const say=document.getElementById('say'),light=document.getElementById('light'),peds=document.getElementById('peds');
+const JUDGES=['\u{1F469}','\u{1F468}','\u{1F9D3}','\u{1F9D4}','\u{1F467}','\u{1F46E}','\u{1F435}'];
+document.getElementById('btnx').addEventListener('click',()=>{
+  presses++;document.getElementById('pc').textContent=presses;
+  __beep(300,.06);
+  const lines=[
+    'registered. the system acknowledges you.',
+    'the button does not care. keep pressing.',
+    'somewhere, a circuit thinks about it.',
+    'extra pressing adds emotional value only.',
+    'you and the button have something special now.',
+    'the light will change when the LIGHT decides.'
+  ];
+  say.textContent=lines[Math.min(lines.length-1,Math.floor(presses/3))]||lines[lines.length-1];
+});
+setInterval(()=>{
+  cycle++;
+  if(cycle%7===3&&peds.children.length<4){
+    const p=document.createElement('span');p.textContent=JUDGES[Math.floor(Math.random()*JUDGES.length)];
+    p.title='they are judging your pressing technique';
+    peds.appendChild(p);
+    setTimeout(()=>p.remove(),9000);
+  }
+},1300);
+setTimeout(()=>{
+  setInterval(()=>{
+    light.innerHTML='&#9918;';
+    __beep(1000,.15);
+    say.innerHTML='<b style="color:#7dff8a">WALK SIGNAL!</b> '+presses+' of your presses were honored.<br><i>fun fact: this button was decorative. the timer did everything.</i>';
+    setTimeout(()=>{light.innerHTML='&#128678;';},2600);
+  },16000);
+  say.textContent='wait for it...';
+},5000);
+(function(){window.__beep=function(f,d){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.frequency.value=f;g.gain.value=.05;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>

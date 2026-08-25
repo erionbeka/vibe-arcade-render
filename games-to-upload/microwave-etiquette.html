@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MICROWAVE ETIQUETTE TRAINER</title>
+<style>
+  html,body{margin:0;height:100%;background:#12181c;color:#e8eef2;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+  h1{font-size:.95rem;color:#ffd54f;margin:0;text-align:center}
+  #scene{width:min(480px,92vw);min-height:110px;background:#1d262d;border:3px solid #37474f;padding:16px;font-size:1.05rem;line-height:1.5}
+  #opts{display:flex;flex-direction:column;gap:8px;width:min(480px,92vw)}
+  #opts button{text-align:left;padding:11px 14px;font-family:inherit;border:3px solid #37474f;background:#182128;color:#d3e3ee;cursor:pointer}
+  #opts button:hover{border-color:#ffd54f}
+  #karmaWrap{display:flex;align-items:center;gap:10px}
+  #kb{width:180px;height:14px;border:3px solid #37474f;background:#0b1114}
+  #kf{height:100%;width:50%;background:#ffd54f}
+</style>
+</head>
+<body>
+<h1>MICROWAVE ETIQUETTE TRAINER<br>(office break room)</h1>
+<div id="scene"></div>
+<div id="opts"></div>
+<div id="karmaWrap">OFFICE KARMA <div id="kb"><div id="kf"></div></div></div>
+<script>
+let karma=50,i=0;
+const SCENES=[
+ {s:'Someone left fish in the microwave overnight. It is morning. The smell greets you personally.',o:['ventilate silently like a professional','reheat it to assert dominance','leave an anonymous strongly-worded memo'],k:[6,-12,2],r:['the office respects quiet heroism.','the smell now has legal rights here.','memo read aloud at meeting. mystery author suspected.'] },
+ {s:'Your soup explodes. The turntable is decorated.',o:['clean every surface immediately','close door, walk away, assume new identity','place sticky note: "FREE SOUP"'],k:[8,-15,-4],r:['spotless. you are the chosen one.','the next user screams. HR notified.','two people fell for it. legend status pending.']},
+ {s:'A line forms. Someone\'s lunch takes 9:59 on the timer.',o:['wait patiently with dignity','hover and sigh audibly','unplug it at 9:58'],k:[5,-8,-20],r:['patience noted by the elders.','the sigh was heard in accounting.','you are the villain of this story now.']},
+ {s:'The "please cover your food" sign has been ignored. Again.',o:['buy everyone splatter lids','ignore it, it is not your journey','replace sign with stricter sign'],k:[7,0,3],r:['office saint status achieved.','neutrality preserves energy.','sign escalation war has begun.']},
+ {s:'Someone is watching their food rotate. The whole time. Silent eye contact through glass.',o:['join the vigil','break the silence with small talk','slowly walk away backwards','' ],k:[3,4,-2],r:['you both understand things now.','you learned their dog\'s name. bonds formed.','backwards exit: flawless execution.']},
+ {s:'Your turn. You hear the dreaded beep-beep-beep of someone pressing CANCEL.',o:['accept fate gracefully','restart your time loudly','eat it cold, stare into distance'],k:[4,-6,1],r:['zen achieved.','the beeping war begins. casualties expected.','cold pizza builds character.']}
+];
+function render(){
+  if(i>=SCENES.length){
+    document.getElementById('scene').innerHTML=karma>=75?'FINAL VERDICT: BREAK ROOM MONARCH.<br>Your mug gets the top shelf forever.':karma>=40?'FINAL VERDICT: TOLERATED COLLEAGUE.<br>People will microwave near you.':'FINAL VERDICT: BANISHED TO THE BASEMENT MICROWAVE.<br>It only has one power level.';
+    document.getElementById('opts').innerHTML='<button onclick="location.reload()">RETRAIN</button>';
+    return;
+  }
+  const s=SCENES[i];
+  document.getElementById('scene').textContent=s.s;
+  const box=document.getElementById('opts');box.innerHTML='';
+  s.o.forEach((txt,j)=>{
+    if(!txt)return;
+    const b=document.createElement('button');b.textContent=txt;
+    b.addEventListener('click',()=>{
+      karma=Math.max(0,Math.min(100,karma+s.k[j]));
+      document.getElementById('kf').style.width=karma+'%';
+      document.getElementById('scene').innerHTML=s.r[j];
+      box.innerHTML='<button id="next">NEXT SCENARIO</button>';
+      document.getElementById('next').addEventListener('click',()=>{i++;render();});
+    });
+    box.appendChild(b);
+  });
+}
+render();
+</script>
+</body>
+</html>

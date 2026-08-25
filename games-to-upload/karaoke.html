@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>KARAOKE SCORER</title>
+<style>
+  html,body{margin:0;height:100%;background:#160a24;color:#f5ecff;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+  h1{font-size:.95rem;color:#ff6ec7;margin:0;text-align:center}
+  #line{width:min(520px,92vw);text-align:center;font-size:1.25rem;color:#ffe600;min-height:60px}
+  input{width:min(520px,92vw);padding:12px;background:#1e1230;border:3px solid #7a3fd0;color:#fff;font-family:inherit;font-size:1rem;outline:none;text-align:center}
+  button{padding:12px 24px;font-family:inherit;font-size:1rem;border:3px solid #ff6ec7;background:#2a1038;color:#ffd9f2;cursor:pointer}
+  #score{font-size:1.6rem;color:#7dff8a;height:36px}
+  #audience{min-height:30px;color:#c9a3ee;text-align:center;padding:0 10px;width:min(480px,92vw)}
+</style>
+</head>
+<body>
+<h1>KARAOKE SCORER<br>(audience is drunk but honest)</h1>
+<div id="line">press START for the lyric...</div>
+<input id="guess" placeholder="type what you remember..." style="display:none" autocomplete="off">
+<button id="go">START SONG</button>
+<div id="score"></div>
+<div id="audience">*the mic smells like quarters*</div>
+<script>
+const LYRICS=[
+ 'never gonna give you up',
+ 'is this the real life is this just fantasy',
+ 'we all live in a yellow submarine',
+ 'just a small town girl living in a lonely world',
+ 'i got friends in low places'
+];
+const HYPE=['the crowd goes mild!','someone yelled WOO. unclear at whom.','a napkin lands at your feet. respect.','the bartender nods solemnly.','you have moved no one and yet everyone.'];
+const ROASTS=['the audience claps out of fear.','a glass breaks. on purpose?','even the karaoke machine winced.','somewhere, the original artist felt a disturbance.','the drunk guy is now singing INSTEAD of you.'];
+let cur=null,round=0,total=0;
+const lineEl=document.getElementById('line'),guess=document.getElementById('guess'),btn=document.getElementById('go'),score=document.getElementById('score'),aud=document.getElementById('audience');
+function sim(a,b){
+  a=a.toLowerCase().replace(/[^a-z ]/g,'').trim();b=b.toLowerCase().replace(/[^a-z ]/g,'').trim();
+  if(!a)return 0;
+  const bw=b.split(/\s+/);
+  let hits=0;
+  const aw=a.split(/\s+/);
+  for(const w of aw){if(bw.includes(w))hits++;}
+  return Math.round((hits/aw.length)*100);
+}
+btn.addEventListener('click',()=>{
+  if(cur!==null){
+    const pct=sim(LYRICS[cur],guess.value);
+    total+=pct;round++;
+    score.textContent=pct+'%';
+    aud.textContent=pct>85?'FLAWLESS?! '+HYPE[Math.floor(Math.random()*HYPE.length)]:pct>50?'passable energy. '+ROASTS[1]:ROASTS[Math.floor(Math.random()*ROASTS.length)];
+    guess.style.display='none';cur=null;
+    btn.textContent=round>=3?'FINAL RESULTS':'NEXT LYRIC';
+    if(round>=3){
+      const avg=Math.round(total/3);
+      lineEl.innerHTML='NIGHT OVER.<br><span style="color:#fff">average: '+avg+'%</span><br>'+(avg>85?'YOU ARE THE NIGHT.':avg>50?'solidly okay. karaoke is about heart anyway.':'the machine has flagged your account.');
+      btn.textContent='SING AGAIN';
+      round=0;total=0;return;
+    }
+    return;
+  }
+  cur=Math.floor(Math.random()*LYRICS.length);
+  lineEl.textContent='"'+LYRICS[cur]+'"';
+  btn.textContent='I KNOW IT';
+  setTimeout(()=>{
+    lineEl.textContent='(sing it from memory)';
+    guess.style.display='block';guess.value='';guess.focus();
+    btn.textContent='SUBMIT PERFORMANCE';
+  },2800);
+});
+</script>
+</body>
+</html>

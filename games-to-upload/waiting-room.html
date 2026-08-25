@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>WAITING ROOM</title>
+<style>
+  html,body{margin:0;height:100%;background:#1c222b;color:#e8edf2;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+  h1{font-size:.95rem;color:#89b8dd;margin:0;text-align:center}
+  #ticket{font-size:3rem;color:#ffd23e;border:4px dashed #55636b;padding:10px 40px;border-radius:10px}
+  #now{color:#ff8a8a;font-size:1.2rem}
+  #room{color:#8fa0b0;font-size:.95rem;text-align:center;line-height:1.8}
+  button{padding:11px 20px;font-family:inherit;border:3px solid #89b8dd;background:#1d2937;color:#cfe3f2;cursor:pointer}
+</style>
+</head>
+<body>
+<h1>WAITING ROOM<br>(please have a seat)</h1>
+<div id="ticket">--</div>
+<button id="go">TAKE A NUMBER</button>
+<div id="now">now serving: --</div>
+<div id="room">the fluorescent hum is free of charge.</div>
+<script>
+let mine=null,served=0;
+const EVENTS=[
+ 'someone\'s number was called twice. they ascended.',
+ 'a TV in the corner plays cooking shows muted. captions are wrong on purpose.',
+ 'you have made eye contact with 4 strangers. bonds formed. words: none.',
+ 'the water cooler gurgles ominously.',
+ 'a child asks "is it much longer". everyone ages.',
+ 'an old magazine offers you a quiz from 2011. you accept.',
+ 'your phone is at 3%. you feel true freedom.',
+ 'someone takes the last comfortable chair. you remember.',
+ 'the receptionist stamps something important-sounding.'
+];
+document.getElementById('go').addEventListener('click',()=>{
+  mine=80+Math.floor(Math.random()*15);
+  document.getElementById('ticket').textContent='#'+mine;
+  document.getElementById('go').style.display='none';
+});
+setInterval(()=>{
+  if(mine===null)return;
+  served+=Math.random()<.75?1:0;
+  document.getElementById('now').textContent='now serving: #'+served;
+  if(served>=mine){
+    document.getElementById('room').innerHTML='<b style="color:#7dff8a">WINDOW 4 PLEASE.</b><br>you forgot which form you needed.<br>take a new number.';
+    served=0;mine=null;
+    setTimeout(()=>{document.getElementById('ticket').textContent='--';document.getElementById('go').style.display='block';},2200);
+    return;
+  }
+  if(Math.random()<.5){
+    const r=document.getElementById('room');
+    r.textContent=EVENTS[Math.floor(Math.random()*EVENTS.length)];
+    __beep(240,.05);
+  }
+},1500);
+(function(){window.__beep=function(f,d){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.frequency.value=f;g.gain.value=.03;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>
