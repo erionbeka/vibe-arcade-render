@@ -1,33 +1,11 @@
 let state = { q: '', tag: '', sort: 'new', page: 1 };
 
-// Stupid-word forge: grows a fake word from the game's own initial,
-// cross-bred with shared letter pools so every card invents new language.
-const PH_A = ['BL','SN','GR','FL','KR','WO','ZO','MU','PL','DR','SK','THW','QU','BR','GL'];
-const PH_B = ['NK','RP','MB','ZZ','G','MP','LK','BSH','NG','TT','FF','RG'];
-const PH_C = ['A','O','E','OO','U','Y',''];
-const PH_CAPS = ['A REAL WORD','IN THE DICTIONARY*','*NOT IN THE DICTIONARY','PRONOUNCE IT. WE DARE YOU','OFFICIALLY A WORD NOW','SAY IT OUT LOUD'];
-function phHash(s){let h=0;for(const ch of s)h=((h*31)+ch.charCodeAt(0))>>>0;return h;}
-function phWord(title){
-  let h=phHash(title);
-  const next=n=>{h=(h*1664525+1013904223)>>>0;return h%n;};
-  const initial=(title.replace(/[^a-z]/i,'')[0]||'X').toUpperCase();
-  let w=next(10)<4?initial:'';
-  w+=PH_A[next(PH_A.length)];
-  w+=PH_C[next(PH_C.length)];
-  w+=PH_B[next(PH_B.length)];
-  if(next(3)===0)w+=PH_C[next(PH_C.length)];
-  return w.toUpperCase().slice(0,9);
-}
-function phCaption(title){
-  return PH_CAPS[phHash(title+'cap')%PH_CAPS.length];
-}
 function cardHtml(g) {
   const thumb = g.screenshot
     ? `<img class="card-thumb" src="${escapeHtml(g.screenshot)}" alt="" loading="lazy">`
     : (() => {
-        const word = phWord(g.title);
-        const size = word.length > 6 ? '.9rem' : word.length > 4 ? '1.15rem' : '1.5rem';
-        return `<div class="card-thumb-placeholder"><span class="ph-letter" style="font-size:${size}">${escapeHtml(word)}</span><span class="ph-cap">${escapeHtml(phCaption(g.title))}</span></div>`;
+        const L = (g.title.replace(/[^a-z]/i,'')[0] || '?').toUpperCase();
+        return `<div class="card-thumb-placeholder"><span class="ph-letter">${escapeHtml(L)}</span></div>`;
       })();
   const tags = g.tags.map(t => `<span class="mini-tag">${escapeHtml(t)}</span>`).join('');
   return `

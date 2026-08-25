@@ -81,9 +81,6 @@ app.use(session({
   }
 }));
 
-app.use('/api', apiLimiter);
-app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1d' })); // hashed? no, but 1 day is safe
-
 // Uploaded content is untrusted: never sniff types; games run in a sandboxed iframe.
 // Short cache so seed refreshes reach players quickly.
 const uploadsStatic = express.static(path.join(__dirname, 'uploads'), {
@@ -92,7 +89,12 @@ const uploadsStatic = express.static(path.join(__dirname, 'uploads'), {
     res.setHeader('X-Content-Type-Options', 'nosniff');
   }
 });
+// game HTML passes through the mobile shim first; other assets stream straight
+app.get(/\/uploads\/games\/.+\.html?$/i, require('./src/mobile-shim').mobileGamesMiddleware(path.join(__dirname, 'uploads')));
 app.use('/uploads', uploadsStatic);
+
+app.use('/api', apiLimiter);
+app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1d' }));
 
 app.use('/api/auth/register', authLimiter);
 app.use('/api/auth/login', authLimiter);

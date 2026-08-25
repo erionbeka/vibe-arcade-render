@@ -237,13 +237,8 @@ select:focus { border-color: var(--cyan); }
 }
 .ph-letter {
   font-family: 'Press Start 2P', monospace;
-  font-size: 2rem; color: rgba(255, 230, 0, .9);
+  font-size: 2.2rem; color: rgba(255, 230, 0, .9);
   text-shadow: 4px 4px 0 rgba(255, 43, 214, .55);
-}
-.ph-cap {
-  font-family: 'Press Start 2P', monospace;
-  font-size: .38rem; letter-spacing: 1px;
-  color: rgba(0, 240, 255, .85);
 }
 .card-body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 9px; flex: 1; }
 .card-title {
