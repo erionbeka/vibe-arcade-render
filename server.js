@@ -69,6 +69,7 @@ app.use(session({
   secret,
   resave: false,
   saveUninitialized: false,
+  store: require('./src/session-store'), // SQLite-backed: survives reboots, no memory leak
   cookie: {
     httpOnly: true,
     sameSite: 'lax',

@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: vibe-arcade
+    name: vibearc
     runtime: node
     plan: free
     buildCommand: npm ci
