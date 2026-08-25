@@ -1,7 +1,20 @@
 const crypto = require('crypto');
 const express = require('express');
 const bcrypt = require('bcryptjs');
+const { spawn } = require('child_process');
+const path = require('path');
 const db = require('./db');
+
+// non-blocking background snapshot (used for critical moments like registration)
+function backupSnap(reason) {
+  try {
+    if (!(process.env.BACKUP_REPO && process.env.BACKUP_TOKEN)) return;
+    const child = spawn(process.execPath,
+      [path.join(__dirname, '..', 'scripts', 'backup.js'), 'snap'],
+      { detached: true, stdio: 'ignore', env: process.env });
+    child.unref();
+  } catch { /* best effort */ }
+}
 
 const router = express.Router();
 
@@ -50,6 +63,7 @@ router.post('/register', (req, res) => {
     .run(username, hash, isFirstUser ? 1 : 0);
   req.session.userId = info.lastInsertRowid;
   const user = db.prepare('SELECT * FROM users WHERE id = ?').get(info.lastInsertRowid);
+  backupSnap('register'); // a new human exists — save them immediately
   res.json({ user: publicUser(user) });
 });
 
