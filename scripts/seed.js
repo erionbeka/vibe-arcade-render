@@ -245,6 +245,12 @@ const CATALOG_HANDMADE = [
     tags:'reflex mouse swarm escalating'
   },
   {
+    file: 'vibeball.html',
+    title: 'VIBEBALL (1v1 MULTIPLAYER)',
+    description: 'REAL-TIME PvP pong-soccer. Create a match, share the code, humiliate a friend live. Server-side ball physics means NO excuses.\n\nFirst to 5 goals wins the Vibeball Cup. The announcer is unwell. Rematches encouraged; grudges included free.',
+    tags: 'multiplayer pvp sports realtime'
+  },
+  {
     file: 'waiting-room.html',
     title: 'WAITING ROOM',
     description: 'Take a number. Sit. The fluorescent hum is free of charge.\n\nWatch numbers get called while bonding silently with strangers, reading a 2011 magazine quiz, and aging at the exact speed of bureaucracy.',

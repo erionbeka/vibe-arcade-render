@@ -115,12 +115,14 @@ const server = app.listen(PORT, () => {
   console.log(`Vibe Arcade running at http://localhost:${PORT}`);
 });
 
+require('./src/arena').attach(server); // VIBEBALL multiplayer
+
 // Periodic + on-exit snapshots so reboots never lose user content
 if (process.env.BACKUP_REPO && process.env.BACKUP_TOKEN) {
   const backup = require('./scripts/backup');
   setInterval(() => {
     try { backup.snapshot('periodic'); } catch (e) { console.error('[backup]', e.message); }
-  }, 15 * 60 * 1000);
+  }, 5 * 60 * 1000);
   const goodbye = sig => {
     console.log(`\n${sig} received \u2014 saving arcade state...`);
     try { backup.snapshot('shutdown'); } catch (e) { /* best effort */ }

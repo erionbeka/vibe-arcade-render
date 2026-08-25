@@ -27,8 +27,8 @@
 <div id="msg">floor 1: the lobby. someone has microwaved fish recently.</div>
 <script>
 const panel=document.getElementById('panel'),cab=document.getElementById('cab'),disp=document.getElementById('display'),msg=document.getElementById('msg');
-const FLOORS={1:'the lobby. someone has microwaved fish recently.',2:'an office. identical to floor 3.',3:'an office. identical to floor 2.',4:'marketing. they have a foosball table nobody uses.',5:'"the creative floor" (same desks).',6:'storage. the copier goes here to retire.',7:'legal. do not make eye contact.',8:'roof access?? no. also an office.',9:'the mysterious floor 9. it is stairs.'};
-const PASSENGERS=['a man who sighs in morse code','someone eating soup, quietly','a woman with 14 identical boxes','a clown (off duty)','your doppelganger (he noticed too)'];
+const FLOORS={1:'the lobby. someone has microwaved fish recently. the smell has a lease.',2:'an office. identical to floor 3. they are feuding about it.',3:'an office. identical to floor 2. do not bring it up.',4:'marketing. foosball table: present. foosball: never.',5:'"the creative floor" (same desks, one beanbag, huge claims).',6:'storage. the copier comes here to retire with honor.',7:'legal. everyone nods at you slowly. keep walking.',8:'roof access?? no. also an office, but with better light for lies.',9:'the mysterious floor 9. it is stairs. it was always stairs.'};
+const PASSENGERS=['a man who sighs in morse code','someone eating soup, quietly','a woman carrying 14 identical boxes','a clown (off duty, still full of sorrow)','your doppelganger (he noticed too)','an intern holding a single envelope like it is plutonium','two people who clearly agreed to avoid this elevator','a consultant. he bills the ride.','someone practicing a speech: "as per my last..."','a plant. just a plant. nobody questions it.'];
 let busy=false;
 for(let f=9;f>=1;f--){
   const b=document.createElement('button');b.textContent=f;b.dataset.f=f;

@@ -62,7 +62,7 @@ function renderPick(){
     p.appendChild(b);
   });
 }
-const LINES=[[1,'AND THEY\'RE OFF... technically'],[3,'shelly shows incredible courage by existing'],[5,'TURBO IS MOVING. this is not a drill. (it is very slow)'],[8,'sir slimesworth leaves a trail of dignity'],[11,'DAVE IS DOING SOMETHING'],[14,'photo finish pending (no photos available)'],[17,'my grandmother could have crawled faster. no offense to the snails.']];
+const LINES=[[1,'AND THEY\'RE OFF... technically'],[2,'shelly shows incredible courage by existing'],[3,'TURBO IS MOVING. this is not a drill. (it is very slow)'],[4,'sir slimesworth leaves a trail of dignity'],[5,'a wild leaf joins the track. it is disqualified for effort'],[7,'DAVE IS DOING SOMETHING'],[8,'commentators remind everyone this is officially a sport'],[9,'shelly blinks. the crowd gasps'],[10,'turbo achieves a personal best: still last'],[12,'sir slimesworth files a complaint about the grass texture'],[13,'DAVE IS DOING IT AGAIN'],[15,'photo finish pending (no photos available)'],[16,'the league lawyer raises a flag made of lettuce'],[17,'my grandmother could have crawled faster. no offense to the snails.']];
 function start(i){
   if(running)return;
   if(coins<10){ann.textContent='you are broke. the league sponsors you out of pity. (+10 coins)';coins+=10;coinsEl.textContent='coins: '+coins;return;}

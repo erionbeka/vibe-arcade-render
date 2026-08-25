@@ -197,6 +197,13 @@ function createGame(req, res) {
     throw err;
   }
 
+  // instantly back up freshly uploaded content (don't wait for the periodic one)
+  try {
+    if (process.env.BACKUP_REPO && process.env.BACKUP_TOKEN) {
+      require(path.join(__dirname, '..', 'scripts', 'backup')).snapshot('upload');
+    }
+  } catch { /* best effort */ }
+
   res.json({ game: shapeGame(gameRow(gameId, req.session.userId)) });
 }
 

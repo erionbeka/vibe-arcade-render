@@ -17,7 +17,7 @@
 <script>
 const cv=document.getElementById('c'),x=cv.getContext('2d'),W=600,H=400;
 let px=W/2,hp=5,bossHp=100,t=0,memos=[],staplers=[],parts=[],dead=false,won=false,score=100,inv=0;
-const BOSSLINES=['your Q3 output was "a vibe"','we are moving your desk to the load-bearing wall','per my last email...','this will go in your permanent record','synergy seminar: mandatory. weekend.','i too once had dreams'];
+const BOSSLINES=['your Q3 output was "a vibe"','we are moving your desk to the load-bearing wall','per my last email...','this will go in your permanent record','synergy seminar: mandatory. weekend.','i too once had dreams','HR described you as "present"','the vending machine complaint? denied.','your idea was implemented. by someone else. better.','we hired a consultant to explain why we need consultants','team-building event: trust falls onto concrete (metaphorically)','your keyboard volume has been noted'];
 addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','a','d'].includes(e.key))keys[e.key]=1;if(e.code==='Space')throwSt();});
 addEventListener('keyup',e=>keys[e.key]=0);
 const keys={};

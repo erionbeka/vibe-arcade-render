@@ -6,7 +6,7 @@
 //
 // How it works at runtime (wired in server.js):
 //   - on boot: restore data/ + uploads/ from the last snapshot (if any)
-//   - every 15 min + on SIGTERM/SIGINT: commit & push a fresh snapshot
+//   - every 5 min + on SIGTERM/SIGINT: commit & push a fresh snapshot
 const path = require('path');
 const fs = require('fs');
 const { execFileSync } = require('child_process');

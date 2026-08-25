@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>VIBEBALL</title>
+<style>
+  html,body{margin:0;height:100%;background:#071418;color:#dffbff;font-family:Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+  h1{font-size:1rem;margin:0;color:#ffe600;text-shadow:0 0 14px rgba(255,230,0,.5)}
+  canvas{border:4px solid #1e5c50;background:#0a2420;border-radius:12px;touch-action:none}
+  #lobby{display:flex;flex-direction:column;gap:12px;align-items:center;background:#0e2a26;border:3px solid #1e5c50;padding:22px;border-radius:14px;width:min(400px,90vw)}
+  input{padding:11px 13px;background:#06201b;border:3px solid #1e5c50;color:#fff;font-family:inherit;font-size:1rem;text-align:center;outline:none;width:200px}
+  .row{display:flex;gap:10px}
+  button{padding:11px 18px;font-family:inherit;font-size:.95rem;border:3px solid #ffd23e;background:#24200a;color:#ffe9a8;cursor:pointer;border-radius:9px}
+  button:hover{filter:brightness(1.2)}
+  #code{font-size:1.6rem;color:#7dff8a;letter-spacing:6px}
+  #status{min-height:24px;text-align:center;color:#9fe0c8;padding:0 10px;width:min(480px,92vw)}
+  .hide{display:none !important}
+</style>
+</head>
+<body>
+<h1>VIBEBALL</h1>
+
+<div id="lobby">
+  <input id="name" placeholder="your legendary name" maxlength="18" value="">
+  <div class="row">
+    <button id="create">CREATE MATCH</button>
+    <button id="join">JOIN WITH CODE</button>
+  </div>
+  <div class="row hide" id="joinRow">
+    <input id="codeIn" placeholder="CODE" maxlength="6" style="text-transform:uppercase">
+    <button id="joinGo">GO</button>
+  </div>
+  <div id="code" class="hide"></div>
+  <div class="muted" style="color:#7aa89b;font-size:.85rem">share the code with a friend. or an enemy. sports has no rules.</div>
+</div>
+
+<canvas id="c" width="640" height="400" class="hide"></canvas>
+<div id="status">the pitch awaits.</div>
+
+<script>
+const cv = document.getElementById('c'), x = cv.getContext('2d');
+const W = 640, H = 400;
+let ws = null, mySlot = -1, state = null, names = ['Player 1', 'Player 2'];
+let flash = '', flashT = 0, ended = null;
+
+function status(t) { document.getElementById('status').textContent = t; }
+
+document.getElementById('create').addEventListener('click', () => {
+  const code = Math.random().toString(36).slice(2, 6).toUpperCase();
+  connect(code);
+});
+document.getElementById('join').addEventListener('click', () => document.getElementById('joinRow').classList.toggle('hide'));
+document.getElementById('joinGo').addEventListener('click', () => {
+  const c = document.getElementById('codeIn').value.trim().toUpperCase();
+  if (c.length >= 3) connect(c);
+});
+
+function connect(room) {
+  const name = (document.getElementById('name').value || 'Anonymous Vibes').slice(0, 18);
+  const url = (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/arena';
+  try { ws = new WebSocket(url); } catch (e) { status('could not reach arena: ' + e.message); return; }
+  ws.onopen = () => ws.send(JSON.stringify({ t: 'join', room, name }));
+  ws.onmessage = ev => handle(JSON.parse(ev.data));
+  ws.onclose = () => { if (!ended) status('disconnected from the arena. refresh to rejoin.'); };
+}
+
+function handle(m) {
+  if (m.t === 'joined') {
+    mySlot = m.slot; names = m.names;
+    document.getElementById('lobby').classList.add('hide');
+    cv.classList.remove('hide');
+    if (m.waiting && m.slot !== -1) {
+      document.getElementById('code').textContent = m.room;
+      document.getElementById('code').classList.remove('hide');
+      status('MATCH CODE: ' + m.room + ' — send it to your rival.');
+    } else if (m.slot === -1) {
+      status('spectator mode. you watch. you learn.');
+      cv.classList.remove('hide');
+    }
+    return;
+  }
+  if (m.t === 'start') {
+    names = m.names;
+    document.getElementById('lobby').classList.add('hide');
+    cv.classList.remove('hide');
+    document.getElementById('code').classList.add('hide');
+    ended = null;
+    status(names[0] + ' vs ' + names[1] + '. MOVE YOUR MOUSE. first to 5.');
+    __beep(600, .1);
+    return;
+  }
+  if (m.t === 's') { state = m; return; }
+  if (m.t === 'goal') {
+    flash = m.line; flashT = 90;
+    document.getElementById('status').textContent = m.line + '   [' + m.sc[0] + ' - ' + m.sc[1] + ']';
+    __beep(900, .15);
+    return;
+  }
+  if (m.t === 'end') {
+    ended = m;
+    const iWon = mySlot === m.winner;
+    status((mySlot === -1 ? '' : iWon ? 'YOU WIN. ' : 'you lost. ') + m.line);
+    showRematch();
+    __beep(iWon ? 900 : 150, .4, iWon ? 'square' : 'sawtooth');
+    return;
+  }
+  if (m.t === 'left') {
+    status(names[m.who] + ' has left the pitch (fled). create a new match when ready.');
+    ended = { left: true }; showRematch(true);
+  }
+}
+
+function showRematch(newRoom) {
+  let b = document.getElementById('rematchBtn');
+  if (!b) {
+    b = document.createElement('button');
+    b.id = 'rematchBtn';
+    b.style.marginTop = '8px';
+    document.getElementById('status').after(b);
+  }
+  b.textContent = newRoom ? 'NEW MATCH' : 'REMATCH!';
+  b.onclick = () => {
+    if (newRoom) location.reload();
+    else { ws.send(JSON.stringify({ t: 'rematch' })); b.remove(); }
+  };
+}
+
+cv.addEventListener('pointermove', e => {
+  if (!ws || mySlot < 0) return;
+  const r = cv.getBoundingClientRect();
+  const y = (e.clientY - r.top) * (H / r.height);
+  ws.send(JSON.stringify({ t: 'pos', y }));
+});
+cv.addEventListener('touchmove', e => {
+  if (!ws || mySlot < 0) return;
+  e.preventDefault();
+  const r = cv.getBoundingClientRect();
+  ws.send(JSON.stringify({ t: 'pos', y: (e.touches[0].clientY - r.top) * (H / r.height) }));
+}, { passive: false });
+
+(function draw() {
+  requestAnimationFrame(draw);
+  x.clearRect(0, 0, W, H);
+  x.strokeStyle='rgba(125,255,138,.35)';x.lineWidth=3;
+  x.beginPath();x.moveTo(W/2,0);x.lineTo(W/2,H);x.stroke();
+  x.beginPath();x.arc(W/2,H/2,46,0,7);x.stroke();
+  x.font='bold 44px Consolas';x.textAlign='center';x.fillStyle='rgba(255,255,255,.25)';
+  const sc=state?state.sc:[0,0];
+  x.fillText(sc[0],W/2-70,60);x.fillText(sc[1],W/2+70,60);
+  x.fillStyle='#ffd23e';
+  if(state){
+    // pads
+    x.fillStyle='#42a5f5';x.fillRect(24,state.p[0]-40,16,80);
+    x.fillStyle='#ef5350';x.fillRect(W-40,state.p[1]-40,16,80);
+    // ball
+    x.fillStyle='#fff';x.shadowColor='#fff';x.shadowBlur=16;
+    x.beginPath();x.arc(state.b[0],state.b[1],9,0,7);x.fill();x.shadowBlur=0;
+  }
+  x.fillStyle='#7aa89b';x.font='12px Consolas';
+  x.fillText(mySlot===0?names[0]:names[1]||'',70,H-14);
+  x.fillText(mySlot===0?(names[1]||''):names[0],W-70,H-14);
+  x.textAlign='left';
+  if(flashT>0){flashT--;x.fillStyle='rgba(255,230,0,'+(flashT/90)+')';x.font='bold 22px Consolas';x.textAlign='center';x.fillText(flash,W/2,H/2-70);x.textAlign='left';}
+  if(ended&&!ended.left){
+    x.fillStyle='rgba(2,20,10,.75)';x.fillRect(0,150,W,120);
+    x.fillStyle='#7dff8a';x.font='bold 30px Consolas';x.textAlign='center';
+    x.fillText((ended.names?ended.names[ended.winner]:'?')+' WINS',W/2,205);x.textAlign='left';
+  }
+})();
+(function(){window.__beep=function(f,d,t){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.type=t||'square';o.frequency.value=f;g.gain.value=.06;g.gain.exponentialRampToValueAtTime(.001,a.currentTime+d);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d);}catch(e){}};})();
+</script>
+</body>
+</html>

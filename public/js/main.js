@@ -1,9 +1,21 @@
 let state = { q: '', tag: '', sort: 'new', page: 1 };
 
+const PH_WORDS={A:'ALIENS',B:'BANANA',C:'CHAOS',D:'DRAMA',E:'EGGS',F:'FLOP',G:'GHOSTS',H:'HYPE',I:'ICEBERG',J:'JELLY',K:'KETCHUP',L:'LAG',M:'MAYO',N:'NOODLES',O:'OOPS',P:'POTATO',Q:'QUACK',R:'REGRET',S:'SOUP',T:'TOAST',U:'UFO',V:'VIBES',W:'WAFFLES',X:'XYLOPHONE',Y:'YELLING',Z:'ZOMBIES'};
+const PH_SPECIAL=['GRAPHICS: YES','4K ULTRA PIXELS','CRT CERTIFIED','100% REAL GAME','NOW WITH COLOR','AS SEEN ON TV'];
+function phCaption(title){
+  let h=0;for(const ch of title)h=((h*31)+ch.charCodeAt(0))>>>0;
+  if(h%7===0)return PH_SPECIAL[h%PH_SPECIAL.length];
+  const m=title.replace(/[^a-z]/i,'');
+  const L=m?m[0].toUpperCase():'?';
+  return 'IS FOR '+(PH_WORDS[L]||'MYSTERY');
+}
 function cardHtml(g) {
   const thumb = g.screenshot
     ? `<img class="card-thumb" src="${escapeHtml(g.screenshot)}" alt="" loading="lazy">`
-    : `<div class="card-thumb-placeholder">${escapeHtml(g.title.charAt(0).toUpperCase())}</div>`;
+    : (() => {
+        const L = (g.title.replace(/[^a-z]/i,'')[0] || '?').toUpperCase();
+        return `<div class="card-thumb-placeholder"><span class="ph-letter">${escapeHtml(L)}</span><span class="ph-cap">${escapeHtml(phCaption(g.title))}</span></div>`;
+      })();
   const tags = g.tags.map(t => `<span class="mini-tag">${escapeHtml(t)}</span>`).join('');
   return `
   <div class="card">

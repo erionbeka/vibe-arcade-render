@@ -23,19 +23,24 @@
 <div id="say"></div>
 <script>
 let minutes=0,suspicion=0,cool=0,over=false;
-const BOSS=['...so as I was saying, before I said that other thing...','...let\'s circle back to the circling back...','...this slide is a picture of my dog, but the POINT stands...','...we\'ll do a deep dive into why we need more deep dives...'];
+const BOSS=['...so as I was saying, before I said that other thing...','...let\'s circle back to the circling back...','...this slide is a picture of my dog, but the POINT stands...','...we\'ll do a deep dive into why we need more deep dives...','...I asked Brenda to walk us through her deck. Brenda made it in 2019. Brenda is gone.','...the action items are actioning as we speak...','...quick heads-up, this will run long...' (it is minute 4),'...can everyone see my screen? No? Now? ...Now?'];
 const EXITS=[
  {t:'Fake a phone call ("Hello? YES I\'M SIGNING NOW.")',risk:35},
  {t:'The slow lean + laptop close + vanish',risk:55},
  {t:'Pretend the wifi died (dramatic sigh)',risk:25},
  {t:'Cough uncontrollably toward the door',risk:40},
- {t:'Stand up and say "well THIS meeting is over"',risk:80}
+ {t:'Stand up and say "well THIS meeting is over"',risk:80},
+ {t:'Volunteer to take notes, then leave to "type them"',risk:15},
+ {t:'Coffee run for everyone (the hero\'s exit)',risk:30},
+ {t:'Type furiously, gasp, stand abruptly, leave',risk:65}
 ];
+const INTERRUPTS=['Brenda unmutes. Breathing. Says nothing.','Someone shares a slide upside down. Nobody corrects it.','"Going forward" is used going forward.','A dog barks somewhere. The meeting pauses 90 seconds for the dog.','Action items are created. They are already dead.','Fourth "can everyone see my screen?" of the day.','The agenda is now officially decorative.','Someone joins late. Intro round restarts. ALL intros.'];
 function scene(t2){document.getElementById('scene').innerHTML=t2;}
 function say(t2){document.getElementById('say').textContent=t2;}
 function render(){
   if(over)return;
-  scene('<b style="color:#fbbf24">'+BOSS[Math.floor(Math.random()*BOSS.length)]+'</b><br><br>nobody has said anything real for '+minutes+' minutes.');
+  const line=Math.random()<.3?INTERRUPTS[Math.floor(Math.random()*INTERRUPTS.length)]:BOSS[Math.floor(Math.random()*BOSS.length)];
+  scene('<b style="color:#fbbf24">'+line+'</b><br><br>nobody has said anything real for '+minutes+' minutes.');
   const box=document.getElementById('opts');box.innerHTML='';
   const choices=[...EXITS].sort(()=>Math.random()-.5).slice(0,3);
   choices.forEach(ex=>{
