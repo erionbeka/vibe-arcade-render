@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const express = require('express');
 const session = require('express-session');
 const rateLimit = require('express-rate-limit');
+const compression = require('compression');
 
 // Restore saves from GitHub BEFORE opening the database, so a fresh container
 // wakes up with all games/ratings/comments/uploads intact.
@@ -59,6 +60,8 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(compression()); // gzip everything the browser can take
+
 // Brute-force / spam protection
 const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 20, standardHeaders: 'draft-7', legacyHeaders: false });
 const uploadLimiter = rateLimit({ windowMs: 60 * 60 * 1000, limit: 30, standardHeaders: 'draft-7', legacyHeaders: false });
@@ -79,10 +82,12 @@ app.use(session({
 }));
 
 app.use('/api', apiLimiter);
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1d' })); // hashed? no, but 1 day is safe
 
-// Uploaded content is untrusted: never sniff types; games run in a sandboxed iframe
+// Uploaded content is untrusted: never sniff types; games run in a sandboxed iframe.
+// Short cache so seed refreshes reach players quickly.
 const uploadsStatic = express.static(path.join(__dirname, 'uploads'), {
+  maxAge: '5m',
   setHeaders(res) {
     res.setHeader('X-Content-Type-Options', 'nosniff');
   }
@@ -111,6 +116,14 @@ app.use((err, req, res, next) => {
   res.status(500).send('Server error');
 });
 
+// Stability guards: log async explosions instead of dying mid-match
+process.on('unhandledRejection', err => console.error('[unhandledRejection]', err));
+process.on('uncaughtException', err => {
+  console.error('[uncaughtException]', err);
+  // keep serving; only exit if the event loop is truly broken
+  try { require('./scripts/backup').snapshot('crash-guard'); } catch {}
+});
+
 const server = app.listen(PORT, () => {
   console.log(`Vibe Arcade running at http://localhost:${PORT}`);
 });
@@ -126,7 +139,8 @@ if (process.env.BACKUP_REPO && process.env.BACKUP_TOKEN) {
   const goodbye = sig => {
     console.log(`\n${sig} received \u2014 saving arcade state...`);
     try { backup.snapshot('shutdown'); } catch (e) { /* best effort */ }
-    process.exit(0);
+    try { server.close(() => process.exit(0)); } catch { process.exit(0); }
+    setTimeout(() => process.exit(0), 3000); // don't hang the platform
   };
   process.on('SIGTERM', () => goodbye('SIGTERM'));
   process.on('SIGINT', () => goodbye('SIGINT'));

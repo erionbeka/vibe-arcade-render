@@ -101,9 +101,11 @@ function handle(m) {
     const iWon = mySlot === m.winner;
     status((mySlot === -1 ? '' : iWon ? 'YOU WIN. ' : 'you lost. ') + m.line);
     showRematch();
+    showReplayBtn();
     __beep(iWon ? 900 : 150, .4, iWon ? 'square' : 'sawtooth');
     return;
   }
+  if (m.t === 'replayData') { startPlayback(m); return; }
   if (m.t === 'left') {
     status(names[m.who] + ' has left the pitch (fled). create a new match when ready.');
     ended = { left: true }; showRematch(true);
@@ -121,8 +123,47 @@ function showRematch(newRoom) {
   b.textContent = newRoom ? 'NEW MATCH' : 'REMATCH!';
   b.onclick = () => {
     if (newRoom) location.reload();
-    else { ws.send(JSON.stringify({ t: 'rematch' })); b.remove(); }
+    else { ws.send(JSON.stringify({ t: 'rematch' })); b.remove(); document.getElementById('replayBtn')?.remove(); }
   };
+}
+
+let replayFrames = null, ri = 0, replayIv = null;
+function showReplayBtn() {
+  let b = document.getElementById('replayBtn');
+  if (!b) {
+    b = document.createElement('button');
+    b.id = 'replayBtn';
+    b.style.marginLeft = '8px';
+    const rm = document.getElementById('rematchBtn');
+    (rm ? rm.after(b) : document.getElementById('status').after(b));
+  }
+  b.textContent = 'WATCH REPLAY';
+  b.onclick = () => {
+    b.remove();
+    document.getElementById('rematchBtn')?.remove();
+    ws.send(JSON.stringify({ t: 'replay' }));
+    status('loading replay...');
+  };
+}
+function startPlayback(data) {
+  replayFrames = data.frames || [];
+  ri = 0; ended = null;
+  names = data.names;
+  state = { b: [W / 2, H / 2], p: [H / 2, H / 2], sc: data.sc };
+  status('\u25CF REPLAY \u2014 ' + data.names[0] + ' vs ' + data.names[1] + '   final ' + data.sc[0] + '-' + data.sc[1]);
+  const rb = document.getElementById('replayBtn');
+  if (rb) { rb.textContent = 'SKIP \u25B6'; rb.onclick = stopPlayback; }
+  flash = '\u25CF REPLAY'; flashT = 1e9;
+  replayIv = setInterval(() => {
+    if (ri >= replayFrames.length) return stopPlayback();
+    const f = replayFrames[ri++];
+    state = { b: [f[0], f[1]], p: [f[2], f[3]], sc: data.sc };
+  }, 40);
+}
+function stopPlayback() {
+  clearInterval(replayIv); replayIv = null; flashT = 0;
+  status('replay finished. rematch?');
+  showRematch();
 }
 
 cv.addEventListener('pointermove', e => {
