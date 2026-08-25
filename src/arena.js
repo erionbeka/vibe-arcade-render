@@ -1,11 +1,10 @@
 // VIBEBALL — real-time 1v1 pong-soccer over WebSockets.
-// Authoritative server sim + frame recording for replays.
+// Authoritative server sim. Hardened: heartbeats, payload caps, rate limits, caps.
 // Hardened: heartbeats, payload caps, per-second rate limits, room/spectator caps.
 const { WebSocketServer } = require('ws');
 
 const W = 640, H = 400, PAD_H = 80, WIN_SCORE = 5;
 const TICK = 40;                 // 25 fps sim
-const MAX_FRAMES = 9000;         // ~6 min of replay per match
 const MAX_ROOMS = 300;
 const MAX_SPECTATORS = 20;
 const MSG_LIMIT = 90;            // messages per second per socket
@@ -66,7 +65,7 @@ function attach(server) {
             players: [null, null], names: ['Player 1', 'Player 2'],
             pads: [H / 2, H / 2], ball: makeBall(1), sc: [0, 0],
             playing: false, winner: -1, loop: null,
-            rec: [], spectators: []
+            spectators: []
           };
           rooms.set(code, r);
         }
@@ -109,10 +108,6 @@ function attach(server) {
         r.sc = [0, 0]; r.winner = -1; r.ball = makeBall(1); r.rec = [];
         broadcast(r, { t: 'start', names: r.names });
         startLoop(r);
-      } else if (m.t === 'replay') {
-        try {
-          ws.send(JSON.stringify({ t: 'replayData', frames: r.rec.slice(-MAX_FRAMES), names: r.names, sc: r.sc, winner: r.winner }));
-        } catch {}
       }
     });
 
@@ -164,9 +159,6 @@ function startLoop(r) {
       b.vy = (Math.random() - .5) * 5;
       broadcast(r, { t: 'goal', line: GOAL_LINES[Math.floor(Math.random() * GOAL_LINES.length)], sc: r.sc });
       checkWin(r);
-    }
-    if (r.rec.length < MAX_FRAMES) {
-      r.rec.push([b.x | 0, b.y | 0, r.pads[0] | 0, r.pads[1] | 0]);
     }
     broadcast(r, { t: 's', b: [+b.x.toFixed(1), +b.y.toFixed(1)], p: [+r.pads[0].toFixed(1), +r.pads[1].toFixed(1)], sc: r.sc });
   }, TICK);
