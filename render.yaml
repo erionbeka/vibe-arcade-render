@@ -15,3 +15,8 @@ services:
         value: "1"
       - key: AUTO_SEED
         value: "1"
+      # Persistent saves: create these after running `npm run backup:init`
+      - key: BACKUP_REPO
+        sync: false
+      - key: BACKUP_TOKEN
+        sync: false

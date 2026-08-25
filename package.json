@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
-    "seed": "node scripts/seed.js"
+    "seed": "node scripts/seed.js",
+    "backup:init": "node scripts/backup.js init",
+    "backup:snap": "node scripts/backup.js snap"
   },
   "dependencies": {
     "adm-zip": "^0.5.16",

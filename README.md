@@ -49,6 +49,24 @@ data/              sqlite db + session secret - created at runtime
 sample-game/       neon-snake.html you can use as your first upload
 ```
 
+## Persistent saves on free hosting
+
+Render's free disk is wiped on every reboot/sleep \u2014 but the arcade can save itself to a **private GitHub repo**:
+
+1. Run once, locally:
+   ```
+   npm run backup:init
+   ```
+   Creates private repo `vibe-arcade-backups` + pushes a first snapshot, then prints two variables.
+2. Paste those into Render \u2192 your service \u2192 **Environment**:
+   ```
+   BACKUP_REPO=https://github.com/<you>/vibe-arcade-backups
+   BACKUP_TOKEN=<the token it printed>
+   ```
+3. That's it. On every boot the server **restores** everything; every 15 minutes and on shutdown it **snapshots**: accounts, games, screenshots, ratings, comments, likes, play counts.
+
+Notes: files >80MB can't be backed up (GitHub limit); the backups repo grows over time \u2014 delete old snapshots there occasionally if it gets huge.
+
 ## Deploying FREE (Render)
 
 Fastest path — no credit card, live at `https://<yourname>.onrender.com` in ~10 minutes:

@@ -5,6 +5,16 @@ const express = require('express');
 const session = require('express-session');
 const rateLimit = require('express-rate-limit');
 
+// Restore saves from GitHub BEFORE opening the database, so a fresh container
+// wakes up with all games/ratings/comments/uploads intact.
+if (process.env.BACKUP_REPO && process.env.BACKUP_TOKEN) {
+  try {
+    require('./scripts/backup').restore();
+  } catch (err) {
+    console.error('[backup] restore error:', err.message);
+  }
+}
+
 require('./src/db'); // initialize database
 
 // On platforms with ephemeral disks (e.g. Render free tier), repopulate the
@@ -103,6 +113,22 @@ app.use((err, req, res, next) => {
 const server = app.listen(PORT, () => {
   console.log(`Vibe Arcade running at http://localhost:${PORT}`);
 });
+
+// Periodic + on-exit snapshots so reboots never lose user content
+if (process.env.BACKUP_REPO && process.env.BACKUP_TOKEN) {
+  const backup = require('./scripts/backup');
+  setInterval(() => {
+    try { backup.snapshot('periodic'); } catch (e) { console.error('[backup]', e.message); }
+  }, 15 * 60 * 1000);
+  const goodbye = sig => {
+    console.log(`\n${sig} received \u2014 saving arcade state...`);
+    try { backup.snapshot('shutdown'); } catch (e) { /* best effort */ }
+    process.exit(0);
+  };
+  process.on('SIGTERM', () => goodbye('SIGTERM'));
+  process.on('SIGINT', () => goodbye('SIGINT'));
+}
+
 server.on('error', (err) => {
   if (err.code === 'EADDRINUSE') {
     console.error(`Port ${PORT} is already in use. Run with another port:  set PORT=3001 && npm start`);
